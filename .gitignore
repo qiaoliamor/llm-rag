@@ -22,6 +22,9 @@ node_modules/
 dist/
 build/
 coverage/
+app/static/*
+!app/static/.gitkeep
+*.tsbuildinfo
 
 # Private runtime data
 data/

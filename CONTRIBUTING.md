@@ -6,6 +6,6 @@
 2. 涉及模型效果的改动同时说明模型、数据、提示版本及对照结果。
 3. 新功能同步更新需求、任务清单与相关验收场景。
 4. 不提交真实玩家聊天、个人信息、密钥、未授权游戏素材或角色设定。
-5. 提交前检查变更内容；运行 `uv run --frozen pytest -q`；模型效果评测另见 README。
+5. 提交前检查变更内容；先运行 `npm ci --prefix frontend`、`npm run build --prefix frontend`，再运行 `npm run test --prefix frontend` 和 `uv run --frozen pytest -q`；模型效果评测另见 README。
 
 默认使用中文说明，可附英文摘要。贡献内容按仓库 MIT 许可证提供；第三方内容需明确来源与授权。
