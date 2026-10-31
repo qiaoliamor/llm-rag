@@ -22,6 +22,14 @@
 
 > M1 已交付本地原型。鉴权为本地匿名 Cookie 会话；向量 RAG、持久化与生产账户系统不在本阶段。测试证据见 [M1 测试记录](docs/M1_TEST_REPORT.md)。
 
+### M1 补充 · Gemini
+
+- [x] 增加 Gemini 适配器，默认使用支持免费档的 `gemini-2.5-flash-lite`。
+- [x] 分离 Gemini/OpenAI 密钥配置，更新网页状态与评测入口。
+- [x] 完成 HTTP 模拟测试、故障处理和本地网页验证，保留 OpenAI 回归测试。
+- [x] 更新本地配置说明与 [Gemini 测试记录](docs/GEMINI_TEST_REPORT.md)。
+- [ ] 本地填写 Gemini 密钥后，验证真实账号额度与角色对话质量。
+
 ## M2 · P0 记忆与检索
 
 - [ ] 建立 PostgreSQL / pgvector、本地服务配置和迁移。

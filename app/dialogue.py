@@ -65,31 +65,77 @@ class MockProvider:
 
 
 class OpenAIProvider:
+    key_field = 'openai_api_key'
+    key_env = 'OPENAI_API_KEY'
+    label = 'OpenAI'
+
     def __init__(self, settings):
         self.settings = settings
 
+    def client_options(self):
+        return {}
+
+    async def request_reply(self, client, history, prompt):
+        response = await client.responses.create(
+            model=self.settings.openai_model, instructions=prompt,
+            input=history, max_output_tokens=500, store=False,
+        )
+        reply = response.output_text.strip()
+        if not reply or response.status != 'completed':
+            raise ProviderFailure('empty_response', '模型没有返回完整回复，请重试或检查模型配置。')
+        return reply
+
     async def generate(self, history, prompt):
-        from openai import AsyncOpenAI, APITimeoutError, APIConnectionError, AuthenticationError, RateLimitError, APIStatusError
-        key = self.settings.openai_api_key.get_secret_value()
+        from openai import AsyncOpenAI, APITimeoutError, APIConnectionError, AuthenticationError, RateLimitError, APIStatusError, BadRequestError, PermissionDeniedError
+        key = getattr(self.settings, self.key_field).get_secret_value().strip()
         if not key:
-            raise ProviderFailure('missing_api_key', '尚未配置密钥：请在本地 .env 填写 OPENAI_API_KEY 并重启服务。', 503)
+            raise ProviderFailure('missing_api_key', f'尚未配置密钥：请在本地 .env 填写 {self.key_env} 并重启服务。', 503)
         try:
-            async with AsyncOpenAI(api_key=key, timeout=self.settings.api_timeout_seconds, max_retries=0) as client:
-                response = await client.responses.create(
-                    model=self.settings.openai_model, instructions=prompt,
-                    input=history, max_output_tokens=500, store=False,
-                )
-            reply = response.output_text.strip()
-            if not reply or response.status != 'completed':
-                raise ProviderFailure('empty_response', '模型没有返回完整回复，请重试或检查模型配置。')
-            return reply
+            async with AsyncOpenAI(api_key=key, timeout=self.settings.api_timeout_seconds, max_retries=0, **self.client_options()) as client:
+                return await self.request_reply(client, history, prompt)
         except AuthenticationError:
             raise ProviderFailure('invalid_api_key', 'API 认证失败，请检查本地密钥后重启。', 503) from None
+        except PermissionDeniedError:
+            raise ProviderFailure('permission_denied', 'API 访问被拒绝，请检查密钥权限、项目及所在地区的服务支持。', 503) from None
+        except BadRequestError:
+            raise ProviderFailure('invalid_config', 'API 请求配置无效，请检查本地密钥、模型名称和模型支持的参数。', 503) from None
         except RateLimitError:
             raise ProviderFailure('rate_limit', 'API 配额不足或请求过快，请检查额度后稍后重试。', 429) from None
         except APITimeoutError:
             raise ProviderFailure('timeout', '模型响应超时，请稍后重试。', 504) from None
         except APIConnectionError:
-            raise ProviderFailure('connection', '无法连接 OpenAI，请检查本机网络。', 502) from None
+            raise ProviderFailure('connection', f'无法连接 {self.label}，请检查本机网络。', 502) from None
         except APIStatusError:
             raise ProviderFailure('upstream_error', '模型服务暂不可用，请检查模型配置或稍后重试。') from None
+
+
+class GeminiProvider(OpenAIProvider):
+    """Google's official OpenAI-compatible Chat Completions endpoint."""
+    key_field = 'gemini_api_key'
+    key_env = 'GEMINI_API_KEY'
+    label = 'Gemini'
+
+    def client_options(self):
+        return {'base_url': 'https://generativelanguage.googleapis.com/v1beta/openai/'}
+
+    async def request_reply(self, client, history, prompt):
+        response = await client.chat.completions.create(
+            model=self.settings.gemini_model,
+            messages=[{'role': 'system', 'content': prompt}, *history],
+            max_tokens=500,
+        )
+        if not response.choices:
+            raise ProviderFailure('empty_response', 'Gemini 未返回回复，请重试。')
+        choice = response.choices[0]
+        if choice.finish_reason == 'content_filter' or choice.message.refusal:
+            raise ProviderFailure('content_blocked', 'Gemini 未能回答这条消息，可以换一种表达再试。', 422)
+        if choice.finish_reason != 'stop' or not choice.message.content or not choice.message.content.strip():
+            raise ProviderFailure('empty_response', 'Gemini 未返回完整回复，请重试或缩短问题。')
+        return choice.message.content.strip()
+
+
+def build_provider(settings):
+    providers = {'mock': MockProvider, 'openai': OpenAIProvider, 'gemini': GeminiProvider}
+    if settings.chat_provider == 'mock':
+        return MockProvider()
+    return providers[settings.chat_provider](settings)

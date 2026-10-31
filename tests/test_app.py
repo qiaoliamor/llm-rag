@@ -22,7 +22,7 @@ def connected(provider=None):
 
 
 def test_page_config_and_secret_not_exposed():
-    client = TestClient(create_app(Settings(_env_file=None, openai_api_key='test-private-value')))
+    client = TestClient(create_app(Settings(_env_file=None, chat_provider='openai', openai_api_key='test-private-value')))
     assert client.get('/').status_code == 200
     response = client.get('/v1/session')
     assert response.json()['configured']
@@ -70,7 +70,7 @@ def test_body_limit_and_host():
 
 
 def test_missing_key_is_explicit_not_mock():
-    client = TestClient(create_app(Settings(_env_file=None, openai_api_key='')))
+    client = TestClient(create_app(Settings(_env_file=None, chat_provider='openai', openai_api_key='')))
     data = client.get('/v1/session').json()
     assert not data['configured']
     result = client.post('/v1/chat', headers={'x-csrf-token':data['csrf_token']}, json={'message':'你好'})
@@ -139,7 +139,7 @@ def test_openai_request_contract(monkeypatch):
         async def __aenter__(self): return self
         async def __aexit__(self, *args): pass
     monkeypatch.setattr('openai.AsyncOpenAI', Client)
-    provider = OpenAIProvider(Settings(_env_file=None, openai_api_key='test-local'))
+    provider = OpenAIProvider(Settings(_env_file=None, chat_provider='openai', openai_api_key='test-local'))
     result = asyncio.run(provider.generate([{'role':'user','content':'你好'}], '角色设定'))
     assert result == '我在听。'
     kwargs = generate.call_args.kwargs
@@ -187,7 +187,7 @@ def test_sdk_failures_are_sanitized(monkeypatch, kind, status, code):
         async def __aenter__(self): return self
         async def __aexit__(self, *args): pass
     monkeypatch.setattr('openai.AsyncOpenAI', Client)
-    client = TestClient(create_app(Settings(_env_file=None, openai_api_key='test-private-value')))
+    client = TestClient(create_app(Settings(_env_file=None, chat_provider='openai', openai_api_key='test-private-value')))
     csrf = client.get('/v1/session').json()['csrf_token']
     result = client.post('/v1/chat', headers={'x-csrf-token':csrf}, json={'message':'你好'})
     assert result.status_code == status

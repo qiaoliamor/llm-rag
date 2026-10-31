@@ -11,7 +11,7 @@ from pydantic import BaseModel, Field, field_validator
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from .config import ROOT, Settings
-from .dialogue import CHARACTER, FALLBACK, MockProvider, OpenAIProvider, ProviderFailure, conflicts, instructions
+from .dialogue import CHARACTER, FALLBACK, build_provider, ProviderFailure, conflicts, instructions
 
 
 @dataclass
@@ -35,7 +35,7 @@ class ChatInput(BaseModel):
 
 def create_app(settings=None, provider=None):
     settings = settings or Settings()
-    provider = provider or (MockProvider() if settings.chat_provider == 'mock' else OpenAIProvider(settings))
+    provider = provider or build_provider(settings)
     app = FastAPI(docs_url=None, redoc_url=None)
     app.state.sessions = sessions = {}
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=['127.0.0.1', 'localhost', 'testserver'])
@@ -99,8 +99,9 @@ def create_app(settings=None, provider=None):
         session.touched = now
         response = JSONResponse({'csrf_token': session.csrf, 'messages': session.messages,
                                  'character': CHARACTER, 'provider': settings.chat_provider,
-                                 'model': settings.openai_model if settings.chat_provider == 'openai' else '离线演示',
-                                 'configured': settings.chat_provider == 'mock' or bool(settings.openai_api_key.get_secret_value())})
+                                 'model': settings.selected_model,
+                                 'api_key_env': settings.api_key_env,
+                                 'configured': settings.configured})
         response.set_cookie('persona_session', sid, httponly=True, samesite='strict', max_age=settings.session_ttl_seconds)
         return response
 

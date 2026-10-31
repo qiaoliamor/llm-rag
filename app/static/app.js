@@ -20,11 +20,12 @@ async function api(path, options = {}) {
 async function init() {
   try {
     const data = await api('/v1/session'); csrf = data.csrf_token;
-    $('status').textContent = data.provider === 'mock' ? '● 离线演示 · 非真实模型回复' : data.configured ? '● OpenAI API · 已配置' : '○ OpenAI API · 等待本地密钥';
+    const providerLabel = data.provider === 'gemini' ? 'Gemini API' : 'OpenAI API';
+    $('status').textContent = data.provider === 'mock' ? '● 离线演示 · 非真实模型回复' : `${data.configured ? '●' : '○'} ${providerLabel} · ${data.configured ? '已配置' : '等待本地密钥'}`;
     $('model').textContent = data.model;
     for (const m of data.messages) addMessage(m.role, m.content);
     $('welcome').hidden = data.messages.length > 0;
-    if (!data.configured) error('请在项目 .env 中填写 OPENAI_API_KEY 并重启服务。密钥仅由本地后端读取。');
+    if (!data.configured) error(`请在项目 .env 中填写 ${data.api_key_env} 并重启服务。密钥仅由本地后端读取。`);
   } catch { error('无法连接本地服务，请确认服务已启动，然后刷新。'); }
   controls();
 }
