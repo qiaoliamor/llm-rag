@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>心语 · 栖川旧书店</title><link rel="stylesheet" href="/static/style.css"><script src="/static/app.js" defer></script></head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+<a class="brand" href="/">心语<span>PERSONA / 01</span></a>
+<div class="portrait" aria-label="栖川旧书店的窗与书架插画"><div class="moon"></div><div class="window"></div><div class="books"><i></i><i></i><i></i><i></i><i></i></div><span>栖川 · 旧书店</span></div>
+<div class="profile"><p class="eyebrow">YOUR COMPANION</p><h1>沈砚<span>SHEN YAN</span></h1><p>听你说，也陪你慢慢想。</p><div class="tags"><span>温和沉稳</span><span>旧书修补者</span><span>28 岁</span></div></div>
+<div class="note"><span>关于他</span><p>三年前，在栖川开了一家旧书店。喜欢修补旧书，也收集读者留在书页间的便签。</p><p>“有些话，不必急着说完。”</p></div>
+<div class="sidebar-bottom"><span class="dot"></span> 单角色对话原型 · M1<p>会话临时保留于本机服务内存，重启后清除。尚未启用长期记忆。</p></div>
+</aside>
+<main>
+<header><div><span class="eyebrow">A LITTLE SPACE FOR YOU</span><h2>留一点时间，给自己。</h2></div><button id="reset" class="quiet" type="button">↺ 开始新对话</button></header>
+<div class="connection"><span id="status">正在连接本地服务…</span><span id="model"></span></div>
+<section id="messages" class="messages" aria-label="对话消息" aria-live="polite"><div id="welcome" class="welcome"><div class="book-icon">书</div><p class="eyebrow">WELCOME TO QICHUAN</p><h3>今天，想从哪里说起？</h3><p>门还开着，给你留了一个靠窗的位置。<br>聊聊今天的小事，或者只是待一会儿。</p><div class="suggestions"><button type="button">今天工作有点累</button><button type="button">介绍一下你的书店吧</button><button type="button">明天有面试，有些紧张</button></div></div></section>
+<div class="composer-area"><p id="error" role="alert" hidden></p><form id="chat-form"><label for="message" class="sr-only">想对沈砚说的话</label><textarea id="message" placeholder="把今天的心事，慢慢说给我听…" maxlength="2000" rows="2" required></textarea><div class="composer-footer"><span id="counter">0 / 2000</span><button id="send" type="submit" disabled>发送 <span>↑</span></button></div></form><p class="footnote">Enter 发送 · Shift + Enter 换行 <span>AI 角色生成内容可能有误，请勿输入敏感信息。</span></p></div>
+</main></div>
+<dialog id="reset-dialog"><h3>翻开新的一页？</h3><p>当前对话会被清空，无法恢复。</p><div><button id="cancel-reset" class="quiet">再聊一会儿</button><button id="confirm-reset">开始新对话</button></div></dialog>
+</body></html>

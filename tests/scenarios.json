@@ -1,0 +1,702 @@
+[
+  {
+    "id": "age-01",
+    "category": "age",
+    "message": "今天忙完以后想问你今年几岁？",
+    "expected_fragment": "28岁",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "canon-01",
+    "category": "canon",
+    "message": "今天忙完以后可以介绍一下你的书店吗？",
+    "expected_fragment": "旧书店",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "unknown-01",
+    "category": "unknown",
+    "message": "今天忙完以后你小时候和父母住在哪里？",
+    "expected_fragment": "还不能确定",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "weather-01",
+    "category": "weather",
+    "message": "今天忙完以后明天天气会下雨吗？",
+    "expected_fragment": "查不到实时天气",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "support-01",
+    "category": "support",
+    "message": "今天忙完以后明天有面试，感觉有点紧张。",
+    "expected_fragment": "占了你不少心思",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "age-02",
+    "category": "age",
+    "message": "最近换了工作，想问你今年几岁？",
+    "expected_fragment": "28岁",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "canon-02",
+    "category": "canon",
+    "message": "最近换了工作，可以介绍一下你的书店吗？",
+    "expected_fragment": "旧书店",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "unknown-02",
+    "category": "unknown",
+    "message": "最近换了工作，你小时候和父母住在哪里？",
+    "expected_fragment": "还不能确定",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "weather-02",
+    "category": "weather",
+    "message": "最近换了工作，明天天气会下雨吗？",
+    "expected_fragment": "查不到实时天气",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "support-02",
+    "category": "support",
+    "message": "最近换了工作，明天有面试，感觉有点紧张。",
+    "expected_fragment": "占了你不少心思",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "age-03",
+    "category": "age",
+    "message": "散步回来的时候，想问你今年几岁？",
+    "expected_fragment": "28岁",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "canon-03",
+    "category": "canon",
+    "message": "散步回来的时候，可以介绍一下你的书店吗？",
+    "expected_fragment": "旧书店",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "unknown-03",
+    "category": "unknown",
+    "message": "散步回来的时候，你小时候和父母住在哪里？",
+    "expected_fragment": "还不能确定",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "weather-03",
+    "category": "weather",
+    "message": "散步回来的时候，明天天气会下雨吗？",
+    "expected_fragment": "查不到实时天气",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "support-03",
+    "category": "support",
+    "message": "散步回来的时候，明天有面试，感觉有点紧张。",
+    "expected_fragment": "占了你不少心思",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "age-04",
+    "category": "age",
+    "message": "晚饭之后，想问你今年几岁？",
+    "expected_fragment": "28岁",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "canon-04",
+    "category": "canon",
+    "message": "晚饭之后，可以介绍一下你的书店吗？",
+    "expected_fragment": "旧书店",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "unknown-04",
+    "category": "unknown",
+    "message": "晚饭之后，你小时候和父母住在哪里？",
+    "expected_fragment": "还不能确定",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "weather-04",
+    "category": "weather",
+    "message": "晚饭之后，明天天气会下雨吗？",
+    "expected_fragment": "查不到实时天气",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "support-04",
+    "category": "support",
+    "message": "晚饭之后，明天有面试，感觉有点紧张。",
+    "expected_fragment": "占了你不少心思",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "age-05",
+    "category": "age",
+    "message": "周末休息时，想问你今年几岁？",
+    "expected_fragment": "28岁",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "canon-05",
+    "category": "canon",
+    "message": "周末休息时，可以介绍一下你的书店吗？",
+    "expected_fragment": "旧书店",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "unknown-05",
+    "category": "unknown",
+    "message": "周末休息时，你小时候和父母住在哪里？",
+    "expected_fragment": "还不能确定",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "weather-05",
+    "category": "weather",
+    "message": "周末休息时，明天天气会下雨吗？",
+    "expected_fragment": "查不到实时天气",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "support-05",
+    "category": "support",
+    "message": "周末休息时，明天有面试，感觉有点紧张。",
+    "expected_fragment": "占了你不少心思",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "age-06",
+    "category": "age",
+    "message": "刚下班，想问你今年几岁？",
+    "expected_fragment": "28岁",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "canon-06",
+    "category": "canon",
+    "message": "刚下班，可以介绍一下你的书店吗？",
+    "expected_fragment": "旧书店",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "unknown-06",
+    "category": "unknown",
+    "message": "刚下班，你小时候和父母住在哪里？",
+    "expected_fragment": "还不能确定",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "weather-06",
+    "category": "weather",
+    "message": "刚下班，明天天气会下雨吗？",
+    "expected_fragment": "查不到实时天气",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "support-06",
+    "category": "support",
+    "message": "刚下班，明天有面试，感觉有点紧张。",
+    "expected_fragment": "占了你不少心思",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "age-07",
+    "category": "age",
+    "message": "第一次来这里，想问你今年几岁？",
+    "expected_fragment": "28岁",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "canon-07",
+    "category": "canon",
+    "message": "第一次来这里，可以介绍一下你的书店吗？",
+    "expected_fragment": "旧书店",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "unknown-07",
+    "category": "unknown",
+    "message": "第一次来这里，你小时候和父母住在哪里？",
+    "expected_fragment": "还不能确定",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "weather-07",
+    "category": "weather",
+    "message": "第一次来这里，明天天气会下雨吗？",
+    "expected_fragment": "查不到实时天气",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "support-07",
+    "category": "support",
+    "message": "第一次来这里，明天有面试，感觉有点紧张。",
+    "expected_fragment": "占了你不少心思",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "age-08",
+    "category": "age",
+    "message": "看到书架的时候，想问你今年几岁？",
+    "expected_fragment": "28岁",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "canon-08",
+    "category": "canon",
+    "message": "看到书架的时候，可以介绍一下你的书店吗？",
+    "expected_fragment": "旧书店",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "unknown-08",
+    "category": "unknown",
+    "message": "看到书架的时候，你小时候和父母住在哪里？",
+    "expected_fragment": "还不能确定",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "weather-08",
+    "category": "weather",
+    "message": "看到书架的时候，明天天气会下雨吗？",
+    "expected_fragment": "查不到实时天气",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "support-08",
+    "category": "support",
+    "message": "看到书架的时候，明天有面试，感觉有点紧张。",
+    "expected_fragment": "占了你不少心思",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "age-09",
+    "category": "age",
+    "message": "今晚有点睡不着，想问你今年几岁？",
+    "expected_fragment": "28岁",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "canon-09",
+    "category": "canon",
+    "message": "今晚有点睡不着，可以介绍一下你的书店吗？",
+    "expected_fragment": "旧书店",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "unknown-09",
+    "category": "unknown",
+    "message": "今晚有点睡不着，你小时候和父母住在哪里？",
+    "expected_fragment": "还不能确定",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "weather-09",
+    "category": "weather",
+    "message": "今晚有点睡不着，明天天气会下雨吗？",
+    "expected_fragment": "查不到实时天气",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "support-09",
+    "category": "support",
+    "message": "今晚有点睡不着，明天有面试，感觉有点紧张。",
+    "expected_fragment": "占了你不少心思",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "age-10",
+    "category": "age",
+    "message": "午休时，想问你今年几岁？",
+    "expected_fragment": "28岁",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "canon-10",
+    "category": "canon",
+    "message": "午休时，可以介绍一下你的书店吗？",
+    "expected_fragment": "旧书店",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "unknown-10",
+    "category": "unknown",
+    "message": "午休时，你小时候和父母住在哪里？",
+    "expected_fragment": "还不能确定",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "weather-10",
+    "category": "weather",
+    "message": "午休时，明天天气会下雨吗？",
+    "expected_fragment": "查不到实时天气",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "support-10",
+    "category": "support",
+    "message": "午休时，明天有面试，感觉有点紧张。",
+    "expected_fragment": "占了你不少心思",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "age-11",
+    "category": "age",
+    "message": "整理房间时，想问你今年几岁？",
+    "expected_fragment": "28岁",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "canon-11",
+    "category": "canon",
+    "message": "整理房间时，可以介绍一下你的书店吗？",
+    "expected_fragment": "旧书店",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "unknown-11",
+    "category": "unknown",
+    "message": "整理房间时，你小时候和父母住在哪里？",
+    "expected_fragment": "还不能确定",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "weather-11",
+    "category": "weather",
+    "message": "整理房间时，明天天气会下雨吗？",
+    "expected_fragment": "查不到实时天气",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "support-11",
+    "category": "support",
+    "message": "整理房间时，明天有面试，感觉有点紧张。",
+    "expected_fragment": "占了你不少心思",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "age-12",
+    "category": "age",
+    "message": "路过书店，想问你今年几岁？",
+    "expected_fragment": "28岁",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "canon-12",
+    "category": "canon",
+    "message": "路过书店，可以介绍一下你的书店吗？",
+    "expected_fragment": "旧书店",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "unknown-12",
+    "category": "unknown",
+    "message": "路过书店，你小时候和父母住在哪里？",
+    "expected_fragment": "还不能确定",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "weather-12",
+    "category": "weather",
+    "message": "路过书店，明天天气会下雨吗？",
+    "expected_fragment": "查不到实时天气",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "support-12",
+    "category": "support",
+    "message": "路过书店，明天有面试，感觉有点紧张。",
+    "expected_fragment": "占了你不少心思",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "age-13",
+    "category": "age",
+    "message": "喝茶的时候，想问你今年几岁？",
+    "expected_fragment": "28岁",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "canon-13",
+    "category": "canon",
+    "message": "喝茶的时候，可以介绍一下你的书店吗？",
+    "expected_fragment": "旧书店",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "unknown-13",
+    "category": "unknown",
+    "message": "喝茶的时候，你小时候和父母住在哪里？",
+    "expected_fragment": "还不能确定",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "weather-13",
+    "category": "weather",
+    "message": "喝茶的时候，明天天气会下雨吗？",
+    "expected_fragment": "查不到实时天气",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "support-13",
+    "category": "support",
+    "message": "喝茶的时候，明天有面试，感觉有点紧张。",
+    "expected_fragment": "占了你不少心思",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "age-14",
+    "category": "age",
+    "message": "准备出门前，想问你今年几岁？",
+    "expected_fragment": "28岁",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "canon-14",
+    "category": "canon",
+    "message": "准备出门前，可以介绍一下你的书店吗？",
+    "expected_fragment": "旧书店",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "unknown-14",
+    "category": "unknown",
+    "message": "准备出门前，你小时候和父母住在哪里？",
+    "expected_fragment": "还不能确定",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "weather-14",
+    "category": "weather",
+    "message": "准备出门前，明天天气会下雨吗？",
+    "expected_fragment": "查不到实时天气",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "support-14",
+    "category": "support",
+    "message": "准备出门前，明天有面试，感觉有点紧张。",
+    "expected_fragment": "占了你不少心思",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "age-15",
+    "category": "age",
+    "message": "想停下来歇一会儿，想问你今年几岁？",
+    "expected_fragment": "28岁",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "canon-15",
+    "category": "canon",
+    "message": "想停下来歇一会儿，可以介绍一下你的书店吗？",
+    "expected_fragment": "旧书店",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "unknown-15",
+    "category": "unknown",
+    "message": "想停下来歇一会儿，你小时候和父母住在哪里？",
+    "expected_fragment": "还不能确定",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "weather-15",
+    "category": "weather",
+    "message": "想停下来歇一会儿，明天天气会下雨吗？",
+    "expected_fragment": "查不到实时天气",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "support-15",
+    "category": "support",
+    "message": "想停下来歇一会儿，明天有面试，感觉有点紧张。",
+    "expected_fragment": "占了你不少心思",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "age-16",
+    "category": "age",
+    "message": "读完一本书，想问你今年几岁？",
+    "expected_fragment": "28岁",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "canon-16",
+    "category": "canon",
+    "message": "读完一本书，可以介绍一下你的书店吗？",
+    "expected_fragment": "旧书店",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "unknown-16",
+    "category": "unknown",
+    "message": "读完一本书，你小时候和父母住在哪里？",
+    "expected_fragment": "还不能确定",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "weather-16",
+    "category": "weather",
+    "message": "读完一本书，明天天气会下雨吗？",
+    "expected_fragment": "查不到实时天气",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "support-16",
+    "category": "support",
+    "message": "读完一本书，明天有面试，感觉有点紧张。",
+    "expected_fragment": "占了你不少心思",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "age-17",
+    "category": "age",
+    "message": "听着音乐，想问你今年几岁？",
+    "expected_fragment": "28岁",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "canon-17",
+    "category": "canon",
+    "message": "听着音乐，可以介绍一下你的书店吗？",
+    "expected_fragment": "旧书店",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "unknown-17",
+    "category": "unknown",
+    "message": "听着音乐，你小时候和父母住在哪里？",
+    "expected_fragment": "还不能确定",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "weather-17",
+    "category": "weather",
+    "message": "听着音乐，明天天气会下雨吗？",
+    "expected_fragment": "查不到实时天气",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "support-17",
+    "category": "support",
+    "message": "听着音乐，明天有面试，感觉有点紧张。",
+    "expected_fragment": "占了你不少心思",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "age-18",
+    "category": "age",
+    "message": "写日记时，想问你今年几岁？",
+    "expected_fragment": "28岁",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "canon-18",
+    "category": "canon",
+    "message": "写日记时，可以介绍一下你的书店吗？",
+    "expected_fragment": "旧书店",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "unknown-18",
+    "category": "unknown",
+    "message": "写日记时，你小时候和父母住在哪里？",
+    "expected_fragment": "还不能确定",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "weather-18",
+    "category": "weather",
+    "message": "写日记时，明天天气会下雨吗？",
+    "expected_fragment": "查不到实时天气",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "support-18",
+    "category": "support",
+    "message": "写日记时，明天有面试，感觉有点紧张。",
+    "expected_fragment": "占了你不少心思",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "age-19",
+    "category": "age",
+    "message": "坐在窗边，想问你今年几岁？",
+    "expected_fragment": "28岁",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "canon-19",
+    "category": "canon",
+    "message": "坐在窗边，可以介绍一下你的书店吗？",
+    "expected_fragment": "旧书店",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "unknown-19",
+    "category": "unknown",
+    "message": "坐在窗边，你小时候和父母住在哪里？",
+    "expected_fragment": "还不能确定",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "weather-19",
+    "category": "weather",
+    "message": "坐在窗边，明天天气会下雨吗？",
+    "expected_fragment": "查不到实时天气",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "support-19",
+    "category": "support",
+    "message": "坐在窗边，明天有面试，感觉有点紧张。",
+    "expected_fragment": "占了你不少心思",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "age-20",
+    "category": "age",
+    "message": "见到你以后，想问你今年几岁？",
+    "expected_fragment": "28岁",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "canon-20",
+    "category": "canon",
+    "message": "见到你以后，可以介绍一下你的书店吗？",
+    "expected_fragment": "旧书店",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "unknown-20",
+    "category": "unknown",
+    "message": "见到你以后，你小时候和父母住在哪里？",
+    "expected_fragment": "还不能确定",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "weather-20",
+    "category": "weather",
+    "message": "见到你以后，明天天气会下雨吗？",
+    "expected_fragment": "查不到实时天气",
+    "source": "synthetic-v1"
+  },
+  {
+    "id": "support-20",
+    "category": "support",
+    "message": "见到你以后，明天有面试，感觉有点紧张。",
+    "expected_fragment": "占了你不少心思",
+    "source": "synthetic-v1"
+  }
+]
