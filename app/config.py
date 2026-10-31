@@ -9,7 +9,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=ROOT / '.env', extra='ignore')
     chat_provider: str = Field(default='gemini', pattern='^(gemini|openai|mock)$')
     gemini_api_key: SecretStr = SecretStr('')
-    gemini_model: str = 'gemini-2.5-flash-lite'
+    gemini_model: str = 'gemini-3.5-flash-lite'
+    memory_database_url: SecretStr = SecretStr('sqlite:///data/memory.sqlite3')
     openai_api_key: SecretStr = SecretStr('')
     openai_model: str = 'gpt-4.1-mini'
     api_timeout_seconds: float = Field(default=30, ge=1, le=120)

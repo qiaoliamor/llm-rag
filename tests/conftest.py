@@ -1,0 +1,12 @@
+"""All tests default to disposable storage, never the user's .env/database."""
+import os
+import tempfile
+import pytest
+
+_test_database = tempfile.TemporaryDirectory(prefix='persona-tests-')
+os.environ['MEMORY_DATABASE_URL'] = 'sqlite:///' + _test_database.name + '/bootstrap.sqlite3'
+
+
+@pytest.fixture(autouse=True)
+def isolated_memory_database(monkeypatch, tmp_path):
+    monkeypatch.setenv('MEMORY_DATABASE_URL', 'sqlite:///' + str(tmp_path / 'memory.sqlite3'))

@@ -18,5 +18,12 @@ if [ ! -f frontend/node_modules/.package-lock.json ] || [ frontend/package-lock.
   npm ci --prefix frontend
 fi
 npm run build --prefix frontend
+if uv run --frozen python -c "from app.config import Settings; import sys; sys.exit(0 if '@127.0.0.1:54329/persona' in Settings().memory_database_url.get_secret_value() else 1)"; then
+  if ! docker info >/dev/null 2>&1; then
+    echo '请先启动 Docker Desktop，再运行此脚本。记忆数据库不会被自动替换。'
+    exit 1
+  fi
+  docker compose up -d --wait db
+fi
 echo '心语 · 本地地址 http://127.0.0.1:8000（Ctrl+C 停止）'
 exec uv run --frozen uvicorn app.main:app --host 127.0.0.1 --port 8000

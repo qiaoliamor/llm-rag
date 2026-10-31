@@ -1,7 +1,7 @@
 import type { ChatResponse, SessionResponse } from './types';
 
 export class ApiError extends Error {
-  constructor(message: string, readonly status: number) {
+  constructor(message: string, readonly status: number, readonly code?: string) {
     super(message);
   }
 }
@@ -22,7 +22,8 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   }
   if (!response.ok) {
     const detail = typeof body === 'object' && body !== null && 'detail' in body ? body.detail : null;
-    throw new ApiError(typeof detail === 'string' ? detail : '输入无效，请检查消息长度后重试。', response.status);
+    const code = typeof body === 'object' && body !== null && 'code' in body && typeof body.code === 'string' ? body.code : undefined;
+    throw new ApiError(typeof detail === 'string' ? detail : '输入无效，请检查消息长度后重试。', response.status, code);
   }
   return body as T;
 }
@@ -38,3 +39,20 @@ export const sendMessage = (message: string, csrf: string) => request<ChatRespon
 export const clearSession = (csrf: string) => request<{ ok: boolean }>('/v1/session', {
   method: 'DELETE', headers: { 'X-CSRF-Token': csrf },
 });
+
+export const getMemories = () => request<import('./types').MemoryList>('/v1/memories');
+export const addMemory = (fact: string, csrf: string) => request('/v1/memories', {
+  method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf }, body: JSON.stringify({ fact }),
+});
+export const editMemory = (id: string, version: number, fact: string, confirm: boolean, replace: boolean, csrf: string, keepBoth = false) => request(`/v1/memories/${id}`, {
+  method: 'PATCH', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf },
+  body: JSON.stringify({ version, fact, confirm, replace_conflicts: replace, keep_both: keepBoth }),
+});
+export const deleteMemory = (id: string, version: number, csrf: string) => request(`/v1/memories/${id}?version=${version}`, {
+  method: 'DELETE', headers: { 'X-CSRF-Token': csrf },
+});
+export const deleteAllMemories = (csrf: string) => request('/v1/memories', { method: 'DELETE', headers: { 'X-CSRF-Token': csrf } });
+export const setMemorySettings = (memory_enabled: boolean, timezone: string, csrf: string) => request('/v1/settings', {
+  method: 'PATCH', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf }, body: JSON.stringify({ memory_enabled, timezone }),
+});
+export const getProject = () => request<{ todo: string; plan: string }>('/v1/project');

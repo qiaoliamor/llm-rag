@@ -25,7 +25,7 @@ def install_transport(monkeypatch, handler):
 
 def completion(content='我是沈砚，今年28岁。', finish='stop', refusal=None):
     return {'id':'test-completion', 'object':'chat.completion', 'created':0,
-            'model':'gemini-2.5-flash-lite',
+            'model':'gemini-3.5-flash-lite',
             'choices':[{'index':0, 'finish_reason':finish,
                         'message':{'role':'assistant', 'content':content, 'refusal':refusal}}]}
 
@@ -48,7 +48,7 @@ def test_real_sdk_wire_and_multiturn(monkeypatch):
         assert str(request.url) == 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions'
         assert request.headers['authorization'] == 'Bearer test-gemini-private'
         payload = json.loads(request.content)
-        assert payload['model'] == 'gemini-2.5-flash-lite'
+        assert payload['model'] == 'gemini-3.5-flash-lite'
         assert payload['max_tokens'] == 500
         assert payload['messages'][0] == {'role':'system', 'content':instructions()}
         assert 'store' not in payload and 'instructions' not in payload
@@ -62,7 +62,7 @@ def test_real_sdk_wire_and_multiturn(monkeypatch):
     assert requests[1]['messages'][1]['content'] == '我明天有面试'
     session = client.get('/v1/session').json()
     assert session['provider'] == 'gemini'
-    assert session['model'] == 'gemini-2.5-flash-lite'
+    assert session['model'] == 'gemini-3.5-flash-lite'
     assert session['configured']
     assert 'test-gemini-private' not in json.dumps(session)
 
@@ -97,7 +97,7 @@ def test_transport_failure(monkeypatch, error, code, status):
 
 
 @pytest.mark.parametrize('payload,code,status', [
-    ({'id':'empty','object':'chat.completion','created':0,'model':'gemini-2.5-flash-lite','choices':[]},'empty_response',502),
+    ({'id':'empty','object':'chat.completion','created':0,'model':'gemini-3.5-flash-lite','choices':[]},'empty_response',502),
     (completion(''),'empty_response',502),
     (completion('   '),'empty_response',502),
     (completion(None),'empty_response',502),

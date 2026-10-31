@@ -1,0 +1,19 @@
+name: persona-rag
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_DB: persona
+      POSTGRES_USER: persona
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in local .env}
+    ports:
+      - '127.0.0.1:54329:5432'
+    volumes:
+      - persona_memory:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U persona -d persona']
+      interval: 2s
+      timeout: 3s
+      retries: 30
+volumes:
+  persona_memory:

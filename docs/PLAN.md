@@ -1,15 +1,17 @@
 # 实施计划
 
-> 2026-10-31 进度：M0 和 M1 基础实现已完成；代码 `21c487e` 经本地模型覆盖使用 Gemini 3.5 Flash-Lite 完成真实对话小样本验证。下文为整体实施计划，其中数据库、长期记忆、天气、独立情绪分析及正式消融评测仍未实现/完成。当前架构见 [ARCHITECTURE.md](ARCHITECTURE.md)，实际进度与问题见 [PROJECT_STATUS.md](PROJECT_STATUS.md) 和 [TEST_HISTORY.md](TEST_HISTORY.md)。M2 开始前已完成 React + TypeScript 前端迁移，后端接口未变；见 [迁移记录](FRONTEND_MIGRATION.md)。
+> 2026-10-31 进度：M0、M1及M2本地记忆闭环已完成；代码 `21c487e` 经本地模型覆盖使用 Gemini 3.5 Flash-Lite 完成真实对话小样本验证。下文为整体实施计划，其中 PostgreSQL/pgvector、确认式长期记忆、混合检索及网页管理已实现；天气、独立情绪分析及正式消融评测仍未完成。当前架构见 [ARCHITECTURE.md](ARCHITECTURE.md)，实际进度与问题见 [PROJECT_STATUS.md](PROJECT_STATUS.md) 和 [TEST_HISTORY.md](TEST_HISTORY.md)。M2 开始前已完成 React + TypeScript 前端迁移，后端接口未变；见 [迁移记录](FRONTEND_MIGRATION.md)。
 
 
 ## 1. 实施原则
 
 先用合成数据构建单角色闭环，再验证长期记忆、外部工具和情绪策略。检索与提示优化属于待验证的研究假设：预期降低无依据事实和正史矛盾，但必须同时观察自然度、成本及延迟。
 
-## 2. 拟议技术方案
+M2具体边界：自动提取采用保守规则并允许手动补充；768维向量为本地字符特征哈希，而非神经语义模型。PG精确向量检索与关键词融合已经运行，正式召回率仍待M5评测。见 [M2测试记录](M2_TEST_REPORT.md)。
 
-以下是待原型验证的初始方案，不代表已安装依赖或完成供应商选型。
+## 2. 初始技术方案与当前落地
+
+下表保留初始分层意图；M2已落实数据库与记忆，现状以架构及测试记录为准。
 
 | 层 | 初始方案 | 选择依据 |
 | --- | --- | --- |
