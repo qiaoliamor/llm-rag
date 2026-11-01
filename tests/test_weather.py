@@ -1,5 +1,6 @@
 """Synthetic, isolated M3 tests. No live provider, .env or player data."""
 import asyncio
+import json
 from datetime import datetime, timedelta, timezone
 from unittest.mock import AsyncMock
 
@@ -367,3 +368,97 @@ def test_delete_cannot_be_undone_by_an_older_inflight_save(tmp_path):
     finally: finish.set();thread.join(3)
     assert results[0].status_code==409
     assert c.get('/v1/weather/settings').json()=={'enabled':False,'place':None}
+
+
+def test_humidity_projection_is_current_only_and_optional(monkeypatch):
+    monkeypatch.setattr('app.weather.clock',lambda:NOW)
+    data=payload();data['current']['relative_humidity_2m']=82;data['current_units']['relative_humidity_2m']='%'
+    provider=OpenMeteoProvider();provider._json=AsyncMock(return_value=data)
+    current=run(provider.forecast(TOKYO,WeatherIntent(kind='current')))
+    assert current['humidity_pct']==82
+    assert 'humidity_pct' not in run(provider.forecast(TOKYO,WeatherIntent(day='明天')))
+    data['current']['relative_humidity_2m']=None;provider.clear()
+    assert 'humidity_pct' not in run(provider.forecast(TOKYO,WeatherIntent(kind='current')))
+
+
+@pytest.mark.parametrize('humidity,unit',[(101,'%'),(-1,'%'),(float('nan'),'%'),(True,'%'),(60,'g/m3')])
+def test_invalid_humidity_rejected(monkeypatch,humidity,unit):
+    monkeypatch.setattr('app.weather.clock',lambda:NOW)
+    data=payload();data['current']['relative_humidity_2m']=humidity;data['current_units']['relative_humidity_2m']=unit
+    provider=OpenMeteoProvider();provider._json=AsyncMock(return_value=data)
+    with pytest.raises(WeatherError):run(provider.forecast(TOKYO,WeatherIntent(kind='current')))
+    assert provider.cache=={}
+
+
+def test_weather_voice_projection_and_capability_consistency():
+    from app.dialogue import CHARACTER
+    from app.weather import WEATHER_GROUNDING_RULES,WEATHER_CARE_STYLE
+    data={'status':'ok','source':'Open-Meteo','attribution':'private-provenance','fetched_at':'sentinel-timestamp',
+          'valid_at':'sentinel-valid-time','location':'合成城市','kind':'current','temperature_c':8,'humidity_pct':80}
+    prompt=weather_prompt(data)
+    projected=json.loads(prompt.split('：\n',1)[1].split('\n',1)[0])
+    assert projected['humidity_pct']==80
+    assert all(key not in projected for key in ['source','attribution','fetched_at','valid_at'])
+    assert 'sentinel' not in prompt and 'private-provenance' not in prompt
+    assert '模型估计，不是地面实测' in WEATHER_GROUNDING_RULES
+    assert '没有湿度不能补写' in WEATHER_GROUNDING_RULES
+    assert '不自称已经是恋人' in CHARACTER['boundaries']
+    assert '不会查天气' not in CHARACTER['boundaries'] and '没有跨会话长期记忆' not in CHARACTER['boundaries']
+    assert '不用“您”' in WEATHER_CARE_STYLE and '共同过去' in WEATHER_CARE_STYLE
+
+
+@pytest.mark.parametrize('reply',[
+    '根据 Open-Meteo 在2026-11-01提供的气象数据，您那里实测6度。',
+    '那边实测六度，肯定冷。',
+    '现在六度，带衣服。',
+])
+def test_weather_voice_guard_rewrites_current_reply(tmp_path,reply):
+    model=AsyncMock();model.generate=AsyncMock(side_effect=[reply,'这是演示天气。那边现在估计十五度左右，见朋友前带件外套吧。'])
+    c,h,_,_=connected(tmp_path,model=model)
+    c.patch('/v1/weather/settings',headers=h,json={'enabled':True,'city_id':1})
+    response=send(c,h,'现在天气如何')
+    assert response['guarded'] and model.generate.await_count==2
+    assert response['reply']=='这是演示天气。那边现在估计十五度左右，见朋友前带件外套吧。'
+
+
+def test_second_bad_weather_reply_uses_evidence_fallback(tmp_path):
+    model=AsyncMock();model.generate=AsyncMock(return_value='根据Open-Meteo的气象数据，您那里实测6度。')
+    c,h,_,_=connected(tmp_path,model=model)
+    c.patch('/v1/weather/settings',headers=h,json={'enabled':True,'city_id':1})
+    response=send(c,h,'现在天气如何')
+    assert response['guarded'] and '估计15' in response['reply'] and '演示' in response['reply']
+    assert '实测' not in response['reply'] and 'Open-Meteo' not in response['reply']
+    assert response['weather']['temperature_c']==15
+
+
+def test_weather_metadata_restores_and_is_excluded_from_model_history(tmp_path):
+    model=AsyncMock();model.generate=AsyncMock(return_value='这是演示天气。那边现在估计十五度左右，外套选方便收起来的吧。')
+    c,h,_,_=connected(tmp_path,model=model)
+    c.patch('/v1/weather/settings',headers=h,json={'enabled':True,'city_id':1})
+    first=send(c,h,'现在天气如何')
+    history=c.get('/v1/session').json()['messages']
+    assert history[-1]['weather']==first['weather'] and history[-1]['weather']['kind']=='current'
+    send(c,h,'我先出门啦')
+    for message in model.generate.call_args.args[0]:assert set(message)=={'role','content'}
+    assert c.delete('/v1/weather/settings',headers=h).status_code==200
+    assert c.get('/v1/session').json()['messages']==[]
+    assert send(c,h,'现在天气')['weather']['status']=='disabled'
+    assert all('weather' not in m for m in c.get('/v1/session').json()['messages'])
+
+
+def test_weather_voice_guard_catches_boilerplate_and_truncated_range():
+    from app.weather import weather_reply_conflicts
+    evidence={'status':'ok','kind':'forecast','source':'Open-Meteo','min_c':13.6,'max_c':20}
+    assert weather_reply_conflicts('明天约13到20度，带伞吧。',evidence)
+    assert weather_reply_conflicts('明天约14到20度，祝你面试顺利。',evidence)
+    assert not weather_reply_conflicts('明天预计14到20度，给伞留点位置吧。',evidence)
+    assert not weather_reply_conflicts('明天预计13.6到20度，路上多留点时间吧。',evidence)
+
+
+def test_forecast_voice_violation_rewrite_retains_exact_range(tmp_path):
+    model=AsyncMock();model.generate=AsyncMock(side_effect=['明天13到20度，祝你面试顺利。','这是演示天气。明天预计12到18度，伞放进包里也安心些。'])
+    c,h,_,_=connected(tmp_path,model=model)
+    c.patch('/v1/weather/settings',headers=h,json={'enabled':True,'city_id':1})
+    result=send(c,h,'明天天气如何')
+    assert result['guarded'] and model.generate.await_count==2
+    assert result['reply']=='这是演示天气。明天预计12到18度，伞放进包里也安心些。'

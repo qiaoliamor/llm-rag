@@ -1,6 +1,7 @@
 export interface Message {
   role: 'user' | 'assistant';
   content: string;
+  weather?: WeatherEvidenceData;
 }
 
 export interface Character {
@@ -26,6 +27,7 @@ export interface ChatResponse {
   guarded: boolean;
   memory_candidates?: MemoryItem[];
   retrieved_memory_ids?: string[];
+  weather?: WeatherEvidenceData | { status: 'disabled' | 'location_required' | 'ambiguous' | 'not_found' | 'date_unsupported' | 'timeout' | 'rate_limit' | 'unavailable' | 'invalid_response' | 'stale' | 'invalid_city'; message: string } | null;
 }
 
 export interface MemorySettings {
@@ -67,4 +69,23 @@ export interface WeatherPlace {
 export interface WeatherSettings {
   enabled: boolean;
   place: WeatherPlace | null;
+}
+
+
+export interface WeatherEvidenceData {
+  status: 'ok';
+  source: string;
+  location: string;
+  timezone: string;
+  date: string;
+  kind: 'current' | 'forecast';
+  fetched_at: string;
+  valid_at?: string;
+  cached: boolean;
+  temperature_c?: number;
+  feels_like_c?: number;
+  humidity_pct?: number;
+  min_c?: number;
+  max_c?: number;
+  rain_probability_pct?: number;
 }

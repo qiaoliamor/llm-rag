@@ -12,7 +12,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from .config import ROOT, Settings
-from .weather import OpenMeteoProvider, MockWeatherProvider, WeatherError, MESSAGES, query_weather, weather_prompt, validate_city
+from .weather import OpenMeteoProvider, MockWeatherProvider, WeatherError, MESSAGES, query_weather, weather_prompt, validate_city, weather_reply_conflicts, weather_fallback
 from .memory import MemoryStore, extract_candidates, memory_prompt
 from .dialogue import CHARACTER, FALLBACK, build_provider, ProviderFailure, conflicts, instructions
 
@@ -186,14 +186,17 @@ def create_app(settings=None, provider=None, weather_provider=None):
                 raise ProviderFailure('memory_changed', '记忆、天气设置或授权已变化，本轮回复已撤销，请重新发送。', 409)
             session.pending_weather = pending
             prompt = instructions() + weather_prompt(weather_result) + memory_prompt(evidence)
+            model_history = [{'role':m['role'], 'content':m['content']} for m in history]
             try:
                 async with asyncio.timeout(settings.api_timeout_seconds * 2 + 2):
-                    reply = await provider.generate(history, prompt)
-                    guarded = conflicts(reply)
+                    reply = await provider.generate(model_history, prompt)
+                    guarded = conflicts(reply) or weather_reply_conflicts(reply, weather_result)
                     if guarded:
-                        reply = await provider.generate(history, prompt + '\n上次输出与正史冲突。重新回答，严格遵守已知事实。')
+                        reply = await provider.generate(model_history, prompt + '\n上次输出违反角色或天气表达规则。重新回答：只用已知事实，以沈砚的自然语气关心，不播报来源/日期，不用您；当前天气只作估计。')
                         if conflicts(reply):
                             reply = FALLBACK
+                        elif weather_reply_conflicts(reply, weather_result):
+                            reply = weather_fallback(weather_result)
             except TimeoutError:
                 raise ProviderFailure('timeout', '模型响应超时，请稍后重试。', 504) from None
             if store.settings(session.user_id)['epoch'] != snapshot['epoch']:
@@ -204,7 +207,7 @@ def create_app(settings=None, provider=None, weather_provider=None):
                 for fact in extract_candidates(body.message):
                     candidate = store.candidate(session.user_id, fact, request.state.request_id, snapshot['epoch'])
                     if candidate and candidate['status'] == 'candidate': candidates.append(candidate)
-            session.messages = (history + [{'role': 'assistant', 'content': reply}])[-24:]
+            session.messages = (history + [{'role': 'assistant', 'content': reply, **({'weather': weather_result} if weather_result and weather_result['status'] == 'ok' else {})}])[-24:]
             return {'weather': weather_result, 'reply': reply, 'request_id': request.state.request_id, 'guarded': guarded, 'memory_candidates': candidates,
                     'retrieved_memory_ids': [m['id'] for m in evidence]}
 

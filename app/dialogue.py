@@ -53,8 +53,8 @@ class MockProvider:
         if weather_marker in prompt:
             data = json.loads(prompt.split(weather_marker, 1)[1].split('\n', 1)[0])
             if data['status'] != 'ok': return data['message']
-            values = (f"当前估计约{data['temperature_c']}°C" if 'temperature_c' in data else f"整日预报{data['min_c']}–{data['max_c']}°C，降水概率{data['rain_probability_pct']}%")
-            return f"据 {data['source']}，{data['location']} {data['date']} {values}，{data['condition']}。如果准备出门，可以按自己的需要备好外套或雨具。"
+            from .weather import weather_fallback
+            return weather_fallback({**data, 'source': 'mock' if data.get('demo') else ''})
         marker = '以下为玩家明确确认的长期记忆数据'
         if marker in prompt and any(w in message for w in ('记得', '面试', '应聘', '求职', '名字', '住哪', '喜欢', '经历')):
             try:

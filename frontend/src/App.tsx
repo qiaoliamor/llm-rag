@@ -47,7 +47,7 @@ export default function App() {
     setMessages([...previous, userMessage]);
     try {
       const data = await sendMessage(text, session.csrf_token);
-      const assistantMessage: Message = { role: 'assistant', content: data.reply };
+      const assistantMessage: Message = { role: 'assistant', content: data.reply, ...((data.weather?.status === 'ok' && 'source' in data.weather) ? { weather: data.weather } : {}) };
       setMessages([...previous, userMessage, assistantMessage].slice(-24));
       setCandidateCount(data.memory_candidates?.length ?? 0);
     } catch (reason) {

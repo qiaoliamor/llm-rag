@@ -167,3 +167,16 @@ describe('typed API client', () => {
     expect(fetchMock).toHaveBeenCalledWith('/v1/session', expect.objectContaining({ credentials: 'same-origin', method: 'DELETE' }));
   });
 });
+
+
+it('attaches weather evidence to the sent reply and clears it on new conversation', async () => {
+  const fetchMock=connect();render(<App />);const user=await ready();
+  fetchMock.mockResolvedValueOnce(response({reply:'那边估计六度左右，外套多带一件吧。',weather:{status:'ok',source:'Open-Meteo',location:'合成巴黎',timezone:'Europe/Paris',date:'2026-11-01',kind:'current',fetched_at:'2026-11-01T05:40:00Z',cached:false,temperature_c:6.3}}));
+  fireEvent.change(screen.getByRole('textbox'),{target:{value:'现在天气如何'}});
+  await user.click(screen.getByRole('button',{name:/发送/}));
+  expect(await screen.findByText('天气依据 · 当前天气为模型估计（非地面实测）')).toBeVisible();
+  fetchMock.mockResolvedValueOnce(response({ok:true}));
+  await user.click(screen.getByRole('button',{name:/开始新对话/}));
+  await user.click(within(screen.getByRole('dialog')).getByRole('button',{name:'开始新对话'}));
+  expect(screen.queryByText(/天气依据/)).not.toBeInTheDocument();
+});

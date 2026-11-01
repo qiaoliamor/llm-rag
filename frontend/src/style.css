@@ -26,3 +26,5 @@
 .project-document { white-space: pre-wrap; overflow-wrap: anywhere; font: 13px/1.9 ui-monospace, monospace; background: #f0f2e9; padding: 18px; border-radius: 8px; }
 @media(max-width:850px) { .workspace-nav { padding: 10px 25px; } .workspace-pane { padding: 15px 25px 25px; } }
 @media(max-width:600px) { .workspace-nav { padding: 8px 15px; gap: 4px; } .workspace-nav button { padding: 9px 12px; } .workspace-pane { padding: 14px 18px 25px; } .workspace-pane h3 { font-size: 22px; } }
+
+.weather-evidence{font-size:11px;line-height:1.7;color:var(--muted);max-width:85%;padding:3px 1px;overflow-wrap:anywhere}.weather-evidence summary{cursor:pointer;color:#71816e}.weather-evidence p{margin:6px 0}.weather-evidence a{color:var(--green)}
