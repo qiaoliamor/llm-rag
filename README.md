@@ -8,6 +8,8 @@
 
 根目录 [TODOLIST.md](TODOLIST.md) 是完整任务清单，[docs/PLAN.md](docs/PLAN.md) 是阶段计划。网页顶部新增 **“计划与进度”**，可直接查看这两份文档；完成项显示 `[x]`，待办显示 `[ ]`。
 
+开发前先阅读 [项目操作规则](AGENTS.md)：任务分支、命令行检查、PR合并与秘密保护。
+
 ## 本地打开
 
 需要 Python 3.11+ 与 [uv](https://docs.astral.sh/uv/getting-started/installation/)。本项目已提交 `uv.lock`，启动时按锁定版本安装依赖。前端需要 Node.js 22.12+ 和 npm（本机已安装）。启动脚本在依赖缺失或锁文件更新时执行 `npm ci`，每次启动执行类型检查、前端构建并交给 FastAPI 提供页面。前端依赖锁定在 `frontend/package-lock.json`，首次安装需要网络。
