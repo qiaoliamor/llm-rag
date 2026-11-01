@@ -12,6 +12,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from .config import ROOT, Settings
+from .weather import OpenMeteoProvider, MockWeatherProvider, WeatherError, MESSAGES, query_weather, weather_prompt, validate_city
 from .memory import MemoryStore, extract_candidates, memory_prompt
 from .dialogue import CHARACTER, FALLBACK, build_provider, ProviderFailure, conflicts, instructions
 
@@ -20,6 +21,7 @@ from .dialogue import CHARACTER, FALLBACK, build_provider, ProviderFailure, conf
 class Session:
     user_id: str = ""
     memory_epoch: int = -1
+    pending_weather: dict | None = None
     csrf: str = field(default_factory=lambda: secrets.token_urlsafe(32))
     messages: list = field(default_factory=list)
     lock: asyncio.Lock = field(default_factory=asyncio.Lock)
@@ -73,13 +75,20 @@ class MemorySettingsInput(BaseModel):
         return value
 
 
-def create_app(settings=None, provider=None):
+class WeatherSettingsInput(BaseModel):
+    enabled: bool
+    city_id: int | None = Field(default=None, gt=0)
+
+
+def create_app(settings=None, provider=None, weather_provider=None):
     settings = settings or Settings()
     provider = provider or build_provider(settings)
+    weather = weather_provider or (MockWeatherProvider() if settings.weather_provider == 'mock' else OpenMeteoProvider())
     store = MemoryStore(settings.memory_database_url.get_secret_value())
     app = FastAPI(docs_url=None, redoc_url=None)
     app.state.sessions = sessions = {}
     app.state.memory_store = store
+    app.state.weather_provider = weather
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=['127.0.0.1', 'localhost', 'testserver'])
 
     @app.middleware('http')
@@ -145,6 +154,7 @@ def create_app(settings=None, provider=None):
         current_settings = store.settings(user_id)
         if session.memory_epoch != current_settings['epoch']:
             session.messages.clear()
+            session.pending_weather = None
             session.memory_epoch = current_settings['epoch']
         response = JSONResponse({'csrf_token': session.csrf, 'messages': session.messages,
                                  'character': CHARACTER, 'provider': settings.chat_provider,
@@ -165,10 +175,17 @@ def create_app(settings=None, provider=None):
             snapshot = store.settings(session.user_id)
             if session.memory_epoch != snapshot['epoch']:
                 session.messages.clear()
+                session.pending_weather = None
                 session.memory_epoch = snapshot['epoch']
             history = session.messages[-24:] + [{'role': 'user', 'content': body.message}]
             evidence = store.retrieve(session.user_id, body.message)
-            prompt = instructions() + memory_prompt(evidence)
+            weather_result, pending = await query_weather(weather, body.message, store.weather_settings(session.user_id), session.pending_weather)
+            if store.settings(session.user_id)['epoch'] != snapshot['epoch']:
+                session.messages.clear()
+                session.pending_weather = None
+                raise ProviderFailure('memory_changed', '记忆、天气设置或授权已变化，本轮回复已撤销，请重新发送。', 409)
+            session.pending_weather = pending
+            prompt = instructions() + weather_prompt(weather_result) + memory_prompt(evidence)
             try:
                 async with asyncio.timeout(settings.api_timeout_seconds * 2 + 2):
                     reply = await provider.generate(history, prompt)
@@ -181,14 +198,14 @@ def create_app(settings=None, provider=None):
                 raise ProviderFailure('timeout', '模型响应超时，请稍后重试。', 504) from None
             if store.settings(session.user_id)['epoch'] != snapshot['epoch']:
                 session.messages.clear()
-                raise ProviderFailure('memory_changed', '记忆或授权已变化，本轮回复已撤销，请重新发送。', 409)
+                raise ProviderFailure('memory_changed', '记忆、天气设置或授权已变化，本轮回复已撤销，请重新发送。', 409)
             candidates = []
             if snapshot['memory_enabled']:
                 for fact in extract_candidates(body.message):
                     candidate = store.candidate(session.user_id, fact, request.state.request_id, snapshot['epoch'])
                     if candidate and candidate['status'] == 'candidate': candidates.append(candidate)
             session.messages = (history + [{'role': 'assistant', 'content': reply}])[-24:]
-            return {'reply': reply, 'request_id': request.state.request_id, 'guarded': guarded, 'memory_candidates': candidates,
+            return {'weather': weather_result, 'reply': reply, 'request_id': request.state.request_id, 'guarded': guarded, 'memory_candidates': candidates,
                     'retrieved_memory_ids': [m['id'] for m in evidence]}
 
     @app.delete('/v1/session')
@@ -197,12 +214,14 @@ def create_app(settings=None, provider=None):
         if session.lock.locked():
             raise ProviderFailure('busy', '请等待当前回复完成后再清空。', 409)
         session.messages.clear()
+        session.pending_weather = None
         return {'ok': True}
 
     def invalidate_user_history(uid):
         for value in sessions.values():
             if value.user_id == uid:
                 value.messages.clear()
+                value.pending_weather = None
 
     @app.get('/v1/memories')
     async def memories(request: Request):
@@ -245,6 +264,43 @@ def create_app(settings=None, provider=None):
     async def configure_memory(body: MemorySettingsInput, request: Request):
         session = get_session(request, True)
         result = store.configure(session.user_id, body.memory_enabled, body.timezone)
+        invalidate_user_history(session.user_id)
+        return {'settings': result, 'history_cleared': True}
+
+    @app.exception_handler(WeatherError)
+    async def weather_error(request, exc):
+        return JSONResponse({'code': 'weather_' + exc.code, 'detail': MESSAGES[exc.code]}, status_code=503 if exc.code in ('timeout', 'unavailable', 'invalid_response', 'rate_limit') else 422)
+
+    @app.get('/v1/weather/settings')
+    async def weather_settings(request: Request):
+        session = get_session(request)
+        return store.weather_settings(session.user_id)
+
+    @app.get('/v1/weather/locations')
+    async def weather_locations(request: Request, q: str):
+        get_session(request)
+        validate_city(q)
+        return {'items': [p.model_dump() for p in await weather.search(q.strip())]}
+
+    @app.patch('/v1/weather/settings')
+    async def configure_weather(body: WeatherSettingsInput, request: Request):
+        session = get_session(request, True)
+        # Reuse a trusted saved place for consent toggles, so opt-out works offline.
+        epoch = store.settings(session.user_id)['epoch']
+        saved = store.weather_settings(session.user_id)['place']
+        place = saved if saved and saved['id'] == body.city_id else ((await weather.place(body.city_id)).model_dump() if body.city_id else None)
+        if store.settings(session.user_id)['epoch'] != epoch:
+            raise ProviderFailure('memory_changed', '设置已变化，请刷新后重试。', 409)
+        result = store.configure_weather(session.user_id, body.enabled, place)
+        weather.clear()
+        invalidate_user_history(session.user_id)
+        return {'settings': result, 'history_cleared': True}
+
+    @app.delete('/v1/weather/settings')
+    async def delete_weather_settings(request: Request):
+        session = get_session(request, True)
+        result = store.configure_weather(session.user_id, remove=True)
+        weather.clear()
         invalidate_user_history(session.user_id)
         return {'settings': result, 'history_cleared': True}
 

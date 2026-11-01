@@ -41,6 +41,13 @@ class Player(Base):
     epoch = Column(Integer, default=0, nullable=False)
 
 
+class WeatherProfile(Base):
+    __tablename__ = 'weather_profiles'
+    user_id = Column(String, primary_key=True)
+    enabled = Column(Boolean, default=False, nullable=False)
+    place = Column(JSON, nullable=True)
+
+
 class Memory(Base):
     __tablename__ = 'memories'
     id = Column(String, primary_key=True)
@@ -193,6 +200,8 @@ class MemoryStore:
                 c.execute(text('INSERT INTO schema_versions(version) VALUES (1)'))
             if not c.execute(text('SELECT version FROM schema_versions WHERE version=2')).first():
                 c.execute(text('INSERT INTO schema_versions(version) VALUES (2)'))
+            if not c.execute(text('SELECT version FROM schema_versions WHERE version=3')).first():
+                c.execute(text('INSERT INTO schema_versions(version) VALUES (3)'))
 
     def identity(self, token):
         hashed = hashlib.sha256(token.encode()).hexdigest() if token else ''
@@ -233,6 +242,26 @@ class MemoryStore:
                 for m in db.scalars(select(Memory).where(Memory.user_id==uid, Memory.status=='candidate')):
                     db.delete(m)
         return self.settings(uid)
+
+    def weather_settings(self, uid):
+        with self.db() as db:
+            self._player(db, uid)
+            profile = db.get(WeatherProfile, uid)
+            return {'enabled': profile.enabled, 'place': profile.place} if profile else {'enabled': False, 'place': None}
+
+    def configure_weather(self, uid, enabled=False, place=None, remove=False):
+        with self.db.begin() as db:
+            player = self._player(db, uid, True)
+            profile = db.get(WeatherProfile, uid)
+            if remove:
+                if profile: db.delete(profile)
+            else:
+                if profile is None:
+                    profile = WeatherProfile(user_id=uid)
+                    db.add(profile)
+                profile.enabled, profile.place = enabled, place
+            player.epoch += 1
+        return self.weather_settings(uid)
 
     def _fingerprint(self, uid, fact):
         return hashlib.sha256((uid + ':' + normalize(fact)).encode()).hexdigest()
