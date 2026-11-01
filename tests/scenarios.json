@@ -24,7 +24,7 @@
     "id": "weather-01",
     "category": "weather",
     "message": "今天忙完以后明天天气会下雨吗？",
-    "expected_fragment": "查不到实时天气",
+    "expected_fragment": "天气查询默认关闭",
     "source": "synthetic-v1"
   },
   {
@@ -59,7 +59,7 @@
     "id": "weather-02",
     "category": "weather",
     "message": "最近换了工作，明天天气会下雨吗？",
-    "expected_fragment": "查不到实时天气",
+    "expected_fragment": "天气查询默认关闭",
     "source": "synthetic-v1"
   },
   {
@@ -94,7 +94,7 @@
     "id": "weather-03",
     "category": "weather",
     "message": "散步回来的时候，明天天气会下雨吗？",
-    "expected_fragment": "查不到实时天气",
+    "expected_fragment": "天气查询默认关闭",
     "source": "synthetic-v1"
   },
   {
@@ -129,7 +129,7 @@
     "id": "weather-04",
     "category": "weather",
     "message": "晚饭之后，明天天气会下雨吗？",
-    "expected_fragment": "查不到实时天气",
+    "expected_fragment": "天气查询默认关闭",
     "source": "synthetic-v1"
   },
   {
@@ -164,7 +164,7 @@
     "id": "weather-05",
     "category": "weather",
     "message": "周末休息时，明天天气会下雨吗？",
-    "expected_fragment": "查不到实时天气",
+    "expected_fragment": "天气查询默认关闭",
     "source": "synthetic-v1"
   },
   {
@@ -199,7 +199,7 @@
     "id": "weather-06",
     "category": "weather",
     "message": "刚下班，明天天气会下雨吗？",
-    "expected_fragment": "查不到实时天气",
+    "expected_fragment": "天气查询默认关闭",
     "source": "synthetic-v1"
   },
   {
@@ -234,7 +234,7 @@
     "id": "weather-07",
     "category": "weather",
     "message": "第一次来这里，明天天气会下雨吗？",
-    "expected_fragment": "查不到实时天气",
+    "expected_fragment": "天气查询默认关闭",
     "source": "synthetic-v1"
   },
   {
@@ -269,7 +269,7 @@
     "id": "weather-08",
     "category": "weather",
     "message": "看到书架的时候，明天天气会下雨吗？",
-    "expected_fragment": "查不到实时天气",
+    "expected_fragment": "天气查询默认关闭",
     "source": "synthetic-v1"
   },
   {
@@ -304,7 +304,7 @@
     "id": "weather-09",
     "category": "weather",
     "message": "今晚有点睡不着，明天天气会下雨吗？",
-    "expected_fragment": "查不到实时天气",
+    "expected_fragment": "天气查询默认关闭",
     "source": "synthetic-v1"
   },
   {
@@ -339,7 +339,7 @@
     "id": "weather-10",
     "category": "weather",
     "message": "午休时，明天天气会下雨吗？",
-    "expected_fragment": "查不到实时天气",
+    "expected_fragment": "天气查询默认关闭",
     "source": "synthetic-v1"
   },
   {
@@ -374,7 +374,7 @@
     "id": "weather-11",
     "category": "weather",
     "message": "整理房间时，明天天气会下雨吗？",
-    "expected_fragment": "查不到实时天气",
+    "expected_fragment": "天气查询默认关闭",
     "source": "synthetic-v1"
   },
   {
@@ -409,7 +409,7 @@
     "id": "weather-12",
     "category": "weather",
     "message": "路过书店，明天天气会下雨吗？",
-    "expected_fragment": "查不到实时天气",
+    "expected_fragment": "天气查询默认关闭",
     "source": "synthetic-v1"
   },
   {
@@ -444,7 +444,7 @@
     "id": "weather-13",
     "category": "weather",
     "message": "喝茶的时候，明天天气会下雨吗？",
-    "expected_fragment": "查不到实时天气",
+    "expected_fragment": "天气查询默认关闭",
     "source": "synthetic-v1"
   },
   {
@@ -479,7 +479,7 @@
     "id": "weather-14",
     "category": "weather",
     "message": "准备出门前，明天天气会下雨吗？",
-    "expected_fragment": "查不到实时天气",
+    "expected_fragment": "天气查询默认关闭",
     "source": "synthetic-v1"
   },
   {
@@ -514,7 +514,7 @@
     "id": "weather-15",
     "category": "weather",
     "message": "想停下来歇一会儿，明天天气会下雨吗？",
-    "expected_fragment": "查不到实时天气",
+    "expected_fragment": "天气查询默认关闭",
     "source": "synthetic-v1"
   },
   {
@@ -549,7 +549,7 @@
     "id": "weather-16",
     "category": "weather",
     "message": "读完一本书，明天天气会下雨吗？",
-    "expected_fragment": "查不到实时天气",
+    "expected_fragment": "天气查询默认关闭",
     "source": "synthetic-v1"
   },
   {
@@ -584,7 +584,7 @@
     "id": "weather-17",
     "category": "weather",
     "message": "听着音乐，明天天气会下雨吗？",
-    "expected_fragment": "查不到实时天气",
+    "expected_fragment": "天气查询默认关闭",
     "source": "synthetic-v1"
   },
   {
@@ -619,7 +619,7 @@
     "id": "weather-18",
     "category": "weather",
     "message": "写日记时，明天天气会下雨吗？",
-    "expected_fragment": "查不到实时天气",
+    "expected_fragment": "天气查询默认关闭",
     "source": "synthetic-v1"
   },
   {
@@ -654,7 +654,7 @@
     "id": "weather-19",
     "category": "weather",
     "message": "坐在窗边，明天天气会下雨吗？",
-    "expected_fragment": "查不到实时天气",
+    "expected_fragment": "天气查询默认关闭",
     "source": "synthetic-v1"
   },
   {
@@ -689,7 +689,7 @@
     "id": "weather-20",
     "category": "weather",
     "message": "见到你以后，明天天气会下雨吗？",
-    "expected_fragment": "查不到实时天气",
+    "expected_fragment": "天气查询默认关闭",
     "source": "synthetic-v1"
   },
   {

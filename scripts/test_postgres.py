@@ -1,4 +1,4 @@
-"""Run memory integration tests in a fresh disposable PostgreSQL database."""
+"""Run memory/weather integration tests in a fresh disposable PostgreSQL database."""
 import os
 from pathlib import Path
 import secrets
@@ -17,7 +17,7 @@ connection=psycopg.connect(host=url.host,port=url.port,user=url.username,passwor
 try:
     connection.execute(sql.SQL('CREATE DATABASE {}').format(sql.Identifier(name)))
     child={**os.environ,'TEST_POSTGRES_URL':url.set(database=name).render_as_string(hide_password=False)}
-    result=subprocess.run([sys.executable,'-m','pytest','-q','tests/test_memory.py'],cwd=root,env=child)
+    result=subprocess.run([sys.executable,'-m','pytest','-q','tests/test_memory.py','tests/test_weather.py'],cwd=root,env=child)
 finally:
     connection.execute(sql.SQL('DROP DATABASE IF EXISTS {} WITH (FORCE)').format(sql.Identifier(name)))
     connection.close()

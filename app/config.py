@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     memory_database_url: SecretStr = SecretStr('sqlite:///data/memory.sqlite3')
     openai_api_key: SecretStr = SecretStr('')
     openai_model: str = 'gpt-4.1-mini'
+    weather_provider: str = Field(default='openmeteo', pattern='^(openmeteo|mock)$')
     api_timeout_seconds: float = Field(default=30, ge=1, le=120)
     session_ttl_seconds: int = Field(default=7200, ge=60)
     max_sessions: int = Field(default=200, ge=1)

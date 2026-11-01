@@ -54,3 +54,17 @@ export interface MemoryList {
   items: MemoryItem[];
   settings: MemorySettings;
 }
+
+export interface WeatherPlace {
+  id: number;
+  name: string;
+  country: string;
+  admin1: string;
+  latitude: number;
+  longitude: number;
+  timezone: string;
+}
+export interface WeatherSettings {
+  enabled: boolean;
+  place: WeatherPlace | null;
+}
