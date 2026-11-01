@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { WeatherEvidence } from './WeatherEvidence';
 import type { Message } from '../types';
 
 const suggestions = ['今天工作有点累', '介绍一下你的书店吧', '明天有面试，有些紧张'];
@@ -32,6 +33,7 @@ export function MessageList({ messages, pending, name, onSuggest, disabled }: {
         <div className={`message ${message.role}`} key={i}>
           <span className="who">{message.role === 'user' ? '你' : name}</span>
           <div className="bubble">{message.content}</div>
+          {message.role === 'assistant' && message.weather?.status === 'ok' && <WeatherEvidence weather={message.weather} />}
         </div>
       ))}
       {pending && <div className="message assistant pending"><span className="who">{name}</span><div className="bubble">正在想怎么回答你…</div></div>}
