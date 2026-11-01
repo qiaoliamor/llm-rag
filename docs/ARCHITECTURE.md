@@ -1,6 +1,6 @@
 # 前后端架构与演进设计
 
-更新日期：2026-10-31（Asia/Tokyo）。当前为 M2：React + TypeScript 前端、FastAPI 编排、持久化身份/记忆及 PostgreSQL + pgvector 混合检索。实际本地模型通过 `.env` 覆盖为 `gemini-3.5-flash-lite`；构建和验证见 [React 迁移记录](FRONTEND_MIGRATION.md)。
+更新日期：2026-11-01（Asia/Tokyo）。当前功能基线 `7bb28ca`，已完成 M2：React + TypeScript 前端、FastAPI 编排、持久化身份/记忆及 PostgreSQL + pgvector 混合检索。源码与空模板默认模型均已统一为 `gemini-3.5-flash-lite`；本地 `.env` 可覆盖，密钥值不记录。最新验证见 [M2测试记录](M2_TEST_REPORT.md)，React历史迁移见 [迁移记录](FRONTEND_MIGRATION.md)。
 
 ## 1. 总体形态
 
@@ -45,7 +45,7 @@ flowchart LR
 | `frontend/src/style.css` | 沿用原有配色、CSS 插画、布局和移动断点 |
 | `frontend/vite.config.ts` / `scripts/publish.mjs` | 类型检查后的构建、资源路径与产物发布 |
 
-前端采用 React + TypeScript，使用组件与状态统一更新界面，为 M2 的记忆管理准备可复用结构。当前单页面不引入路由库或全局状态库。构建器 Vite 将源码变成浏览器 JS/CSS，启动脚本构建后仍由同一个 FastAPI 服务提供，日常保持一个启动命令。
+前端采用 React + TypeScript，使用组件与状态统一更新界面，已复用于 M2 的记忆管理和项目进度界面。当前单页面不引入路由库或全局状态库。构建器 Vite 将源码变成浏览器 JS/CSS，启动脚本构建后仍由同一个 FastAPI 服务提供，日常保持一个启动命令。
 
 构建先写入 `frontend/dist/`，再把 assets 与 index 发布到 `app/static/`；index 最后替换。构建产物与依赖目录忽略，仅源码、配置和 npm 锁文件进入 Git。新克隆直接运行 uvicorn 之前应先构建；推荐使用自动完成安装/构建的 `scripts/start.sh`。
 
