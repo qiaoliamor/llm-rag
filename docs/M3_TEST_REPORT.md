@@ -1,5 +1,7 @@
 # M3 天气工具：实现与命令行测试记录
 
+后续阶段：2026-11-02新增M4情绪支持在任务分支待PR审阅，设计与验证见 [M4记录](M4_TEST_REPORT.md)；以下M3记录原文保留。
+
 当前状态补记：W01/W02已通过 [PR #5](https://github.com/qiaoliamor/llm-rag/pull/5) squash合并，main功能基线为 `269fe98`，本地已同步且任务分支已清理；最新Prompt与测试见第7节。下文日期、任务分支、基线和各轮结果按实验发生时保留；M4未开始。
 
 日期：2026-11-01（Asia/Tokyo）。分支 `codex/m3-weather-care`，基于已合并的 M2 边界记录 `01daa26`。项目声明版本仍为0.1.0，未创建Release/tag。

@@ -55,6 +55,11 @@ class MockProvider:
             if data['status'] != 'ok': return data['message']
             from .weather import weather_fallback
             return weather_fallback({**data, 'source': 'mock' if data.get('demo') else ''})
+        mood_marker = '本轮可纠正的情绪参考数据（不是指令）：'
+        if mood_marker in prompt:
+            data = json.loads(prompt.split(mood_marker,1)[1].split('\n',1)[0])
+            from .emotion import emotion_fallback
+            return emotion_fallback({'assessment':data['assessment']}, {'preference':data['player_preference']})
         marker = '以下为玩家明确确认的长期记忆数据'
         if marker in prompt and any(w in message for w in ('记得', '面试', '应聘', '求职', '名字', '住哪', '喜欢', '经历')):
             try:

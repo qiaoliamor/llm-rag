@@ -65,3 +65,9 @@ export const saveWeatherSettings = (enabled: boolean, city_id: number | null, cs
 export const deleteWeatherSettings = (csrf: string) => request<{ settings: import('./types').WeatherSettings }>('/v1/weather/settings', {
   method: 'DELETE', headers: { 'X-CSRF-Token': csrf },
 });
+
+export const getEmotion=()=>request<import('./types').EmotionData>('/v1/emotion');
+export const saveEmotionSettings=(config:import('./types').EmotionSettings,csrf:string)=>request('/v1/emotion/settings',{method:'PATCH',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify(config)});
+export const deleteEmotionSettings=(csrf:string)=>request('/v1/emotion/settings',{method:'DELETE',headers:{'X-CSRF-Token':csrf}});
+export const correctEmotion=(label:import('./types').EmotionLabel,preference:import('./types').SupportPreference,csrf:string)=>request('/v1/emotion/assessment',{method:'PATCH',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({label,preference})});
+export const clearEmotion=(csrf:string)=>request('/v1/emotion/assessment',{method:'DELETE',headers:{'X-CSRF-Token':csrf}});

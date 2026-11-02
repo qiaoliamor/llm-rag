@@ -89,3 +89,9 @@ export interface WeatherEvidenceData {
   max_c?: number;
   rain_probability_pct?: number;
 }
+
+export type EmotionLabel='unknown'|'neutral'|'joy'|'sadness'|'anxiety'|'anger'|'tired';
+export type SupportPreference='ask'|'listen'|'encourage'|'practical';
+export interface EmotionSettings { enabled:boolean; interval:number; window:number; cooldown:number; threshold:number; preference:SupportPreference; }
+export interface EmotionAssessment { labels:EmotionLabel[]; intensity:number; confidence:number; evidence_message_ids:string[]; response_strategy:SupportPreference; source:'user'|'model'; turn:number; observed_at:string; }
+export interface EmotionData { settings:EmotionSettings; assessment:EmotionAssessment|null; }

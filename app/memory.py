@@ -41,6 +41,12 @@ class Player(Base):
     epoch = Column(Integer, default=0, nullable=False)
 
 
+class EmotionProfile(Base):
+    __tablename__ = 'emotion_profiles'
+    user_id = Column(String, primary_key=True)
+    config = Column(JSON, nullable=False)
+
+
 class WeatherProfile(Base):
     __tablename__ = 'weather_profiles'
     user_id = Column(String, primary_key=True)
@@ -202,6 +208,8 @@ class MemoryStore:
                 c.execute(text('INSERT INTO schema_versions(version) VALUES (2)'))
             if not c.execute(text('SELECT version FROM schema_versions WHERE version=3')).first():
                 c.execute(text('INSERT INTO schema_versions(version) VALUES (3)'))
+            if not c.execute(text('SELECT version FROM schema_versions WHERE version=4')).first():
+                c.execute(text('INSERT INTO schema_versions(version) VALUES (4)'))
 
     def identity(self, token):
         hashed = hashlib.sha256(token.encode()).hexdigest() if token else ''
@@ -242,6 +250,33 @@ class MemoryStore:
                 for m in db.scalars(select(Memory).where(Memory.user_id==uid, Memory.status=='candidate')):
                     db.delete(m)
         return self.settings(uid)
+
+    def emotion_settings(self, uid):
+        from .emotion import DEFAULTS
+        with self.db() as db:
+            self._player(db, uid)
+            profile = db.get(EmotionProfile, uid)
+            return {**DEFAULTS, **profile.config} if profile else dict(DEFAULTS)
+
+    def configure_emotion(self, uid, config=None, remove=False):
+        from .emotion import EmotionSettingsInput
+        if not remove: config = EmotionSettingsInput.model_validate(config).model_dump()
+        with self.db.begin() as db:
+            player = self._player(db, uid, True)
+            profile = db.get(EmotionProfile, uid)
+            if remove:
+                if profile: db.delete(profile)
+            else:
+                if profile is None:
+                    profile = EmotionProfile(user_id=uid, config=config)
+                    db.add(profile)
+                else: profile.config = config
+            player.epoch += 1
+        return self.emotion_settings(uid)
+
+    def invalidate(self, uid):
+        with self.db.begin() as db:
+            self._player(db, uid, True).epoch += 1
 
     def weather_settings(self, uid):
         with self.db() as db:
