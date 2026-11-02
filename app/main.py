@@ -13,6 +13,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from .config import ROOT, Settings
 from .weather import OpenMeteoProvider, MockWeatherProvider, WeatherError, MESSAGES, query_weather, weather_prompt, validate_city, weather_reply_conflicts, weather_fallback
+from .emotion import EmotionState, EmotionSettingsInput, CorrectionInput, Estimate, ModelEmotionProvider, MockEmotionProvider, assess, emotion_prompt, decorate, emotion_reply_conflicts, emotion_fallback
 from .memory import MemoryStore, extract_candidates, memory_prompt
 from .dialogue import CHARACTER, FALLBACK, build_provider, ProviderFailure, conflicts, instructions
 
@@ -22,6 +23,7 @@ class Session:
     user_id: str = ""
     memory_epoch: int = -1
     pending_weather: dict | None = None
+    emotion: EmotionState = field(default_factory=EmotionState)
     csrf: str = field(default_factory=lambda: secrets.token_urlsafe(32))
     messages: list = field(default_factory=list)
     lock: asyncio.Lock = field(default_factory=asyncio.Lock)
@@ -80,15 +82,17 @@ class WeatherSettingsInput(BaseModel):
     city_id: int | None = Field(default=None, gt=0)
 
 
-def create_app(settings=None, provider=None, weather_provider=None):
+def create_app(settings=None, provider=None, weather_provider=None, emotion_provider=None):
     settings = settings or Settings()
     provider = provider or build_provider(settings)
     weather = weather_provider or (MockWeatherProvider() if settings.weather_provider == 'mock' else OpenMeteoProvider())
+    emotion = emotion_provider or (MockEmotionProvider() if settings.chat_provider == 'mock' else ModelEmotionProvider(settings))
     store = MemoryStore(settings.memory_database_url.get_secret_value())
     app = FastAPI(docs_url=None, redoc_url=None)
     app.state.sessions = sessions = {}
     app.state.memory_store = store
     app.state.weather_provider = weather
+    app.state.emotion_provider = emotion
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=['127.0.0.1', 'localhost', 'testserver'])
 
     @app.middleware('http')
@@ -155,6 +159,7 @@ def create_app(settings=None, provider=None, weather_provider=None):
         if session.memory_epoch != current_settings['epoch']:
             session.messages.clear()
             session.pending_weather = None
+            session.emotion = EmotionState()
             session.memory_epoch = current_settings['epoch']
         response = JSONResponse({'csrf_token': session.csrf, 'messages': session.messages,
                                  'character': CHARACTER, 'provider': settings.chat_provider,
@@ -166,6 +171,17 @@ def create_app(settings=None, provider=None, weather_provider=None):
         response.set_cookie('persona_session', sid, httponly=True, samesite='strict', max_age=settings.session_ttl_seconds)
         return response
 
+    def verify_epoch(session, expected):
+        current = store.settings(session.user_id)['epoch']
+        if current != expected:
+            session.messages.clear()
+            session.pending_weather = None
+            # A concurrent user correction may already have installed newer state.
+            if session.memory_epoch != current:
+                session.emotion = EmotionState()
+                session.memory_epoch = current
+            raise ProviderFailure('memory_changed', '记忆、天气、情绪或授权已变化，本轮回复已撤销，请重新发送。', 409)
+
     @app.post('/v1/chat')
     async def chat(body: ChatInput, request: Request):
         session = get_session(request, True)
@@ -176,39 +192,45 @@ def create_app(settings=None, provider=None, weather_provider=None):
             if session.memory_epoch != snapshot['epoch']:
                 session.messages.clear()
                 session.pending_weather = None
+                session.emotion = EmotionState()
                 session.memory_epoch = snapshot['epoch']
-            history = session.messages[-24:] + [{'role': 'user', 'content': body.message}]
+            turn = session.emotion.turn + 1
+            history = session.messages[-24:] + [{'role': 'user', 'content': body.message, 'id':f'u{turn}'}]
             evidence = store.retrieve(session.user_id, body.message)
             weather_result, pending = await query_weather(weather, body.message, store.weather_settings(session.user_id), session.pending_weather)
-            if store.settings(session.user_id)['epoch'] != snapshot['epoch']:
-                session.messages.clear()
-                session.pending_weather = None
-                raise ProviderFailure('memory_changed', '记忆、天气设置或授权已变化，本轮回复已撤销，请重新发送。', 409)
+            verify_epoch(session, snapshot['epoch'])
+            mood_settings = store.emotion_settings(session.user_id)
+            mood_result = await assess(emotion, session.emotion, mood_settings, history)
+            verify_epoch(session, snapshot['epoch'])
             session.pending_weather = pending
-            prompt = instructions() + weather_prompt(weather_result) + memory_prompt(evidence)
+            prompt = instructions() + weather_prompt(weather_result) + memory_prompt(evidence) + emotion_prompt(mood_result, mood_settings)
             model_history = [{'role':m['role'], 'content':m['content']} for m in history]
             try:
                 async with asyncio.timeout(settings.api_timeout_seconds * 2 + 2):
                     reply = await provider.generate(model_history, prompt)
-                    guarded = conflicts(reply) or weather_reply_conflicts(reply, weather_result)
+                    guarded = conflicts(reply) or weather_reply_conflicts(reply, weather_result) or emotion_reply_conflicts(reply, mood_result)
                     if guarded:
-                        reply = await provider.generate(model_history, prompt + '\n上次输出违反角色或天气表达规则。重新回答：只用已知事实，以沈砚的自然语气关心，不播报来源/日期，不用您；当前天气只作估计。')
+                        reply = await provider.generate(model_history, prompt + '\n上次输出违反角色或天气表达规则。重新回答：只用已知事实，以沈砚的自然语气关心，不播报来源/日期，不用您；当前天气只作估计。情绪只是可纠正参考，不诊断、不报分数，尊重自述和倾听偏好。')
                         if conflicts(reply):
                             reply = FALLBACK
                         elif weather_reply_conflicts(reply, weather_result):
                             reply = weather_fallback(weather_result)
+                        elif emotion_reply_conflicts(reply, mood_result):
+                            reply = emotion_fallback(mood_result,mood_settings)
             except TimeoutError:
                 raise ProviderFailure('timeout', '模型响应超时，请稍后重试。', 504) from None
-            if store.settings(session.user_id)['epoch'] != snapshot['epoch']:
-                session.messages.clear()
-                raise ProviderFailure('memory_changed', '记忆、天气设置或授权已变化，本轮回复已撤销，请重新发送。', 409)
+            verify_epoch(session, snapshot['epoch'])
             candidates = []
             if snapshot['memory_enabled']:
                 for fact in extract_candidates(body.message):
                     candidate = store.candidate(session.user_id, fact, request.state.request_id, snapshot['epoch'])
                     if candidate and candidate['status'] == 'candidate': candidates.append(candidate)
+            session.emotion.turn = turn
+            if mood_result['assessment']:
+                if mood_result['status'] not in ('cached','user_override'): session.emotion.remember(mood_result['assessment'],turn)
+            else: session.emotion.assessment = None
             session.messages = (history + [{'role': 'assistant', 'content': reply, **({'weather': weather_result} if weather_result and weather_result['status'] == 'ok' else {})}])[-24:]
-            return {'weather': weather_result, 'reply': reply, 'request_id': request.state.request_id, 'guarded': guarded, 'memory_candidates': candidates,
+            return {'emotion': mood_result, 'weather': weather_result, 'reply': reply, 'request_id': request.state.request_id, 'guarded': guarded, 'memory_candidates': candidates,
                     'retrieved_memory_ids': [m['id'] for m in evidence]}
 
     @app.delete('/v1/session')
@@ -218,6 +240,7 @@ def create_app(settings=None, provider=None, weather_provider=None):
             raise ProviderFailure('busy', '请等待当前回复完成后再清空。', 409)
         session.messages.clear()
         session.pending_weather = None
+        session.emotion = EmotionState()
         return {'ok': True}
 
     def invalidate_user_history(uid):
@@ -225,6 +248,7 @@ def create_app(settings=None, provider=None, weather_provider=None):
             if value.user_id == uid:
                 value.messages.clear()
                 value.pending_weather = None
+                value.emotion = EmotionState()
 
     @app.get('/v1/memories')
     async def memories(request: Request):
@@ -306,6 +330,56 @@ def create_app(settings=None, provider=None, weather_provider=None):
         weather.clear()
         invalidate_user_history(session.user_id)
         return {'settings': result, 'history_cleared': True}
+
+    def fresh_emotion_session(request, mutate=False):
+        session = get_session(request, mutate)
+        epoch = store.settings(session.user_id)['epoch']
+        if session.memory_epoch != epoch:
+            session.messages.clear()
+            session.pending_weather = None
+            session.emotion = EmotionState()
+            session.memory_epoch = epoch
+        return session
+
+    @app.get('/v1/emotion')
+    async def emotion_status(request: Request):
+        session = fresh_emotion_session(request)
+        return {'settings': store.emotion_settings(session.user_id), 'assessment': session.emotion.current()}
+
+    @app.patch('/v1/emotion/settings')
+    async def configure_emotion(body: EmotionSettingsInput, request: Request):
+        session = get_session(request, True)
+        result = store.configure_emotion(session.user_id, body.model_dump())
+        invalidate_user_history(session.user_id)
+        return {'settings': result, 'history_cleared': True}
+
+    @app.delete('/v1/emotion/settings')
+    async def delete_emotion_settings(request: Request):
+        session = get_session(request, True)
+        result = store.configure_emotion(session.user_id, remove=True)
+        invalidate_user_history(session.user_id)
+        return {'settings': result, 'history_cleared': True}
+
+    @app.patch('/v1/emotion/assessment')
+    async def correct_emotion(body: CorrectionInput, request: Request):
+        session = fresh_emotion_session(request, True)
+        config = store.emotion_settings(session.user_id)
+        if not config['enabled']:
+            raise ProviderFailure('emotion_disabled', '请先开启情绪分析。', 409)
+        store.invalidate(session.user_id)
+        invalidate_user_history(session.user_id)
+        session.memory_epoch = store.settings(session.user_id)['epoch']
+        value = Estimate(labels=[body.label], intensity=.5, confidence=1, evidence_message_ids=[], response_strategy=body.preference)
+        result = decorate(value,'user',0)
+        session.emotion.remember(result,0)
+        return {'assessment': result, 'history_cleared': True}
+
+    @app.delete('/v1/emotion/assessment')
+    async def clear_emotion(request: Request):
+        session = get_session(request, True)
+        store.invalidate(session.user_id)
+        invalidate_user_history(session.user_id)
+        return {'ok': True, 'history_cleared': True}
 
     @app.get('/v1/project')
     async def project_progress():

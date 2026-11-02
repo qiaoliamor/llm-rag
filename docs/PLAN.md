@@ -1,6 +1,6 @@
 # 实施计划
 
-> 2026-11-01 进度：M0、M1、React 迁移和 M2 已完成，本次 M3 天气工具闭环已实现；M4 独立情绪分析和 M5 正式质量评测尚待进行。Gemini 默认模型不变；M2 的 B01–B03 边界继续保留。M3 设计与验证见 [WEATHER.md](WEATHER.md) 和 [M3_TEST_REPORT.md](M3_TEST_REPORT.md)。
+> 2026-11-02：M0–M3及W01/W02已交付；M4情绪支持闭环交付见 [PR #8](https://github.com/qiaoliamor/llm-rag/pull/8)，包含合并审阅修复。M5正式质量评测与M6正式发布尚待进行。M2 B01–B03仍未完成；设计/验证见 [EMOTION.md](EMOTION.md) 和 [M4_TEST_REPORT.md](M4_TEST_REPORT.md)。
 
 ## 1. 实施原则
 
@@ -24,7 +24,7 @@ M2具体边界：自动提取采用保守规则并允许手动补充；768维向
 
 ## 3. 目标对话链路（包含尚未实现阶段）
 
-当前使用完整角色正史、玩家记忆检索和M3天气工具，采用同步候选处理与epoch检查，没有后台提取队列。天气已作为独立工具输入，情绪和后台任务仍属于目标设计；当前细节以架构文档为准。
+当前使用完整角色正史、玩家记忆检索和M3天气工具，采用同步候选处理与epoch检查，没有后台提取队列。天气和M4可纠正情绪参考已作为独立工具输入，后台任务仍属于目标设计；当前细节以架构文档为准。
 
 1. 校验身份、请求 ID、输入和授权配置，加载角色版本与短期历史。
 2. 判断天气与情绪分析是否触发；补齐必需地点或时间，独立调用设置超时。
@@ -77,7 +77,7 @@ MVP 先缓冲完整文本并检查后返回；流式输出后置，避免校验�
 
 ## 7. 目标接口草案（非当前接口契约）
 
-当前聊天只接收message，角色固定，记忆列表尚无分页；原 /v1/settings 管理记忆开关/事件时区，M3另有 /v1/weather/settings 管理天气授权/城市。下列多角色、分页、情绪字段仍为后续设计；已实现接口见 [架构文档](ARCHITECTURE.md) 和 [天气接口](WEATHER.md#接口)。
+当前聊天只接收message，角色固定，记忆列表尚无分页；原 /v1/settings 管理记忆开关/事件时区，M3另有 /v1/weather/settings 管理天气授权/城市，M4用 /v1/emotion/settings 管理情绪授权和偏好。下列多角色、分页等字段仍为后续设计；已实现接口见 [架构文档](ARCHITECTURE.md) 和 [天气接口](WEATHER.md#接口)。
 
 - `POST /v1/chat`：输入 conversation_id、character_id、message；返回 reply、request_id、memory_candidates 和必要的地点澄清提示。
 - `GET /v1/memories`：分页查看当前玩家记忆。
