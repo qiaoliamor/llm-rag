@@ -314,3 +314,24 @@ def test_overcertain_emotion_claim_is_rewritten(tmp_path):
     result=send(c,h,'太棒了，又失败了，呵呵')
     assert result['guarded'] and model.generate.await_count==2
     assert result['reply']=='听起来这次不太顺心，我先听你说。'
+
+
+@pytest.mark.parametrize('message,expected',[
+    ('我很难过，但你不用担心。',['sadness']),
+    ('我很开心，但你很难过。',['joy']),
+    ('我猜你很难过。',None),
+    ('你知道吗，我很难过。',['sadness']),
+    ('我很难过，朋友在安慰我。',['sadness']),
+    ('我很开心，不过他有些难过。',['joy']),
+])
+def test_self_report_scopes_player_and_addressee_clauses(message,expected):
+    assert self_report(message)==expected
+
+
+def test_new_explicit_self_report_with_addressee_replaces_old_ui_correction(tmp_path):
+    analyzer=AsyncMock();c,h,_,_=connected(tmp_path,analyzer);enable(c,h)
+    assert c.patch('/v1/emotion/assessment',headers=h,json={'label':'joy','preference':'listen'}).status_code==200
+    data=send(c,h,'我很难过，但你不用担心。')['emotion']
+    assert data['status']=='self_report' and data['assessment']['labels']==['sadness']
+    assert c.get('/v1/emotion').json()['assessment']['labels']==['sadness']
+    analyzer.analyze.assert_not_called()

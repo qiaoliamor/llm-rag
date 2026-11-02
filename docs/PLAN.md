@@ -1,6 +1,6 @@
 # 实施计划
 
-> 2026-11-02：M0–M3及W01/W02已交付；当前M4情绪支持闭环在任务分支实现，待PR审阅。M5正式质量评测与M6正式发布尚待进行。M2 B01–B03仍未完成；设计/验证见 [EMOTION.md](EMOTION.md) 和 [M4_TEST_REPORT.md](M4_TEST_REPORT.md)。
+> 2026-11-02：M0–M3及W01/W02已交付；M4情绪支持闭环交付见 [PR #8](https://github.com/qiaoliamor/llm-rag/pull/8)，包含合并审阅修复。M5正式质量评测与M6正式发布尚待进行。M2 B01–B03仍未完成；设计/验证见 [EMOTION.md](EMOTION.md) 和 [M4_TEST_REPORT.md](M4_TEST_REPORT.md)。
 
 ## 1. 实施原则
 

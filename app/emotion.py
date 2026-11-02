@@ -109,10 +109,21 @@ def analysis_window(history, count):
 
 
 def self_report(message):
-    if re.search(r'朋友|他|她|假如|如果|[“「"]',message): return None
+    if re.search(r'[“「"]',message): return None
+    if re.search(r'呵呵|才怪|又失败|反话',message): return None
+    # Scope self-report rules to the player's clauses; an addressee in a later
+    # clause must not discard an explicit first-person correction.
+    own=[]
+    active=False
+    for clause in re.split(r'[，,。！？?!；;]|但是|可是|不过',message):
+        if re.match(r'\s*(?:其实|现在|今天|刚才|说真的)?我',clause): active=True
+        elif re.search(r'你|朋友|他|她|假如|如果',clause): active=False
+        if active:
+            own.append(re.split(r'你|朋友|他|她|假如|如果',clause,maxsplit=1)[0])
+    message='，'.join(own)
+    if not message: return None
     if re.search(r'我(?:其实|现在|并|真的|一点)?(?:没有|不|没|不是)(?:难过|伤心|焦虑|紧张|生气|开心|累)',message):
         return ['unknown']  # A denial alone does not establish a neutral or happy mood.
-    if '我' not in message or re.search(r'你|呵呵|才怪|又失败|反话',message): return None
     if re.search(r'我.{0,5}(?:不觉得|不认为|没说|没有说|不是说|没有很|没那么).{0,5}(?:难过|焦虑|紧张|生气|开心|累)',message): return ['unknown']
     signals=[('joy',r'很开心|好开心|很高兴'),('sadness',r'很难过|好难过|很伤心'),
              ('anxiety',r'很焦虑|很紧张'),('anger',r'很生气|好生气'),('tired',r'很累|好累')]
