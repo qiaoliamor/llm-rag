@@ -17,24 +17,30 @@ from .evaluation import percentile
 from .memory import CHARACTER_ID, EMBEDDING_VERSION, RetrievalPolicy, describe, embed, memory_prompt, rank_memories
 
 DATASET = Path(__file__).resolve().parent.parent / 'evaluations/retrieval_dev.json'
+REGRESSION_DATASET = DATASET.with_name('retrieval_guard_regressions.json')
 TOP_K, CANDIDATES, BUDGET = 5, 20, 1200
 PROMPT_VERSION = 'm5-source-boundary-v1'
 # Fixed document vectors (production alias preprocessing), query-only controls.
 VARIANTS = {
     'A_no_memory': None,
-    'B_vector': RetrievalPolicy(False, False, False, CANDIDATES, False),
-    'Q_query_only': RetrievalPolicy(True, False, False, CANDIDATES, False),
-    'H_hybrid_only': RetrievalPolicy(False, True, False, CANDIDATES, False),
-    'C_query_hybrid': RetrievalPolicy(True, True, False, CANDIDATES, False),
-    'D_rerank': RetrievalPolicy(True, True, True, CANDIDATES, False),
-    'E_prompt': RetrievalPolicy(True, True,True, CANDIDATES, False),
-    'D_no_query': RetrievalPolicy(False, True, True, CANDIDATES, False),
-    'D_no_hybrid': RetrievalPolicy(True, False, True, CANDIDATES, False),
+    'B_vector': RetrievalPolicy(False, False, False, CANDIDATES, False, False, False),
+    'Q_query_only': RetrievalPolicy(True, False, False, CANDIDATES, False, False, False),
+    'H_hybrid_only': RetrievalPolicy(False, True, False, CANDIDATES, False, False, False),
+    'C_query_hybrid': RetrievalPolicy(True, True, False, CANDIDATES, False, False, False),
+    'D_rerank': RetrievalPolicy(True, True, True, CANDIDATES, False, False, False),
+    'E_prompt': RetrievalPolicy(True, True, True, CANDIDATES, False, False, False),
+    'D_no_query': RetrievalPolicy(False, True, True, CANDIDATES, False, False, False),
+    'D_no_hybrid': RetrievalPolicy(True, False, True, CANDIDATES, False, False, False),
+    'R_identity': RetrievalPolicy(True, True, True, CANDIDATES, False, True, False),
+    'S_evidence': RetrievalPolicy(True, True, True, CANDIDATES, False, False, True),
+    'F_retrieval_fix': RetrievalPolicy(True, True, True, CANDIDATES, False, True, True),
 }
 PAIRS = [('B_vector','Q_query_only'), ('B_vector','H_hybrid_only'),
          ('Q_query_only','C_query_hybrid'), ('H_hybrid_only','C_query_hybrid'),
          ('C_query_hybrid','D_rerank'), ('D_no_query','D_rerank'),
-         ('D_no_hybrid','D_rerank'), ('D_rerank','E_prompt')]
+         ('D_no_hybrid','D_rerank'), ('D_rerank','E_prompt'),
+         ('D_rerank','R_identity'), ('D_rerank','S_evidence'),
+         ('R_identity','F_retrieval_fix'), ('S_evidence','F_retrieval_fix')]
 
 
 class Record(BaseModel):
@@ -181,7 +187,7 @@ def evaluate_retrieval(path=DATASET):
                        'wins':sum(d['recall_delta']>0 for d in deltas),
                        'ties':sum(d['recall_delta']==0 for d in deltas),
                        'losses':sum(d['recall_delta']<0 for d in deltas),'per_query':deltas})
-    return {'suite':'m5-retrieval-ablation-v1','source':'synthetic','partition':'dev',
+    return {'suite':'m5-retrieval-ablation-v2','source':'synthetic','partition':'dev',
             'dataset_version':data.version,'dataset_sha256':digest,'queries':len(data.queries),
             'documents':len(data.documents),'visible_documents':len(rows),'clock':data.now.isoformat(),
             'top_k':TOP_K,'candidate_limit':CANDIDATES,'context_budget_chars':BUDGET,
@@ -192,6 +198,7 @@ def evaluate_retrieval(path=DATASET):
                       'Exact in-memory character vectors, not PostgreSQL/ANN performance.',
                       'Rerank uses identity score boost, importance and recency; not a cross encoder.',
                       'Domain admission shortcuts are disabled uniformly, isolating rerank from candidate admission.',
+                      'R adds identity field routing; S adds evidence compatibility; F combines both. Old variants explicitly disable them.',
                       'Production uses no SQLite candidate cap; experiments use pooled cap 20 before reranking.',
                       'E and D have identical rankings; prompt effects require the optional live comparison.']}
 
@@ -208,15 +215,16 @@ def asserted_atoms(reply, atoms):
     return sorted(found)
 
 
-async def compare_prompts(provider, *, path=DATASET, limit=3, repeats=2, max_calls=12, include_replies=False):
+async def compare_prompts(provider, *, path=DATASET, limit=3, repeats=2, max_calls=12, include_replies=False,
+                          retrieval_variant='D_rerank'):
     data, digest = load_dataset(path)
     cases = [q for q in data.queries if q.live_probe][:limit]
-    if not 1 <= limit <= 3 or not 1 <= repeats <= 3 or not 1 <= max_calls <= 18 or not cases:
+    if retrieval_variant not in ('D_rerank','F_retrieval_fix') or not 1 <= limit <= 3 or not 1 <= repeats <= 3 or not 1 <= max_calls <= 18 or not cases:
         raise ValueError('invalid generation bounds')
     if len(cases)*2*repeats > max_calls: raise ValueError('generation call budget exceeded')
     rows, trials = materialize(data), []
     for q in cases:
-        evidence = retrieve(rows,q.query,'D_rerank',data.now)
+        evidence = retrieve(rows,q.query,retrieval_variant,data.now)
         for repeat in range(repeats):
             order = ['D_rerank','E_prompt']
             if (repeat + len(trials)//max(1,2*repeats)) % 2: order.reverse()
@@ -259,6 +267,7 @@ async def compare_prompts(provider, *, path=DATASET, limit=3, repeats=2, max_cal
                 'unsupported_probe_trial_delta':int(bool(e['unsupported_probe_hits']))-int(bool(d['unsupported_probe_hits'])) if complete else None,
                 'supported_probe_hit_delta':len(e['supported_probe_hits'])-len(d['supported_probe_hits']) if complete else None})
     return {'dataset_sha256':digest,'prompt_version':PROMPT_VERSION,'order':'counterbalanced',
+            'retrieval_variant':retrieval_variant,
             'repeats':repeats,'case_count':len(cases),'api_calls':len(trials),'summaries':summaries,
             'sampling':'existing provider defaults; max output tokens 500; no automatic retries',
             'token_usage':None,'actual_cost':None,'trials':trials,'paired_trials':pairs,

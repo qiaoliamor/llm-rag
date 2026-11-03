@@ -7,11 +7,12 @@ import subprocess
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from app.retrieval_evaluation import compare_prompts, evaluate_retrieval
+from app.retrieval_evaluation import DATASET, REGRESSION_DATASET, compare_prompts, evaluate_retrieval
 
 
 async def run(args):
-    report = evaluate_retrieval()
+    path = DATASET if args.dataset == 'dev' else REGRESSION_DATASET
+    report = evaluate_retrieval(path)
     if args.live:
         # Local configuration is loaded ONLY for an explicitly requested live run.
         from app.config import Settings
@@ -22,8 +23,9 @@ async def run(args):
             raise ValueError('本地模型配置无效，请检查 .env（不显示配置原文）') from None
         if settings.chat_provider == 'mock' or not settings.configured:
             raise ValueError('真实对照需要配置当前供应商的本地密钥，不能用mock代替')
-        report['generation'] = await compare_prompts(build_provider(settings),limit=args.live_limit,
-            repeats=args.repeats,max_calls=args.max_calls,include_replies=args.include_synthetic_replies)
+        report['generation'] = await compare_prompts(build_provider(settings),path=path,limit=args.live_limit,
+            repeats=args.repeats,max_calls=args.max_calls,include_replies=args.include_synthetic_replies,
+            retrieval_variant=args.retrieval_variant)
         report['model_calls'] = report['generation']['api_calls']
         report['generation']['provider'] = settings.chat_provider
         report['generation']['model'] = settings.selected_model
@@ -33,11 +35,15 @@ async def run(args):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--live',action='store_true',help='Use local API credentials; consumes quota and may incur charges')
+    parser.add_argument('--dataset',choices=('dev','guard-regressions'),default='dev')
     parser.add_argument('--live-limit',type=int,choices=range(1,4),default=3)
     parser.add_argument('--repeats',type=int,choices=range(1,4),default=2)
     parser.add_argument('--max-calls',type=int,choices=range(1,19),default=12)
     parser.add_argument('--include-synthetic-replies',action='store_true',help='Include replies to fixed synthetic probes only')
+    parser.add_argument('--retrieval-variant',choices=('D_rerank','F_retrieval_fix'),default='D_rerank',help='Evidence source for optional live prompt pairs')
     args = parser.parse_args()
+    if args.live and args.dataset != 'dev':
+        parser.error('新增回归集只进行离线检索评测，不包含真实模型探针')
     if args.live_limit*args.repeats*2 > args.max_calls and args.live:
         parser.error('请求预算不足：需要 live-limit × repeats × 2 次，未发起请求')
     try:

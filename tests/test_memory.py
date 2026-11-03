@@ -301,3 +301,62 @@ def test_historical_interview_experience_does_not_expire(database_url):
     m=manual(c,h,'我2020年6月1日参加过一次重要面试，这是合成经历')
     uid=next(iter(app.state.sessions.values())).user_id
     assert m['id'] in [x['id'] for x in app.state.memory_store.retrieve(uid,'面试的经历')]
+
+
+def test_name_routing_crud_restart_and_other_identity(database_url):
+    app=app_for(database_url);c,h=boot(app);enable(c,h)
+    own=manual(c,h,'我叫合成旧名')
+    manual(c,h,'我的猫咪叫合成米粒')
+    manual(c,h,'我叫合成待确认',False)
+    result=c.post('/v1/chat',headers=h,json={'message':'我的名字是合成别名，对吗？'}).json()
+    assert result['retrieved_memory_ids']==[own['id']]
+    assert '合成旧名' in result['reply'] and '合成米粒' not in result['reply']
+    other,ho=boot(app);enable(other,ho)
+    assert other.post('/v1/chat',headers=ho,json={'message':'我的名字是什么？'}).json()['retrieved_memory_ids']==[]
+    updated=c.patch('/v1/memories/'+own['id'],headers=h,json={'version':own['version'],'fact':'我叫合成新名'}).json()['item']
+    restarted=TestClient(app_for(database_url));restarted.cookies.update(dict(c.cookies))
+    session=restarted.get('/v1/session').json();hr={'x-csrf-token':session['csrf_token']}
+    result=restarted.post('/v1/chat',headers=hr,json={'message':'我名字是合成别名，对吗？'}).json()
+    assert result['retrieved_memory_ids']==[own['id']]
+    assert '合成新名' in result['reply'] and '合成旧名' not in result['reply']
+    assert restarted.delete('/v1/memories/'+own['id'],headers=hr,params={'version':updated['version']}).status_code==200
+    assert restarted.post('/v1/chat',headers=hr,json={'message':'我的名字是什么？'}).json()['retrieved_memory_ids']==[]
+    # The unconfirmed name is not a fallback, and automatic extraction cannot resurrect deletion.
+    store=restarted.app.state.memory_store;uid=next(iter(restarted.app.state.sessions.values())).user_id
+    assert store.candidate(uid,'我叫合成新名','synthetic',store.settings(uid)['epoch']) is None
+
+
+def test_supported_and_unsupported_fields_with_lifecycle(database_url):
+    app=app_for(database_url);c,h=boot(app);enable(c,h)
+    current=manual(c,h,'我住在合成临川')
+    manual(c,h,'我的猫咪叫合成米粒')
+    uid=next(iter(app.state.sessions.values())).user_id;store=app.state.memory_store
+    assert store.retrieve(uid,'我的护照号码是SYNTHETIC-PASS，对吗？')==[]
+    assert store.retrieve(uid,'我小时候住在合成临川吗？')==[]
+    childhood=manual(c,h,'我小时候住在合成旧镇')
+    passport=manual(c,h,'我的护照号码是SYNTHETIC-PASS')
+    manual(c,h,'我的朋友的护照号码是FRIEND-ONLY')
+    assert [m['id'] for m in store.retrieve(uid,'我小时候住哪？')]==[childhood['id']]
+    assert [m['id'] for m in store.retrieve(uid,'我现在住哪里？')]==[current['id']]
+    assert [m['id'] for m in store.retrieve(uid,'我的护照号码是什么？')]==[passport['id']]
+    enable(c,h,False)
+    assert store.retrieve(uid,'我的护照号码是什么？')==[]
+    enable(c,h,True)
+    assert c.delete('/v1/memories/'+passport['id'],headers=h,params={'version':passport['version']}).status_code==200
+    assert store.retrieve(uid,'我的护照号码是什么？')==[]
+    assert c.delete('/v1/memories',headers=h).status_code==200
+    assert store.retrieve(uid,'我小时候住哪？')==store.retrieve(uid,'我叫什么名字？')==[]
+
+
+def test_name_route_cannot_bypass_expiry_role_or_vector_version(database_url):
+    store=MemoryStore(database_url);uid,_=store.identity(None);store.configure(uid,True,'Asia/Tokyo')
+    row=store.candidate(uid,'我叫合成阿澄','synthetic',store.settings(uid)['epoch'],manual=True)
+    row=store.mutate(uid,row['id'],row['version'],confirm=True)
+    assert [m['id'] for m in store.retrieve(uid,'我的名字是合成别名吗？')]==[row['id']]
+    for field,value,restore in [('character_id','other-role','shen_yan'),
+                               ('embedding_version','old-version',EMBEDDING_VERSION),
+                               ('expires_at',datetime(2000,1,1),None)]:
+        with store.db.begin() as db:setattr(db.get(Memory,row['id']),field,value)
+        assert store.retrieve(uid,'我的名字是什么？')==[]
+        with store.db.begin() as db:setattr(db.get(Memory,row['id']),field,restore)
+    assert [m['id'] for m in store.retrieve(uid,'我的名字是什么？')]==[row['id']]

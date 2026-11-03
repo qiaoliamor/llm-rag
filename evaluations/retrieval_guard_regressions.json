@@ -1,0 +1,401 @@
+{
+  "version": "m5-retrieval-guard-regressions-v1",
+  "source": "synthetic",
+  "split_note": "Authored development regressions, not held-out or independent generalization data.",
+  "now": "2026-11-03T00:00:00",
+  "documents": [
+    {
+      "id": "r01",
+      "fact": "我叫合成阿澄",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.8,
+      "age_days": 0,
+      "expires_at": null
+    },
+    {
+      "id": "r02",
+      "fact": "我现在住在合成临川",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.8,
+      "age_days": 0,
+      "expires_at": null
+    },
+    {
+      "id": "r03",
+      "fact": "我小时候住在合成旧镇",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.8,
+      "age_days": 0,
+      "expires_at": null
+    },
+    {
+      "id": "r04",
+      "fact": "我的护照号码是SYNTHETIC-PASS",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.8,
+      "age_days": 0,
+      "expires_at": null
+    },
+    {
+      "id": "r05",
+      "fact": "我的朋友叫合成阿禾",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.8,
+      "age_days": 0,
+      "expires_at": null
+    },
+    {
+      "id": "r06",
+      "fact": "我的猫咪叫合成米米",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.8,
+      "age_days": 0,
+      "expires_at": null
+    },
+    {
+      "id": "r07",
+      "fact": "我的猫咪对鸡肉过敏",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.8,
+      "age_days": 0,
+      "expires_at": null
+    },
+    {
+      "id": "r08",
+      "fact": "我喜欢喝无糖茶",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.8,
+      "age_days": 0,
+      "expires_at": null
+    },
+    {
+      "id": "r09",
+      "fact": "我曾参加合成星河公司的面试",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.8,
+      "age_days": 0,
+      "expires_at": null
+    },
+    {
+      "id": "r10",
+      "fact": "我的妈妈叫合成阿岚",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.8,
+      "age_days": 0,
+      "expires_at": null
+    },
+    {
+      "id": "r11",
+      "fact": "我以前住在合成南城",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.8,
+      "age_days": 0,
+      "expires_at": null
+    },
+    {
+      "id": "r12",
+      "fact": "我的朋友的护照号码是FRIEND-ONLY",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.8,
+      "age_days": 0,
+      "expires_at": null
+    },
+    {
+      "id": "r13",
+      "fact": "我的朋友小时候住在合成远镇",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.8,
+      "age_days": 0,
+      "expires_at": null
+    },
+    {
+      "id": "r14",
+      "fact": "我有一只猫叫合成团子",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.8,
+      "age_days": 0,
+      "expires_at": null
+    }
+  ],
+  "queries": [
+    {
+      "id": "name",
+      "group": "guard-regression",
+      "split": "dev",
+      "query": "我名字是什么？",
+      "relevance": {
+        "r01": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "name-premise",
+      "group": "guard-regression",
+      "split": "dev",
+      "query": "我的名字是合成别名，对吗？",
+      "relevance": {
+        "r01": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "pet-name",
+      "group": "guard-regression",
+      "split": "dev",
+      "query": "我养的猫叫什么名字？",
+      "relevance": {
+        "r06": 2,
+        "r14": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "friend-name",
+      "group": "guard-regression",
+      "split": "dev",
+      "query": "我的朋友叫什么名字？",
+      "relevance": {
+        "r05": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "mother-name",
+      "group": "guard-regression",
+      "split": "dev",
+      "query": "我的妈妈叫什么名字？",
+      "relevance": {
+        "r10": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "passport",
+      "group": "guard-regression",
+      "split": "dev",
+      "query": "我的护照号码是多少？",
+      "relevance": {
+        "r04": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "friend-passport",
+      "group": "guard-regression",
+      "split": "dev",
+      "query": "我的朋友的护照号码是多少？",
+      "relevance": {
+        "r12": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "current-home",
+      "group": "guard-regression",
+      "split": "dev",
+      "query": "我现在住哪里？",
+      "relevance": {
+        "r02": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "past-home",
+      "group": "guard-regression",
+      "split": "dev",
+      "query": "我以前住哪里？",
+      "relevance": {
+        "r11": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "child-home",
+      "group": "guard-regression",
+      "split": "dev",
+      "query": "我小时候住在哪？",
+      "relevance": {
+        "r03": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "friend-child-home",
+      "group": "guard-regression",
+      "split": "dev",
+      "query": "我的朋友小时候住在哪？",
+      "relevance": {
+        "r13": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "hobby",
+      "group": "guard-regression",
+      "split": "dev",
+      "query": "我的喝茶偏好是什么？",
+      "relevance": {
+        "r08": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "career",
+      "group": "guard-regression",
+      "split": "dev",
+      "query": "我的求职经历有哪些？",
+      "relevance": {
+        "r09": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "unknown-id",
+      "group": "guard-regression",
+      "split": "dev",
+      "query": "我的身份证号码是多少？",
+      "relevance": {},
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "unknown-phone",
+      "group": "guard-regression",
+      "split": "dev",
+      "query": "我的手机号是多少？",
+      "relevance": {},
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "unknown-father-name",
+      "group": "guard-regression",
+      "split": "dev",
+      "query": "我的爸爸叫什么名字？",
+      "relevance": {},
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "unknown-father-child",
+      "group": "guard-regression",
+      "split": "dev",
+      "query": "我的爸爸小时候住哪？",
+      "relevance": {},
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "character-name",
+      "group": "guard-regression",
+      "split": "dev",
+      "query": "沈砚你叫什么名字？",
+      "relevance": {},
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "unknown-topic",
+      "group": "guard-regression",
+      "split": "dev",
+      "query": "我的宇宙飞船型号是什么？",
+      "relevance": {},
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "friend-current-home",
+      "group": "guard-regression",
+      "split": "dev",
+      "query": "我的朋友现在住哪？",
+      "relevance": {},
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "pet-passport",
+      "group": "guard-regression",
+      "split": "dev",
+      "query": "我的猫咪的护照号码是什么？",
+      "relevance": {},
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    }
+  ]
+}

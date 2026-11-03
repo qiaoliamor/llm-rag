@@ -1,6 +1,6 @@
 # M5 首批分析、组件基线与规则完善
 
-日期：2026-11-03（Asia/Tokyo）。状态：**M5进行中，首批PR #10已合并，第二批检索消融交付见PR #11（合入main生效），未整体验收**。基线main为 `90350e4`（M4 PR #8）；分支 `codex/m5-evaluation-baseline`。此前EMOTION.md流程说明已通过 [PR #9](https://github.com/qiaoliamor/llm-rag/pull/9) squash合并至main（4513496）；PR #10已变基到该基线，文档与代码通过各自PR依次交付。
+日期：2026-11-03（Asia/Tokyo）。状态：**M5进行中，首批PR #10已合并，第二批检索消融PR #11已合并，本批继续修复姓名/无答案检索，未整体验收**。基线main为 `90350e4`（M4 PR #8）；分支 `codex/m5-evaluation-baseline`。此前EMOTION.md流程说明已通过 [PR #9](https://github.com/qiaoliamor/llm-rag/pull/9) squash合并至main（4513496）；PR #10已变基到该基线，文档与代码通过各自PR依次交付。
 
 ## 1. 分析与本批范围
 
@@ -104,3 +104,11 @@ CRUD适用性：新评测入口只读合成定义、临时建立/查询/清理�
 2026-11-03，核对共享评分默认行为、候选池/预算、向量和关键词查询扩展开关、授权预过滤、数据与指标分母、D/E同证据配对、API预算/错误处理、合成数据和提交边界。原2个无答案误召回、姓名漏召回、命名值探针误计和提示未见稳定收益继续保留，不作为代码检查通过后的质量达标项。本轮不改功能代码、不重采样真实模型或执行原保留集；仅更新PR交付状态。最终命令行结果与安全审计补记于下。
 
 最终审阅结果：`.venv/bin/python -m pytest -q` 345通过/20个PG变体跳过；9组×24开发查询离线复现与报告各项数值一致，12份历史合成回复保持原样。本轮功能代码/数据与e8d3442完全一致，沿用同一功能版本此前临时PostgreSQL专项161通过及同前端36项/构建结果，不重复调用模型或未改动前端。实际本地秘密值/常见密钥模式、PR历史及最终差异、暂存、已跟踪路径、Python/JSON语法、Markdown链接/围栏检查通过。未提交真实玩家数据、凭据或运行导出，M5正式验收与B01–B03保持待办。
+
+## 9. 姓名漏召回与无答案误召回修复
+
+2026-11-03，基线352a5dc，新分支codex/m5-retrieval-evidence-guards。生产默认启用姓名字段路由和有限主体/字段/时间证据检查；不靠全局提高阈值或硬编码案例ID/错误值。对应事实存在时仍检索；原数据不改，旧组显式关闭新能力，新增R_identity/S_evidence/F_retrieval_fix隔离贡献。默认385通过/23PG跳过（408收集），临时PG专项167通过（记忆55+天气68+情绪44，与默认重叠）；前端不变不重跑。
+
+命令：`.venv/bin/python -m pytest -q`、`.venv/bin/python scripts/test_postgres.py`、`.venv/bin/python scripts/evaluate_retrieval.py`、`.venv/bin/python scripts/evaluate_retrieval.py --dataset guard-regressions`。原24查询D36/37且2/2无答案误召回，F37/37且0/2；新21查询F14/14且0/8，均为开发集。新增37个规则/消融单测、3项跨数据库生命周期测试，覆盖正/负字段、关系/时间、40干扰压力、PG预选漏选、确认/纠正/重启/删除/撤回与角色/过期/版本隔离。初次测试位置断言及Cookie夹具失败保留在 [检索修复记录](RETRIEVAL_GUARDS.md)，不当产品提升。
+
+`.venv/bin/python scripts/evaluate_retrieval.py --live --retrieval-variant F_retrieval_fix --live-limit 3 --repeats 2 --max-calls 12 --include-synthetic-replies`：12/12真实Gemini合成请求完成，D/E提示均使用F证据，记录retrieval_variant。加强组命名值4/4、普通3/4；仍有来源时间臆测及替代名字探针误计，不作幻觉率或完整质量结论。没有为提高结果重采样；旧12回复保持、新12回复归档，运行JSON不提交。未运行原32保留案例，M5仍进行中。

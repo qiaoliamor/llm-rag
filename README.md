@@ -126,7 +126,7 @@ uv run --frozen pytest -q
 uv run --frozen python scripts/evaluate.py --limit 100
 ```
 
-M2 历史结果为20项前端、174项默认后端通过；M4历史为36项前端、284项默认后端通过/20项PG跳过、临时库专项161项通过，见 [M4测试记录](docs/M4_TEST_REPORT.md)。M5当前后端345通过/20跳过，组件开发集68/68；新增检索消融及12次真实合成提示配对，正式模型质量未验收，见 [M5记录](docs/M5_TEST_REPORT.md)。数据库专项脚本 `uv run --frozen python scripts/test_postgres.py` 只创建并删除临时库，不操作真实记忆数据。后端测试前必须先构建前端。原有 100 条合成场景及接口、隔离、重写、密钥缺失、配额、超时等回归保留；新增静态资源检查验证 React 构建能通过现有路径和 CSP 加载。离线评测只验证 mock 链路，不衡量情感理解或幻觉率。脚本提供 direct（直接提示）、rag（简单关键词正史检索）、canon（完整正史）三个对照入口。实际聊天现已检索已确认玩家记忆；该脚本仍是角色正史的三组简易对照，不等于完整记忆评测。
+M2 历史结果为20项前端、174项默认后端通过；M4历史为36项前端、284项默认后端通过/20项PG跳过、临时库专项161项通过，见 [M4测试记录](docs/M4_TEST_REPORT.md)。M5当前后端385通过/23跳过，组件开发集68/68；新增检索消融及12次真实合成提示配对，正式模型质量未验收，见 [M5记录](docs/M5_TEST_REPORT.md)。数据库专项脚本 `uv run --frozen python scripts/test_postgres.py` 只创建并删除临时库，不操作真实记忆数据。后端测试前必须先构建前端。原有 100 条合成场景及接口、隔离、重写、密钥缺失、配额、超时等回归保留；新增静态资源检查验证 React 构建能通过现有路径和 CSP 加载。离线评测只验证 mock 链路，不衡量情感理解或幻觉率。脚本提供 direct（直接提示）、rag（简单关键词正史检索）、canon（完整正史）三个对照入口。实际聊天现已检索已确认玩家记忆；该脚本仍是角色正史的三组简易对照，不等于完整记忆评测。
 
 本地填好密钥后可执行下列小规模真实测试；会消耗当前供应商额度，付费档可能产生费用；每组最多 `limit` 次、共三组：
 
@@ -178,3 +178,14 @@ uv run --frozen python scripts/test_postgres.py
 ```
 
 默认不加载.env或调用API，使用40条合成记录/24个开发查询，比较查询扩展、混合检索、重排和移除因素的结果，报告宏/微Recall、Precision、MRR、nDCG及无答案误召回。可显式加 `--live --live-limit 3 --repeats 2 --max-calls 12` 做同证据D/E来源提示配对，会消耗当前供应商额度。本批交付见 [PR #11](https://github.com/qiaoliamor/llm-rag/pull/11)。完整结果、12份合成回复及局限见 [检索消融报告](docs/RETRIEVAL_ABLATION.md)；当前未观察到稳定提示收益，不作为正式质量验收。
+
+### 姓名与无答案检索修复
+
+生产默认增加本人姓名路由与有限主体/字段/时间证据检查，缺少对应事实不补无关记忆；存在对应确认事实仍可召回。重跑旧开发集和新增回归集：
+
+```bash
+.venv/bin/python scripts/evaluate_retrieval.py
+.venv/bin/python scripts/evaluate_retrieval.py --dataset guard-regressions
+```
+
+旧组保持、新R/S/F分别比较路由/证据检查/组合。可用 `--live --retrieval-variant F_retrieval_fix --live-limit 3 --repeats 2 --max-calls 12` 显式做修复后证据的提示配对，会消耗当前供应商额度。数值、12份合成回复及有限规则边界见 [检索修复记录](docs/RETRIEVAL_GUARDS.md)；M5仍未整体完成。

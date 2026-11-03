@@ -114,7 +114,8 @@ def test_pairing_and_report_reproducibility():
         assert metrics['micro_recall_at_5']==pytest.approx(metrics['hits']/37)
     for pair in report['paired_deltas']:
         assert pair['n']==22 and pair['wins']+pair['losses']+pair['ties']==22
-    assert report['paired_deltas'][-1]['mean_recall_delta']==0
+    prompt_pair=next(p for p in report['paired_deltas'] if p['before']=='D_rerank' and p['after']=='E_prompt')
+    assert prompt_pair['mean_recall_delta']==0
 
 
 @pytest.mark.parametrize('reply,expected',[
