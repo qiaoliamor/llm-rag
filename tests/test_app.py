@@ -167,7 +167,7 @@ def test_retrieval_baseline_sources():
     assert '正史证据' not in instructions('direct')
 
 
-@pytest.mark.parametrize('kind,status,code', [('auth',503,'invalid_api_key'),('rate',429,'rate_limit'),('timeout',504,'timeout'),('connection',502,'connection'),('upstream',502,'upstream_error'),('empty',502,'empty_response')])
+@pytest.mark.parametrize('kind,status,code', [('auth',503,'invalid_api_key'),('rate',429,'rate_limit'),('timeout',504,'timeout'),('connection',502,'connection'),('upstream',502,'upstream_error'),('not_found',503,'model_unavailable'),('empty',502,'empty_response')])
 def test_sdk_failures_are_sanitized(monkeypatch, kind, status, code):
     import openai
     import httpx
@@ -179,6 +179,7 @@ def test_sdk_failures_are_sanitized(monkeypatch, kind, status, code):
         'timeout': openai.APITimeoutError(request=req),
         'connection': openai.APIConnectionError(request=req),
         'upstream': openai.APIStatusError('private-upstream-message', response=response, body=None),
+        'not_found': openai.NotFoundError('private-upstream-message', response=response, body=None),
     }
     generate = AsyncMock(return_value=SimpleNamespace(output_text='', status='incomplete'))
     if kind != 'empty': generate.side_effect = errors[kind]

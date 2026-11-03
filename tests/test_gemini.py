@@ -68,7 +68,7 @@ def test_real_sdk_wire_and_multiturn(monkeypatch):
 
 
 @pytest.mark.parametrize('status,expected,code', [(400,503,'invalid_config'), (401,503,'invalid_api_key'),
-    (403,503,'permission_denied'), (404,502,'upstream_error'), (429,429,'rate_limit'), (500,502,'upstream_error')])
+    (403,503,'permission_denied'), (404,503,'model_unavailable'), (429,429,'rate_limit'), (500,502,'upstream_error')])
 def test_api_errors_no_retry_no_secret(monkeypatch, status, expected, code):
     calls = []
     def handler(request):
