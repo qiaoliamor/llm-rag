@@ -1,0 +1,761 @@
+{
+  "version": "m5-retrieval-dev-v1",
+  "source": "synthetic",
+  "split_note": "Development challenge set; not an independent held-out test.",
+  "now": "2026-11-03T00:00:00",
+  "documents": [
+    {
+      "id": "m01",
+      "fact": "我叫合成小岚",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 1,
+      "age_days": 0,
+      "expires_at": null
+    },
+    {
+      "id": "m02",
+      "fact": "我住在青禾市",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.9,
+      "age_days": 0,
+      "expires_at": null
+    },
+    {
+      "id": "m03",
+      "fact": "我的猫咪叫米粒",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.95,
+      "age_days": 0,
+      "expires_at": null
+    },
+    {
+      "id": "m04",
+      "fact": "我的猫咪对鸡肉过敏",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 1,
+      "age_days": 0,
+      "expires_at": null
+    },
+    {
+      "id": "m05",
+      "fact": "我曾参加青梧工作室的设计师面试",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.95,
+      "age_days": 7,
+      "expires_at": null
+    },
+    {
+      "id": "m06",
+      "fact": "我正在准备秋灯公司的编辑面试",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 1,
+      "age_days": 1,
+      "expires_at": null
+    },
+    {
+      "id": "m07",
+      "fact": "我准备参加十二月的研究生考试",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.9,
+      "age_days": 3,
+      "expires_at": null
+    },
+    {
+      "id": "m08",
+      "fact": "我喜欢画水彩画",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.7,
+      "age_days": 4,
+      "expires_at": null
+    },
+    {
+      "id": "m09",
+      "fact": "我喜欢在周末修补旧书",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.8,
+      "age_days": 2,
+      "expires_at": null
+    },
+    {
+      "id": "m10",
+      "fact": "我的生日是五月十二日",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.9,
+      "age_days": 100,
+      "expires_at": null
+    },
+    {
+      "id": "m11",
+      "fact": "我以前住在白芷市",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.5,
+      "age_days": 365,
+      "expires_at": null
+    },
+    {
+      "id": "m12",
+      "fact": "我上次在青禾市散步遇到降雨",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.4,
+      "age_days": 60,
+      "expires_at": null
+    },
+    {
+      "id": "m13",
+      "fact": "我不喜欢甜咖啡",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.9,
+      "age_days": 1,
+      "expires_at": null
+    },
+    {
+      "id": "m14",
+      "fact": "我喜欢喝无糖茶",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.8,
+      "age_days": 1,
+      "expires_at": null
+    },
+    {
+      "id": "m15",
+      "fact": "我喜欢摄影和步行",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.6,
+      "age_days": 5,
+      "expires_at": null
+    },
+    {
+      "id": "m16",
+      "fact": "我的职业是设计助理",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.9,
+      "age_days": 2,
+      "expires_at": null
+    },
+    {
+      "id": "m17",
+      "fact": "我的朋友合成小禾是医生",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.6,
+      "age_days": 30,
+      "expires_at": null
+    },
+    {
+      "id": "m18",
+      "fact": "我每天晚上复习数学，为研究生考试做准备",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.9,
+      "age_days": 2,
+      "expires_at": null
+    },
+    {
+      "id": "m19",
+      "fact": "我的猫咪上周做过体检",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.8,
+      "age_days": 7,
+      "expires_at": null
+    },
+    {
+      "id": "m20",
+      "fact": "我最近搬家时把旧书送给了邻居",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.5,
+      "age_days": 6,
+      "expires_at": null
+    },
+    {
+      "id": "m21",
+      "fact": "我正在为面试练习作品介绍",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.8,
+      "age_days": 1,
+      "expires_at": null
+    },
+    {
+      "id": "m22",
+      "fact": "我在阳光图书馆做志愿者",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.8,
+      "age_days": 3,
+      "expires_at": null
+    },
+    {
+      "id": "m23",
+      "fact": "我喜欢收藏面试主题的小说",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.2,
+      "age_days": 120,
+      "expires_at": null
+    },
+    {
+      "id": "m24",
+      "fact": "我喜欢收藏猫咪主题的玩偶",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.2,
+      "age_days": 120,
+      "expires_at": null
+    },
+    {
+      "id": "m25",
+      "fact": "我喜欢收藏考试主题的电影",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.2,
+      "age_days": 120,
+      "expires_at": null
+    },
+    {
+      "id": "m26",
+      "fact": "我喜欢收藏搬家主题的歌曲",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.2,
+      "age_days": 120,
+      "expires_at": null
+    },
+    {
+      "id": "m27",
+      "fact": "我喜欢收藏生日主题的绘本",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.2,
+      "age_days": 120,
+      "expires_at": null
+    },
+    {
+      "id": "m28",
+      "fact": "我喜欢收藏摄影主题的展览",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.2,
+      "age_days": 120,
+      "expires_at": null
+    },
+    {
+      "id": "m29",
+      "fact": "我喜欢收藏求职主题的纪录片",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.2,
+      "age_days": 120,
+      "expires_at": null
+    },
+    {
+      "id": "m30",
+      "fact": "我喜欢收藏爱好主题的随笔",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.2,
+      "age_days": 120,
+      "expires_at": null
+    },
+    {
+      "id": "m31",
+      "fact": "我喜欢收藏城市主题的地图",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.2,
+      "age_days": 120,
+      "expires_at": null
+    },
+    {
+      "id": "m32",
+      "fact": "我喜欢收藏宠物主题的动画",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.2,
+      "age_days": 120,
+      "expires_at": null
+    },
+    {
+      "id": "m33",
+      "fact": "我喜欢收藏应聘主题的剧本",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.2,
+      "age_days": 120,
+      "expires_at": null
+    },
+    {
+      "id": "m34",
+      "fact": "我喜欢收藏考研主题的播客",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 0.2,
+      "age_days": 120,
+      "expires_at": null
+    },
+    {
+      "id": "x01",
+      "fact": "我叫红豆",
+      "user_id": "other-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 1,
+      "age_days": 0,
+      "expires_at": null
+    },
+    {
+      "id": "x02",
+      "fact": "我的猫咪叫红豆",
+      "user_id": "synthetic-player",
+      "character_id": "other-role",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 1,
+      "age_days": 0,
+      "expires_at": null
+    },
+    {
+      "id": "x03",
+      "fact": "我住在旧城",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "candidate",
+      "deleted": false,
+      "importance": 1,
+      "age_days": 0,
+      "expires_at": null
+    },
+    {
+      "id": "x04",
+      "fact": "我的护照号码是TEST0000",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": true,
+      "importance": 1,
+      "age_days": 0,
+      "expires_at": null
+    },
+    {
+      "id": "x05",
+      "fact": "我参加过旧公司的面试",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "superseded",
+      "deleted": false,
+      "importance": 1,
+      "age_days": 0,
+      "expires_at": null
+    },
+    {
+      "id": "x06",
+      "fact": "我今天要去旧城参加面试",
+      "user_id": "synthetic-player",
+      "character_id": "shen_yan",
+      "status": "confirmed",
+      "deleted": false,
+      "importance": 1,
+      "age_days": 0,
+      "expires_at": "2026-11-02T00:00:00"
+    }
+  ],
+  "queries": [
+    {
+      "id": "name",
+      "group": "identity",
+      "split": "dev",
+      "query": "我叫什么名字？",
+      "relevance": {
+        "m01": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "name-correction",
+      "group": "identity",
+      "split": "dev",
+      "query": "我的名字是红豆，对吗？",
+      "relevance": {
+        "m01": 2
+      },
+      "live_probe": true,
+      "allowed_atoms": [
+        "合成小岚"
+      ],
+      "forbidden_atoms": [
+        "红豆"
+      ]
+    },
+    {
+      "id": "current-city",
+      "group": "identity",
+      "split": "dev",
+      "query": "我现在住在哪个城市？",
+      "relevance": {
+        "m02": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "past-city",
+      "group": "history",
+      "split": "dev",
+      "query": "我以前住在哪里？",
+      "relevance": {
+        "m11": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "interviews",
+      "group": "career",
+      "split": "dev",
+      "query": "说说我准备面试和曾经面试的事情",
+      "relevance": {
+        "m05": 2,
+        "m06": 2,
+        "m21": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "job-synonym",
+      "group": "career",
+      "split": "dev",
+      "query": "我的求职进展有哪些？",
+      "relevance": {
+        "m05": 2,
+        "m06": 2,
+        "m21": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "application-synonym",
+      "group": "career",
+      "split": "dev",
+      "query": "我的应聘经历和准备情况呢？",
+      "relevance": {
+        "m05": 2,
+        "m06": 2,
+        "m21": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "interview-target",
+      "group": "career",
+      "split": "dev",
+      "query": "我正在准备哪家公司的编辑面试？",
+      "relevance": {
+        "m06": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "pet-name",
+      "group": "pet",
+      "split": "dev",
+      "query": "我的猫咪叫红豆，对吗？",
+      "relevance": {
+        "m03": 2
+      },
+      "live_probe": true,
+      "allowed_atoms": [
+        "米粒"
+      ],
+      "forbidden_atoms": [
+        "红豆"
+      ]
+    },
+    {
+      "id": "pet-health",
+      "group": "pet",
+      "split": "dev",
+      "query": "我家宠物的健康有哪些要注意的事？",
+      "relevance": {
+        "m04": 2,
+        "m19": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "pet-allergy",
+      "group": "pet",
+      "split": "dev",
+      "query": "我的小猫吃鸡肉要注意什么？",
+      "relevance": {
+        "m04": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "pet-recall",
+      "group": "pet",
+      "split": "dev",
+      "query": "你记得我的猫咪有哪些事？",
+      "relevance": {
+        "m03": 2,
+        "m04": 2,
+        "m19": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "study",
+      "group": "study",
+      "split": "dev",
+      "query": "我准备什么考试，平时怎么复习？",
+      "relevance": {
+        "m07": 2,
+        "m18": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "postgraduate",
+      "group": "study",
+      "split": "dev",
+      "query": "我考研的准备情况是什么？",
+      "relevance": {
+        "m07": 2,
+        "m18": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "study-detail",
+      "group": "study",
+      "split": "dev",
+      "query": "我每天晚上在复习什么？",
+      "relevance": {
+        "m18": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "preferences",
+      "group": "preference",
+      "split": "dev",
+      "query": "我的爱好和偏好是什么？",
+      "relevance": {
+        "m08": 2,
+        "m09": 2,
+        "m13": 2,
+        "m14": 2,
+        "m15": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "books",
+      "group": "preference",
+      "split": "dev",
+      "query": "我周末会做什么和旧书有关的事？",
+      "relevance": {
+        "m09": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "drink-negation",
+      "group": "preference",
+      "split": "dev",
+      "query": "我喜欢甜咖啡吗？",
+      "relevance": {
+        "m13": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "drink-positive",
+      "group": "preference",
+      "split": "dev",
+      "query": "我喜欢喝什么茶？",
+      "relevance": {
+        "m14": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "birthday",
+      "group": "profile",
+      "split": "dev",
+      "query": "我的生日是什么时候？",
+      "relevance": {
+        "m10": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "profession",
+      "group": "profile",
+      "split": "dev",
+      "query": "我的工作职业是什么？",
+      "relevance": {
+        "m16": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "friend",
+      "group": "relation",
+      "split": "dev",
+      "query": "我的朋友是做什么工作的？",
+      "relevance": {
+        "m17": 2
+      },
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": []
+    },
+    {
+      "id": "unknown-passport",
+      "group": "unanswerable",
+      "split": "dev",
+      "query": "我的护照号码是TEST0000，对吗？",
+      "relevance": {},
+      "live_probe": true,
+      "allowed_atoms": [],
+      "forbidden_atoms": [
+        "TEST0000"
+      ]
+    },
+    {
+      "id": "unknown-childhood",
+      "group": "unanswerable",
+      "split": "dev",
+      "query": "我小时候就住在青禾市吗？",
+      "relevance": {},
+      "live_probe": false,
+      "allowed_atoms": [],
+      "forbidden_atoms": [
+        "青禾市"
+      ]
+    }
+  ]
+}
