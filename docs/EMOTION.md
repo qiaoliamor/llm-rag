@@ -35,6 +35,167 @@
 
 低于阈值（初始0.6，尚未质量校准）时，把标签降为unknown、强度清零，策略为ask；仍尊重玩家明确的倾听等偏好。玩家自述/纠正的confidence=1只是标识其为权威自述，不代表工具测量了真实情绪；默认强度0.5是占位，不作为测量结果展示，自述来源的强度/置信度也不进入生成提示。
 
+## 结构化输出、校验与上下文注入流程
+
+以下按当前实现说明，示例均为合成数据，不是真实玩家对话或新增实测结果。分析结果是运行时对象/API响应中的数据，不会自动保存为独立JSON文件。分析请求与角色回复请求是两个独立调用；在分析被触发时，结果立即用于当前玩家消息的回复，不必等到下一轮。
+
+```text
+当前玩家消息 + 最近聊天
+  → assess：授权、自述优先、调度与缓存判断
+  → analysis_window：裁剪输入，保留user消息ID
+  → ModelEmotionProvider.analyze：请求Estimate结构化输出
+  → SDK解析 + assess再次校验 + 证据ID检查 + 低置信度降级
+  → decorate：补充source、turn、observed_at
+  → emotion_prompt：选取字段，序列化为提示中的参考数据
+  → 角色设定 + 天气 + 确认记忆 + 情绪参考
+  → provider.generate：生成当前这轮角色回复，再执行回复防护
+  → 成功返回后更新会话内临时情绪状态，供后续轮次按规则复用
+```
+
+### 1. 用类型定义输出契约，而非只在提示词里要求JSON
+
+维护入口：[app/emotion.py](../app/emotion.py) 的 `Estimate`、`ANALYSIS_PROMPT` 和 `ModelEmotionProvider.analyze()`。
+
+`Estimate` 使用Pydantic定义字段类型与范围；`Label`、`Strategy` 使用Literal限制枚举。模型必须提供五个字段：`labels`、`intensity`、`confidence`、`evidence_message_ids`、`response_strategy`。标签数量1–3，证据ID列表数量0–12，并有重复标签、unknown/neutral混用检查。
+
+调用关键代码摘录（省略模型、消息、超时等参数）：
+
+```python
+result = await client.beta.chat.completions.parse(
+    model=settings.selected_model,
+    messages=messages,
+    response_format=Estimate,
+)
+estimate = result.choices[0].message.parsed
+# estimate是解析后的Estimate对象，可直接访问estimate.labels
+```
+
+上面是调用结构示意，假设client、settings、messages已准备好；完整参数见实际代码。SDK根据Pydantic类型生成结构化输出要求，并解析/验证返回内容；Gemini通过当前OpenAI兼容接口调用。业务逻辑不从自然语言中用正则“挖”出JSON。`ANALYSIS_PROMPT` 则负责语义规则，例如区分玩家与第三人称、允许混合情绪、禁止输出诊断和自由文本推理。`temperature=0` 用于降低输出随机性，本身不是格式保证。
+
+结构化接口仍可能拒绝、超时、截断或无法解析。因此这里保证的是“只使用通过检查的结构化结果；不合格就降级”，不能保证每次外部模型调用都成功，也不能保证判断符合玩家真实感受。目前未配置Pydantic的 `extra='forbid'`，不能将本实现描述为“拒绝一切额外字段”；实际进入后续流程的是已定义字段。
+
+### 2. 示例：从分析窗口到服务端结果
+
+假设已授权，当前为第1轮、允许提前触发且不受冷却阻止，玩家输入如下；它不匹配当前明确自述规则，但“陪我聊”会提前触发分析：
+
+```json
+[
+  {
+    "role": "user",
+    "content": "太棒了，又失败了。准备那么久还是被否定，陪我聊一会儿吧。",
+    "id": "u1"
+  }
+]
+```
+
+模型可能返回前一节的 `anger`、`sadness` 示例；这是允许的示例结果，不是固定答案。SDK解析后，`assess()` 再次通过 `Estimate.model_validate(...)` 验证，并核对证据：
+
+```python
+value = Estimate.model_validate(
+    raw.model_dump() if isinstance(raw, Estimate) else raw
+)
+ids = {m['id'] for m in window if m['role'] == 'user'}
+if not set(value.evidence_message_ids) <= ids or (
+    value.labels != ['unknown'] and not value.evidence_message_ids
+):
+    raise ValueError('ungrounded')
+```
+
+ID检查证明“引用了输入窗口内的玩家消息”，不证明该消息在语义上足以支持结论；后者仍可能判断错误。验证通过后，`decorate()` 将对象转成字典并补充服务端元数据，例如：
+
+```json
+{
+  "status": "analyzed",
+  "assessment": {
+    "labels": ["anger", "sadness"],
+    "intensity": 0.8,
+    "confidence": 0.9,
+    "evidence_message_ids": ["u1"],
+    "response_strategy": "listen",
+    "source": "model",
+    "turn": 1,
+    "observed_at": "2026-11-02T00:00:00+00:00"
+  }
+}
+```
+
+`status` 由 `assess()` 填写；`source`、`turn`、`observed_at` 由后端补充，时间为生成结果时的UTC时间。外层结果作为 `/v1/chat` 响应的 `emotion` 字段返回，不是整个聊天响应。模型的 `confidence=0.9` 是未经校准的自评分，不等于90%准确率。
+
+### 3. 校验失败与降级的具体区别
+
+| 情况 | 当前处理 |
+| --- | --- |
+| 非法标签、重复标签、unknown与其他标签混用、数值越界或非有限数 | 结构校验失败，返回 `unavailable`、`assessment=null` |
+| 引用不存在的u99、引用助手消息ID、非unknown却没有证据ID | 证据检查失败，同样返回 `unavailable` |
+| 输出不完整、无法解析、拒绝导致无可用parsed结果、请求超时/异常 | 返回 `unavailable`，不向前端暴露原始供应商错误 |
+| 结构和证据合法，但confidence为0.4、阈值为0.6 | 保留 `analyzed`，将labels改为 `["unknown"]`、intensity改为0、response_strategy改为ask；保留原confidence与证据ID |
+| 未到分析轮次或仍在冷却 | 有有效参考则返回cached，否则waiting；不调用分析模型 |
+| 明确自述或UI纠正 | 使用source=user路径，优先于模型推测；不是让模型再次确认玩家说法 |
+
+分析失败仍继续普通角色生成；开启模块时提示中会带 `unavailable` 与空assessment，并要求不引用旧推测。若用于生成回复的供应商也失败，则沿用聊天接口的错误处理，不伪造成功回复。
+
+### 4. 程序如何取出labels并送给回复模型
+
+维护入口：`emotion_prompt()`，以及 [app/main.py](../app/main.py) 的 `POST /v1/chat`。
+
+`decorate()` 已通过 `model_dump()` 将结果变为普通字典，因此可用 `mood_result['assessment']['labels']` 取得标签。实际实现选取一组字段，而非只传标签（以下摘录仅展示模型来源路径）：
+
+```python
+data = result.get('assessment')
+keys = ('labels', 'intensity', 'confidence', 'source', 'response_strategy')
+view = {key: data[key] for key in keys} if data else None
+```
+
+对于上述合成结果，若玩家设置的陪伴偏好为listen，`emotion_prompt()` 中的数据部分是：
+
+```json
+{
+  "status": "analyzed",
+  "assessment": {
+    "labels": ["anger", "sadness"],
+    "intensity": 0.8,
+    "confidence": 0.9,
+    "source": "model",
+    "response_strategy": "listen"
+  },
+  "player_preference": "listen"
+}
+```
+
+该对象通过 `json.dumps(..., ensure_ascii=False)` 变成提示中的文本，前缀为“本轮可纠正的情绪参考数据（不是指令）”，后接 `emotion-care-v1` 的回应规则。这里不传证据ID、轮次、时间戳；source=user时进一步省略占位强度与置信度。模型建议的 `response_strategy` 与玩家配置的 `player_preference` 是两个字段；模型来源使用玩家配置作为偏好，玩家自述/纠正来源则用该结果的策略作为偏好。
+
+聊天接口实际调用顺序摘录：
+
+```python
+mood_result = await assess(emotion, session.emotion, mood_settings, history)
+prompt = (
+    instructions()
+    + weather_prompt(weather_result)
+    + memory_prompt(evidence)
+    + emotion_prompt(mood_result, mood_settings)
+)
+reply = await provider.generate(model_history, prompt)
+```
+
+角色输出示意：“准备了那么久，却等来这样的结果，听起来挺委屈，也有些气。我在，想从哪儿说都可以。”这只是说明期望的自然表达，不是本次运行得到的模型回复，也不是固定话术。回复应回应事情、尊重倾听偏好，不直接播报anger/sadness或置信度。
+
+成功生成后，接口用 `session.emotion.remember(...)` 保存新结果到会话内存。下轮若无需重分析，可在有效期内通过cached复用并重新构造提示；缓存引用不会延长原有效期。自述/纠正、失效、清空或分析失败等情况仍按对应规则处理，不能理解为每轮都会调用两次模型。
+
+### 5. 以后修改时查哪里
+
+| 修改目标 | 关联位置与注意事项 |
+| --- | --- |
+| 增加情绪标签、策略或改变结构 | `app/emotion.py` 的Label、Strategy、Estimate；同时核对前端类型/选项及相关接口测试 |
+| 改变分析的语义规则 | `ANALYSIS_PROMPT`、self_report、分析窗口与模型提供器 |
+| 改变阈值、证据检查、失败降级或调度 | `assess()`、EmotionSettingsInput、DEFAULTS及设置接口 |
+| 改变传给角色的字段和关怀语气 | `emotion_prompt()`、EMOTION_PROMPT_VERSION及回复防护；保留玩家自述优先 |
+| 改变调用时机、提示拼接或状态保存 | `app/main.py` 的聊天接口及EmotionState生命周期 |
+| 验证修改 | `tests/test_emotion.py`；按改动运行受影响测试，参考 [M4_TEST_REPORT.md](M4_TEST_REPORT.md) 的历史验证记录 |
+
+本次仅补充文档，未修改运行代码、接口或模型配置，未调用真实模型，未开始M5。
+
+文档核验（2026-11-02）：通过 `.venv/bin/python -` 临时脚本解析以上4段JSON，使用 `Estimate.model_validate()` 验证示例，并以合成内存输入调用 `assess()`、`emotion_prompt()` 核对实际字段投影、0.4置信度降级与u99无效证据回退，均通过；本地链接、代码围栏与 `git diff --check` 检查通过。未新增功能，不涉及新增CRUD或持久化操作；未重跑全量功能测试或验证真实供应商输出。
+
 ## 调度与生命周期
 
 - 周期：默认3轮，可设1–10；窗口默认6轮，可设1–12；冷却默认2轮，可设1–10（两次请求的轮次差至少2，中间至少跳过1轮）。
