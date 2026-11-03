@@ -4,6 +4,7 @@ import json
 import math
 import re
 import secrets
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from uuid import uuid4
@@ -120,13 +121,60 @@ def terms(value):
     return set(normalized[i:i + 2] for i in range(max(0, len(normalized) - 1)))
 
 
-def embed(value):
+def embed(value, *, expand=True):
     vector = [0.0] * DIMENSIONS
-    for token in terms(rewrite(value)):
+    for token in terms(rewrite(value) if expand else value):
         digest = hashlib.sha256(token.encode()).digest()
         vector[int.from_bytes(digest[:4], 'big') % DIMENSIONS] += 1 if digest[4] & 1 else -1
     norm = math.sqrt(sum(x*x for x in vector)) or 1
     return [x / norm for x in vector]
+
+
+@dataclass(frozen=True)
+class RetrievalPolicy:
+    """Internal experiment controls; defaults preserve the deployed ranker."""
+    query_expansion: bool = True
+    hybrid: bool = True
+    rerank: bool = True
+    candidate_limit: int | None = None
+    domain_admission: bool = True
+
+
+def rank_memories(rows, query, *, now, limit=5, budget=1200,
+                  policy=RetrievalPolicy(), vector_ids=None):
+    """Rank already scoped/authorized rows. Never use this to replace owner filtering."""
+    if limit < 1 or budget < 1 or (policy.candidate_limit is not None and policy.candidate_limit < 1):
+        raise ValueError('retrieval budgets must be positive')
+    q = embed(query, expand=policy.query_expansion)
+    qt = terms(rewrite(query) if policy.query_expansion else query)
+    recall = policy.domain_admission and policy.rerank and any(word in query for word in ('记得我','我的经历','重要的事','关于我','记住了什么'))
+    scored = []
+    for m in rows:
+        overlap = len(qt & terms(rewrite(m.fact))) / max(1, len(qt)) if policy.hybrid else 0
+        cosine = sum(a*b for a,b in zip(q,m.embedding))
+        direct = policy.rerank and ((m.slot == 'name' and any(w in query for w in ('名字','叫什么'))) or
+                                   (m.slot == 'city' and any(w in query for w in ('住哪','住在','城市'))))
+        admitted_direct = policy.domain_admission and direct
+        if not (overlap >= .025 or cosine >= .12 or admitted_direct or recall): continue
+        if vector_ids is not None and m.id not in vector_ids and overlap == 0 and not admitted_direct: continue
+        base = .55*cosine + .3*overlap
+        age = max(0, (now-m.updated_at).total_seconds()/86400)
+        score = base
+        if policy.rerank:
+            score += .1*m.importance
+            score += .05/(1+age/30)
+            score += int(direct)
+        scored.append((base, score, m))
+    if policy.candidate_limit is not None:
+        scored.sort(key=lambda x:x[0], reverse=True)
+        scored = scored[:policy.candidate_limit]
+    scored.sort(key=lambda x:x[1], reverse=True)
+    results, used = [], 0
+    for _, _, m in scored[:limit]:
+        if used + len(m.fact) > budget: continue
+        results.append(m)
+        used += len(m.fact)
+    return results
 
 
 def describe(fact, tz='Asia/Tokyo', now=None):
@@ -399,29 +447,13 @@ class MemoryStore:
             if not p.memory_enabled:return []
             rows=[m for m in self._rows(db,uid) if m.status=='confirmed' and m.embedding_version==EMBEDDING_VERSION]
             if not rows:return []
-            q=embed(query); expanded=rewrite(query); qt=terms(expanded)
             vector_ids=None
             if self.engine.dialect.name=='postgresql':
+                q=embed(query)
                 # Exact scoped vector search. No ANN index can drop scoped candidates.
                 statement=select(Memory.id).where(Memory.user_id==uid,Memory.character_id==CHARACTER_ID,
                     Memory.status=='confirmed',Memory.embedding_version==EMBEDDING_VERSION,
                     (Memory.expires_at.is_(None)) | (Memory.expires_at>utcnow())).order_by(Memory.embedding.cosine_distance(q)).limit(20)
                 vector_ids=set(db.scalars(statement))
-            scored=[]
-            recall=any(word in query for word in ('记得我','我的经历','重要的事','关于我','记住了什么'))
-            for m in rows:
-                overlap=len(qt & terms(rewrite(m.fact))) / max(1,len(qt))
-                cosine=sum(a*b for a,b in zip(q,m.embedding))
-                # Identity questions should retrieve name/city without lexical overlap.
-                direct=(m.slot=='name' and any(w in query for w in ('名字','叫什么'))) or (m.slot=='city' and any(w in query for w in ('住哪','住在','城市')))
-                if not (overlap>=0.025 or cosine>=0.12 or direct or recall): continue
-                if vector_ids is not None and m.id not in vector_ids and overlap==0 and not direct:continue
-                age=max(0,(utcnow()-m.updated_at).total_seconds()/86400)
-                score=0.55*cosine+0.3*overlap+0.1*m.importance+0.05/(1+age/30)+int(direct)
-                scored.append((score,m))
-            scored.sort(key=lambda x:x[0],reverse=True)
-            results=[];budget=0
-            for _,m in scored[:limit]:
-                if budget+len(m.fact)>1200:continue
-                results.append(self._public(m));budget+=len(m.fact)
-            return results
+            return [self._public(m) for m in rank_memories(
+                rows, query, now=utcnow(), limit=limit, vector_ids=vector_ids)]
