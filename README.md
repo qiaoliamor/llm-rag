@@ -177,4 +177,4 @@ uv run --frozen python scripts/test_postgres.py
 .venv/bin/python scripts/evaluate_retrieval.py
 ```
 
-默认不加载.env或调用API，使用40条合成记录/24个开发查询，比较查询扩展、混合检索、重排和移除因素的结果，报告宏/微Recall、Precision、MRR、nDCG及无答案误召回。可显式加 `--live --live-limit 3 --repeats 2 --max-calls 12` 做同证据D/E来源提示配对，会消耗当前供应商额度。完整结果、12份合成回复及局限见 [检索消融报告](docs/RETRIEVAL_ABLATION.md)；当前未观察到稳定提示收益，不作为正式质量验收。
+默认不加载.env或调用API，使用40条合成记录/24个开发查询，比较查询扩展、混合检索、重排和移除因素的结果，报告宏/微Recall、Precision、MRR、nDCG及无答案误召回。可显式加 `--live --live-limit 3 --repeats 2 --max-calls 12` 做同证据D/E来源提示配对，会消耗当前供应商额度。本批交付见 [PR #11](https://github.com/qiaoliamor/llm-rag/pull/11)。完整结果、12份合成回复及局限见 [检索消融报告](docs/RETRIEVAL_ABLATION.md)；当前未观察到稳定提示收益，不作为正式质量验收。
