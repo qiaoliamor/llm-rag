@@ -1,0 +1,857 @@
+{
+  "version": "m5-synthetic-v1",
+  "source": "synthetic",
+  "cases": [
+    {
+      "id": "memory-01",
+      "category": "memory",
+      "group": "memory-name",
+      "split": "dev",
+      "fact": "我叫合成小岚",
+      "query": "我的名字是什么"
+    },
+    {
+      "id": "memory-02",
+      "category": "memory",
+      "group": "memory-name",
+      "split": "dev",
+      "fact": "我叫合成小禾",
+      "query": "我叫什么名字"
+    },
+    {
+      "id": "memory-03",
+      "category": "memory",
+      "group": "memory-name",
+      "split": "dev",
+      "fact": "我叫合成小宁",
+      "query": "你记得我的名字吗"
+    },
+    {
+      "id": "memory-04",
+      "category": "memory",
+      "group": "memory-name",
+      "split": "dev",
+      "fact": "我叫合成小雨",
+      "query": "可以说说我的名字吗"
+    },
+    {
+      "id": "memory-05",
+      "category": "memory",
+      "group": "memory-name",
+      "split": "dev",
+      "fact": "我叫合成小舟",
+      "query": "我的名字你知道吗"
+    },
+    {
+      "id": "memory-06",
+      "category": "memory",
+      "group": "memory-city",
+      "split": "dev",
+      "fact": "我住在合成城市青川",
+      "query": "我住在哪个城市"
+    },
+    {
+      "id": "memory-07",
+      "category": "memory",
+      "group": "memory-city",
+      "split": "dev",
+      "fact": "我住在合成城市白川",
+      "query": "我住哪里"
+    },
+    {
+      "id": "memory-08",
+      "category": "memory",
+      "group": "memory-city",
+      "split": "dev",
+      "fact": "我住在合成城市南川",
+      "query": "我的居住城市"
+    },
+    {
+      "id": "memory-09",
+      "category": "memory",
+      "group": "memory-city",
+      "split": "dev",
+      "fact": "我住在合成城市北川",
+      "query": "我的住处在哪个城市"
+    },
+    {
+      "id": "memory-10",
+      "category": "memory",
+      "group": "memory-city",
+      "split": "dev",
+      "fact": "我住在合成城市东川",
+      "query": "你知道我住在哪吗"
+    },
+    {
+      "id": "memory-11",
+      "category": "memory",
+      "group": "memory-interview",
+      "split": "dev",
+      "fact": "我曾参加设计师面试",
+      "query": "还记得我的求职经历吗"
+    },
+    {
+      "id": "memory-12",
+      "category": "memory",
+      "group": "memory-interview",
+      "split": "dev",
+      "fact": "我曾参加图书管理员面试",
+      "query": "我的应聘经历"
+    },
+    {
+      "id": "memory-13",
+      "category": "memory",
+      "group": "memory-interview",
+      "split": "dev",
+      "fact": "我曾参加编辑面试",
+      "query": "我的面试经历"
+    },
+    {
+      "id": "memory-14",
+      "category": "memory",
+      "group": "memory-interview",
+      "split": "dev",
+      "fact": "我曾参加插画师面试",
+      "query": "面试时的经历"
+    },
+    {
+      "id": "memory-15",
+      "category": "memory",
+      "group": "memory-interview",
+      "split": "dev",
+      "fact": "我曾参加翻译面试",
+      "query": "求职和面试"
+    },
+    {
+      "id": "memory-16",
+      "category": "memory",
+      "group": "memory-hobby",
+      "split": "holdout",
+      "fact": "我喜欢修补旧书",
+      "query": "我的修补旧书爱好"
+    },
+    {
+      "id": "memory-17",
+      "category": "memory",
+      "group": "memory-hobby",
+      "split": "holdout",
+      "fact": "我喜欢画水彩画",
+      "query": "我的水彩画偏好"
+    },
+    {
+      "id": "memory-18",
+      "category": "memory",
+      "group": "memory-hobby",
+      "split": "holdout",
+      "fact": "我喜欢夜间散步",
+      "query": "我喜欢的夜间活动"
+    },
+    {
+      "id": "memory-19",
+      "category": "memory",
+      "group": "memory-hobby",
+      "split": "holdout",
+      "fact": "我喜欢种植薄荷",
+      "query": "我的薄荷种植爱好"
+    },
+    {
+      "id": "memory-20",
+      "category": "memory",
+      "group": "memory-hobby",
+      "split": "holdout",
+      "fact": "我喜欢阅读推理小说",
+      "query": "我的小说阅读偏好"
+    },
+    {
+      "id": "memory-21",
+      "category": "memory",
+      "group": "memory-pet",
+      "split": "holdout",
+      "fact": "我的猫咪叫合成团团",
+      "query": "我的宠物名字"
+    },
+    {
+      "id": "memory-22",
+      "category": "memory",
+      "group": "memory-pet",
+      "split": "holdout",
+      "fact": "我的猫咪叫合成圆圆",
+      "query": "我的小猫叫什么"
+    },
+    {
+      "id": "memory-23",
+      "category": "memory",
+      "group": "memory-pet",
+      "split": "holdout",
+      "fact": "我的猫咪叫合成点点",
+      "query": "猫咪的名字"
+    },
+    {
+      "id": "memory-24",
+      "category": "memory",
+      "group": "memory-pet",
+      "split": "holdout",
+      "fact": "我的猫咪叫合成毛毛",
+      "query": "我的猫咪"
+    },
+    {
+      "id": "memory-25",
+      "category": "memory",
+      "group": "memory-pet",
+      "split": "holdout",
+      "fact": "我的猫咪叫合成豆豆",
+      "query": "我的宠物猫"
+    },
+    {
+      "id": "canon-01",
+      "category": "canon",
+      "group": "canon-age",
+      "split": "dev",
+      "reply": "我今年28岁。",
+      "query": "介绍一下自己",
+      "expected": false
+    },
+    {
+      "id": "canon-02",
+      "category": "canon",
+      "group": "canon-age",
+      "split": "dev",
+      "reply": "我今年二十八岁。",
+      "query": "介绍一下自己",
+      "expected": false
+    },
+    {
+      "id": "canon-03",
+      "category": "canon",
+      "group": "canon-age",
+      "split": "dev",
+      "reply": "我今年19岁。",
+      "query": "介绍一下自己",
+      "expected": true
+    },
+    {
+      "id": "canon-04",
+      "category": "canon",
+      "group": "canon-age",
+      "split": "dev",
+      "reply": "沈砚现在三十岁。",
+      "query": "介绍一下自己",
+      "expected": true
+    },
+    {
+      "id": "canon-05",
+      "category": "canon",
+      "group": "canon-age",
+      "split": "dev",
+      "reply": "我今年二十九岁。",
+      "query": "介绍一下自己",
+      "expected": true
+    },
+    {
+      "id": "canon-06",
+      "category": "canon",
+      "group": "canon-subject",
+      "split": "holdout",
+      "reply": "她今年19岁。",
+      "query": "介绍一下自己",
+      "expected": false
+    },
+    {
+      "id": "canon-07",
+      "category": "canon",
+      "group": "canon-subject",
+      "split": "holdout",
+      "reply": "你刚才说“我今年19岁”。",
+      "query": "介绍一下自己",
+      "expected": false
+    },
+    {
+      "id": "canon-08",
+      "category": "canon",
+      "group": "canon-subject",
+      "split": "holdout",
+      "reply": "朋友是医生，我是旧书店店主。",
+      "query": "介绍一下自己",
+      "expected": false
+    },
+    {
+      "id": "canon-09",
+      "category": "canon",
+      "group": "canon-subject",
+      "split": "holdout",
+      "reply": "我是医生。",
+      "query": "介绍一下自己",
+      "expected": true
+    },
+    {
+      "id": "canon-10",
+      "category": "canon",
+      "group": "canon-subject",
+      "split": "holdout",
+      "reply": "我的职业是律师。",
+      "query": "介绍一下自己",
+      "expected": true
+    },
+    {
+      "id": "canon-11",
+      "category": "canon",
+      "group": "canon-inheritance",
+      "split": "dev",
+      "reply": "书店是我从亲人那里继承的。",
+      "query": "介绍一下自己",
+      "expected": true
+    },
+    {
+      "id": "canon-12",
+      "category": "canon",
+      "group": "canon-inheritance",
+      "split": "dev",
+      "reply": "旧书店并非继承而来。",
+      "query": "介绍一下自己",
+      "expected": false
+    },
+    {
+      "id": "canon-13",
+      "category": "canon",
+      "group": "canon-inheritance",
+      "split": "dev",
+      "reply": "我继承了这家书店。",
+      "query": "介绍一下自己",
+      "expected": true
+    },
+    {
+      "id": "canon-14",
+      "category": "canon",
+      "group": "canon-inheritance",
+      "split": "dev",
+      "reply": "朋友的书店是继承的。",
+      "query": "介绍一下自己",
+      "expected": false
+    },
+    {
+      "id": "canon-15",
+      "category": "canon",
+      "group": "canon-inheritance",
+      "split": "dev",
+      "reply": "这家书店是三年前自己开设的。",
+      "query": "介绍一下自己",
+      "expected": false
+    },
+    {
+      "id": "canon-16",
+      "category": "canon",
+      "group": "canon-unknown",
+      "split": "dev",
+      "reply": "我不太记得小时候住在哪里。",
+      "query": "你小时候和父母住在哪里？",
+      "expected": true
+    },
+    {
+      "id": "canon-17",
+      "category": "canon",
+      "group": "canon-unknown",
+      "split": "dev",
+      "reply": "那段记忆已经记不清了。",
+      "query": "你小时候和父母住在哪里？",
+      "expected": true
+    },
+    {
+      "id": "canon-18",
+      "category": "canon",
+      "group": "canon-unknown",
+      "split": "dev",
+      "reply": "我没有留下痕迹。",
+      "query": "你小时候和父母住在哪里？",
+      "expected": true
+    },
+    {
+      "id": "canon-19",
+      "category": "canon",
+      "group": "canon-unknown",
+      "split": "dev",
+      "reply": "这件事我还不能确定。",
+      "query": "你小时候和父母住在哪里？",
+      "expected": false
+    },
+    {
+      "id": "canon-20",
+      "category": "canon",
+      "group": "canon-unknown",
+      "split": "dev",
+      "reply": "我不知道，不能随口补写。",
+      "query": "你小时候和父母住在哪里？",
+      "expected": false
+    },
+    {
+      "id": "canon-21",
+      "category": "canon",
+      "group": "canon-quotes",
+      "split": "holdout",
+      "reply": "“我是医生”，这是你刚才的话。",
+      "query": "介绍一下自己",
+      "expected": false
+    },
+    {
+      "id": "canon-22",
+      "category": "canon",
+      "group": "canon-quotes",
+      "split": "holdout",
+      "reply": "「书店是继承的」，这句话不符合设定。",
+      "query": "介绍一下自己",
+      "expected": false
+    },
+    {
+      "id": "canon-23",
+      "category": "canon",
+      "group": "canon-quotes",
+      "split": "holdout",
+      "reply": "我是演员。",
+      "query": "介绍一下自己",
+      "expected": true
+    },
+    {
+      "id": "canon-24",
+      "category": "canon",
+      "group": "canon-quotes",
+      "split": "holdout",
+      "reply": "我不是医生。",
+      "query": "介绍一下自己",
+      "expected": false
+    },
+    {
+      "id": "canon-25",
+      "category": "canon",
+      "group": "canon-quotes",
+      "split": "holdout",
+      "reply": "我的职业不是程序员。",
+      "query": "介绍一下自己",
+      "expected": false
+    },
+    {
+      "id": "weather-01",
+      "category": "weather",
+      "group": "weather-forecast",
+      "split": "dev",
+      "message": "明天东京下雨吗",
+      "expected": true
+    },
+    {
+      "id": "weather-02",
+      "category": "weather",
+      "group": "weather-forecast",
+      "split": "dev",
+      "message": "今天的天气怎么样",
+      "expected": true
+    },
+    {
+      "id": "weather-03",
+      "category": "weather",
+      "group": "weather-forecast",
+      "split": "dev",
+      "message": "后天要带伞吗",
+      "expected": true
+    },
+    {
+      "id": "weather-04",
+      "category": "weather",
+      "group": "weather-forecast",
+      "split": "dev",
+      "message": "上海气温多少",
+      "expected": true
+    },
+    {
+      "id": "weather-05",
+      "category": "weather",
+      "group": "weather-current",
+      "split": "dev",
+      "message": "现在好冷",
+      "expected": true
+    },
+    {
+      "id": "weather-06",
+      "category": "weather",
+      "group": "weather-current",
+      "split": "dev",
+      "message": "东京现在天气如何",
+      "expected": true
+    },
+    {
+      "id": "weather-07",
+      "category": "weather",
+      "group": "weather-current",
+      "split": "dev",
+      "message": "此刻下雨吗",
+      "expected": true
+    },
+    {
+      "id": "weather-08",
+      "category": "weather",
+      "group": "weather-current",
+      "split": "dev",
+      "message": "当前温度多少",
+      "expected": true
+    },
+    {
+      "id": "weather-09",
+      "category": "weather",
+      "group": "weather-metaphor",
+      "split": "dev",
+      "message": "心里下雨了",
+      "expected": false
+    },
+    {
+      "id": "weather-10",
+      "category": "weather",
+      "group": "weather-metaphor",
+      "split": "dev",
+      "message": "我们风雨同舟",
+      "expected": false
+    },
+    {
+      "id": "weather-11",
+      "category": "weather",
+      "group": "weather-metaphor",
+      "split": "dev",
+      "message": "这个冷笑话真有趣",
+      "expected": false
+    },
+    {
+      "id": "weather-12",
+      "category": "weather",
+      "group": "weather-metaphor",
+      "split": "dev",
+      "message": "她很热情",
+      "expected": false
+    },
+    {
+      "id": "weather-13",
+      "category": "weather",
+      "group": "weather-cancel",
+      "split": "dev",
+      "message": "不要查天气",
+      "expected": false
+    },
+    {
+      "id": "weather-14",
+      "category": "weather",
+      "group": "weather-cancel",
+      "split": "dev",
+      "message": "别查天气了",
+      "expected": false
+    },
+    {
+      "id": "weather-15",
+      "category": "weather",
+      "group": "weather-cancel",
+      "split": "dev",
+      "message": "不需要天气预报",
+      "expected": false
+    },
+    {
+      "id": "weather-16",
+      "category": "weather",
+      "group": "weather-cancel",
+      "split": "dev",
+      "message": "取消天气查询",
+      "expected": false
+    },
+    {
+      "id": "weather-17",
+      "category": "weather",
+      "group": "weather-ordinary",
+      "split": "holdout",
+      "message": "今天工作结束了",
+      "expected": false
+    },
+    {
+      "id": "weather-18",
+      "category": "weather",
+      "group": "weather-ordinary",
+      "split": "holdout",
+      "message": "我想喝杯茶",
+      "expected": false
+    },
+    {
+      "id": "weather-19",
+      "category": "weather",
+      "group": "weather-ordinary",
+      "split": "holdout",
+      "message": "你喜欢读书吗",
+      "expected": false
+    },
+    {
+      "id": "weather-20",
+      "category": "weather",
+      "group": "weather-ordinary",
+      "split": "holdout",
+      "message": "这本小说不错",
+      "expected": false
+    },
+    {
+      "id": "emotion-01",
+      "category": "emotion",
+      "group": "emotion-explicit",
+      "split": "dev",
+      "message": "我很开心",
+      "expected": [
+        "joy"
+      ]
+    },
+    {
+      "id": "emotion-02",
+      "category": "emotion",
+      "group": "emotion-explicit",
+      "split": "dev",
+      "message": "我很难过",
+      "expected": [
+        "sadness"
+      ]
+    },
+    {
+      "id": "emotion-03",
+      "category": "emotion",
+      "group": "emotion-explicit",
+      "split": "dev",
+      "message": "我很焦虑",
+      "expected": [
+        "anxiety"
+      ]
+    },
+    {
+      "id": "emotion-04",
+      "category": "emotion",
+      "group": "emotion-explicit",
+      "split": "dev",
+      "message": "我很生气",
+      "expected": [
+        "anger"
+      ]
+    },
+    {
+      "id": "emotion-05",
+      "category": "emotion",
+      "group": "emotion-mixed",
+      "split": "dev",
+      "message": "我很开心也很焦虑",
+      "expected": [
+        "joy",
+        "anxiety"
+      ]
+    },
+    {
+      "id": "emotion-06",
+      "category": "emotion",
+      "group": "emotion-mixed",
+      "split": "dev",
+      "message": "我很累又很难过",
+      "expected": [
+        "sadness",
+        "tired"
+      ]
+    },
+    {
+      "id": "emotion-07",
+      "category": "emotion",
+      "group": "emotion-mixed",
+      "split": "dev",
+      "message": "我很生气也很难过",
+      "expected": [
+        "sadness",
+        "anger"
+      ]
+    },
+    {
+      "id": "emotion-08",
+      "category": "emotion",
+      "group": "emotion-mixed",
+      "split": "dev",
+      "message": "我很紧张又很累",
+      "expected": [
+        "anxiety",
+        "tired"
+      ]
+    },
+    {
+      "id": "emotion-09",
+      "category": "emotion",
+      "group": "emotion-denial",
+      "split": "dev",
+      "message": "我没有难过",
+      "expected": [
+        "unknown"
+      ]
+    },
+    {
+      "id": "emotion-10",
+      "category": "emotion",
+      "group": "emotion-denial",
+      "split": "dev",
+      "message": "我不开心",
+      "expected": [
+        "unknown"
+      ]
+    },
+    {
+      "id": "emotion-11",
+      "category": "emotion",
+      "group": "emotion-denial",
+      "split": "dev",
+      "message": "我没有很难过",
+      "expected": [
+        "unknown"
+      ]
+    },
+    {
+      "id": "emotion-12",
+      "category": "emotion",
+      "group": "emotion-denial",
+      "split": "dev",
+      "message": "我没说我很焦虑",
+      "expected": [
+        "unknown"
+      ]
+    },
+    {
+      "id": "emotion-13",
+      "category": "emotion",
+      "group": "emotion-subject",
+      "split": "holdout",
+      "message": "我猜你很难过",
+      "expected": null
+    },
+    {
+      "id": "emotion-14",
+      "category": "emotion",
+      "group": "emotion-subject",
+      "split": "holdout",
+      "message": "朋友很开心",
+      "expected": null
+    },
+    {
+      "id": "emotion-15",
+      "category": "emotion",
+      "group": "emotion-subject",
+      "split": "holdout",
+      "message": "假如我很难过呢",
+      "expected": null
+    },
+    {
+      "id": "emotion-16",
+      "category": "emotion",
+      "group": "emotion-subject",
+      "split": "holdout",
+      "message": "“我很开心”是他说的",
+      "expected": null
+    },
+    {
+      "id": "emotion-17",
+      "category": "emotion",
+      "group": "emotion-clauses",
+      "split": "dev",
+      "message": "我很难过，但你不用担心",
+      "expected": [
+        "sadness"
+      ]
+    },
+    {
+      "id": "emotion-18",
+      "category": "emotion",
+      "group": "emotion-clauses",
+      "split": "dev",
+      "message": "我很开心，不过他有些难过",
+      "expected": [
+        "joy"
+      ]
+    },
+    {
+      "id": "emotion-19",
+      "category": "emotion",
+      "group": "emotion-clauses",
+      "split": "dev",
+      "message": "你知道吗，我很焦虑",
+      "expected": [
+        "anxiety"
+      ]
+    },
+    {
+      "id": "emotion-20",
+      "category": "emotion",
+      "group": "emotion-clauses",
+      "split": "dev",
+      "message": "我很累，朋友在安慰我",
+      "expected": [
+        "tired"
+      ]
+    },
+    {
+      "id": "security-01",
+      "category": "security",
+      "group": "security-ownership",
+      "split": "dev",
+      "operation": "cross_read"
+    },
+    {
+      "id": "security-02",
+      "category": "security",
+      "group": "security-ownership",
+      "split": "dev",
+      "operation": "cross_update"
+    },
+    {
+      "id": "security-03",
+      "category": "security",
+      "group": "security-ownership",
+      "split": "dev",
+      "operation": "cross_delete"
+    },
+    {
+      "id": "security-04",
+      "category": "security",
+      "group": "security-revocation",
+      "split": "dev",
+      "operation": "delete"
+    },
+    {
+      "id": "security-05",
+      "category": "security",
+      "group": "security-revocation",
+      "split": "dev",
+      "operation": "clear"
+    },
+    {
+      "id": "security-06",
+      "category": "security",
+      "group": "security-revocation",
+      "split": "dev",
+      "operation": "stale_epoch"
+    },
+    {
+      "id": "security-07",
+      "category": "security",
+      "group": "security-visibility",
+      "split": "holdout",
+      "operation": "pending"
+    },
+    {
+      "id": "security-08",
+      "category": "security",
+      "group": "security-visibility",
+      "split": "holdout",
+      "operation": "disabled"
+    },
+    {
+      "id": "security-09",
+      "category": "security",
+      "group": "security-visibility",
+      "split": "holdout",
+      "operation": "role"
+    },
+    {
+      "id": "security-10",
+      "category": "security",
+      "group": "security-visibility",
+      "split": "holdout",
+      "operation": "injected"
+    }
+  ]
+}

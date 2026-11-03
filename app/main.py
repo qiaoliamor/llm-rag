@@ -208,10 +208,10 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
             try:
                 async with asyncio.timeout(settings.api_timeout_seconds * 2 + 2):
                     reply = await provider.generate(model_history, prompt)
-                    guarded = conflicts(reply) or weather_reply_conflicts(reply, weather_result) or emotion_reply_conflicts(reply, mood_result)
+                    guarded = conflicts(reply, body.message) or weather_reply_conflicts(reply, weather_result) or emotion_reply_conflicts(reply, mood_result)
                     if guarded:
                         reply = await provider.generate(model_history, prompt + '\n上次输出违反角色或天气表达规则。重新回答：只用已知事实，以沈砚的自然语气关心，不播报来源/日期，不用您；当前天气只作估计。情绪只是可纠正参考，不诊断、不报分数，尊重自述和倾听偏好。')
-                        if conflicts(reply):
+                        if conflicts(reply, body.message):
                             reply = FALLBACK
                         elif weather_reply_conflicts(reply, weather_result):
                             reply = weather_fallback(weather_result)

@@ -31,14 +31,31 @@ def instructions(mode='canon', query=''):
     return prompt
 
 
-def conflicts(reply):
+def conflicts(reply, query=''):
     """Small deterministic checks, not a general hallucination detector."""
-    patterns = [
-        r'(?:我|沈砚)(?:今年|已经|现在)?\s*(\d{1,3})\s*岁',
-    ]
-    if any(int(age) != 28 for p in patterns for age in re.findall(p, reply)):
-        return True
-    return bool(re.search(r'(?:我是|我的职业是)(?:一名|一个|位)?(?:医生|律师|警察|演员|程序员)|(?:书店|店铺).{0,8}(?:继承|传给我)|(?:继承).{0,8}(?:书店|店铺)', reply))
+    # Only explicitly attributed/rejected quotes are excluded. Wrapping the
+    # character's own incorrect answer in quotes must not bypass the guard.
+    def quoted_text(match):
+        before = reply[max(0, match.start()-20):match.start()]
+        after = reply[match.end():match.end()+30]
+        attributed = re.search(r'(?:你|他|她|朋友).{0,6}(?:说|写|问|提到)[：:]?$', before)
+        attributed = attributed or re.match(r'[，,。\s]*这是.{0,8}(?:你|他|她|朋友).{0,6}(?:话|说|写)', after)
+        rejected = re.match(r'[，,。\s]*这句话不符合设定', after)
+        return '' if attributed or rejected else match.group(0)[1:-1]
+    text = re.sub(r'“[^”]*”|「[^」]*」|"[^"\n]*"', quoted_text, reply)
+    for age in re.findall(r'(?:我|沈砚)(?:今年|已经|现在)?\s*([0-9]{1,3}|[零一二两三四五六七八九十]{1,4})\s*岁', text):
+        if not (int(age) == 28 if age.isascii() and age.isdigit() else age == '二十八'): return True
+    for clause in re.split(r'[，,。！？?!；;]|但是|但|可是|不过|而是', text):
+        if re.search(r'(?:我是|我的职业是)(?:一名|一个|位)?(?:医生|律师|警察|演员|程序员)', clause):
+            return True
+        inheritance = re.search(r'(?:书店|店铺|这家店).{0,8}(?:继承|传给我)|继承.{0,8}(?:书店|店铺|这家店)', clause)
+        if inheritance and not re.search(r'不是|并非|没有|未曾|不曾', clause):
+            # A third party's shop is not Shen Yan's canon.
+            if not re.search(r'朋友|他|她|你', clause): return True
+    if re.search(r'童年|小时候|父母|亲属', query):
+        if re.search(r'(?:我|那段记忆|那段经历).{0,10}(?:记不清|不太记得|不记得|忘记了|没有留下痕迹)', text):
+            return True
+    return False
 
 
 class ProviderFailure(Exception):
@@ -104,7 +121,7 @@ class OpenAIProvider:
         return reply
 
     async def generate(self, history, prompt):
-        from openai import AsyncOpenAI, APITimeoutError, APIConnectionError, AuthenticationError, RateLimitError, APIStatusError, BadRequestError, PermissionDeniedError
+        from openai import AsyncOpenAI, APITimeoutError, APIConnectionError, AuthenticationError, RateLimitError, APIStatusError, BadRequestError, PermissionDeniedError, NotFoundError
         key = getattr(self.settings, self.key_field).get_secret_value().strip()
         if not key:
             raise ProviderFailure('missing_api_key', f'尚未配置密钥：请在本地 .env 填写 {self.key_env} 并重启服务。', 503)
@@ -115,6 +132,8 @@ class OpenAIProvider:
             raise ProviderFailure('invalid_api_key', 'API 认证失败，请检查本地密钥后重启。', 503) from None
         except PermissionDeniedError:
             raise ProviderFailure('permission_denied', 'API 访问被拒绝，请检查密钥权限、项目及所在地区的服务支持。', 503) from None
+        except NotFoundError:
+            raise ProviderFailure('model_unavailable', '模型或 API 路径不可用，请检查本地 .env 的模型名称、接口地址及账号访问权限，修改后重启服务。', 503) from None
         except BadRequestError:
             raise ProviderFailure('invalid_config', 'API 请求配置无效，请检查本地密钥、模型名称和模型支持的参数。', 503) from None
         except RateLimitError:
