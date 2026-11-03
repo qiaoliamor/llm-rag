@@ -188,4 +188,4 @@ uv run --frozen python scripts/test_postgres.py
 .venv/bin/python scripts/evaluate_retrieval.py --dataset guard-regressions
 ```
 
-旧组保持、新R/S/F分别比较路由/证据检查/组合。可用 `--live --retrieval-variant F_retrieval_fix --live-limit 3 --repeats 2 --max-calls 12` 显式做修复后证据的提示配对，会消耗当前供应商额度。数值、12份合成回复及有限规则边界见 [检索修复记录](docs/RETRIEVAL_GUARDS.md)；M5仍未整体完成。
+旧组保持、新R/S/F分别比较路由/证据检查/组合。可用 `--live --retrieval-variant F_retrieval_fix --live-limit 3 --repeats 2 --max-calls 12` 显式做修复后证据的提示配对，会消耗当前供应商额度。本批交付见 [PR #12](https://github.com/qiaoliamor/llm-rag/pull/12)。数值、12份合成回复及有限规则边界见 [检索修复记录](docs/RETRIEVAL_GUARDS.md)；M5仍未整体完成。

@@ -1,6 +1,6 @@
 # M5 首批分析、组件基线与规则完善
 
-日期：2026-11-03（Asia/Tokyo）。状态：**M5进行中，首批PR #10已合并，第二批检索消融PR #11已合并，本批继续修复姓名/无答案检索，未整体验收**。基线main为 `90350e4`（M4 PR #8）；分支 `codex/m5-evaluation-baseline`。此前EMOTION.md流程说明已通过 [PR #9](https://github.com/qiaoliamor/llm-rag/pull/9) squash合并至main（4513496）；PR #10已变基到该基线，文档与代码通过各自PR依次交付。
+日期：2026-11-03（Asia/Tokyo）。状态：**M5进行中，首批PR #10已合并，第二批检索消融PR #11已合并，本批检索修复交付见PR #12（合入main生效），未整体验收**。基线main为 `90350e4`（M4 PR #8）；分支 `codex/m5-evaluation-baseline`。此前EMOTION.md流程说明已通过 [PR #9](https://github.com/qiaoliamor/llm-rag/pull/9) squash合并至main（4513496）；PR #10已变基到该基线，文档与代码通过各自PR依次交付。
 
 ## 1. 分析与本批范围
 
@@ -112,3 +112,7 @@ CRUD适用性：新评测入口只读合成定义、临时建立/查询/清理�
 命令：`.venv/bin/python -m pytest -q`、`.venv/bin/python scripts/test_postgres.py`、`.venv/bin/python scripts/evaluate_retrieval.py`、`.venv/bin/python scripts/evaluate_retrieval.py --dataset guard-regressions`。原24查询D36/37且2/2无答案误召回，F37/37且0/2；新21查询F14/14且0/8，均为开发集。新增37个规则/消融单测、3项跨数据库生命周期测试，覆盖正/负字段、关系/时间、40干扰压力、PG预选漏选、确认/纠正/重启/删除/撤回与角色/过期/版本隔离。初次测试位置断言及Cookie夹具失败保留在 [检索修复记录](RETRIEVAL_GUARDS.md)，不当产品提升。
 
 `.venv/bin/python scripts/evaluate_retrieval.py --live --retrieval-variant F_retrieval_fix --live-limit 3 --repeats 2 --max-calls 12 --include-synthetic-replies`：12/12真实Gemini合成请求完成，D/E提示均使用F证据，记录retrieval_variant。加强组命名值4/4、普通3/4；仍有来源时间臆测及替代名字探针误计，不作幻觉率或完整质量结论。没有为提高结果重采样；旧12回复保持、新12回复归档，运行JSON不提交。未运行原32保留案例，M5仍进行中。
+
+## 10. PR #12合并审阅
+
+2026-11-03，功能提交36136b7。核对生产预过滤、字段路由、证据缺失/存在的正反流程、旧9组关闭新开关、R/S/F因子隔离、API预算及合成数据提交边界。审阅补充关系词匹配修复与两项回归，最终pytest385通过/23PG跳过、临时PG专项167通过；两套离线表完整复现，真实12次请求的证据ID/提示哈希与最终代码一致。既有24份分两批的合成回复保持原样，无新的模型请求、未执行原保留集；不把来源时间措辞问题或有限规则边界标为完成。文档状态随PR #12合入main生效。

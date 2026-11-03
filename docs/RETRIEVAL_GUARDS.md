@@ -1,6 +1,6 @@
 # M5 检索证据检查与姓名路由修复
 
-日期：2026-11-03（Asia/Tokyo）。基线main为352a5dc（PR #11）；本批任务分支codex/m5-retrieval-evidence-guards。状态：本批修复与开发集评测已实现，M5未整体完成。全部输入、事实和下列真实模型调用的回复均基于原创合成场景，无真实玩家数据；未运行原32个保留案例。
+日期：2026-11-03（Asia/Tokyo）。基线main为352a5dc（PR #11）；本批任务分支codex/m5-retrieval-evidence-guards。交付见 [PR #12](https://github.com/qiaoliamor/llm-rag/pull/12)，状态随合入main生效；功能提交36136b7，M5未整体完成。全部输入、事实和下列真实模型调用的回复均基于原创合成场景，无真实玩家数据；未运行原32个保留案例。
 
 ## 1. 复现与原因
 
