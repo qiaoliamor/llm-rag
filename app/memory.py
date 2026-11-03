@@ -17,6 +17,7 @@ from sqlalchemy.types import JSON, TypeDecorator
 from pgvector.sqlalchemy import Vector
 
 from .dialogue import ProviderFailure
+from .memory_query import compatible, content_text, evidence_need, player_name_fact
 
 Base = declarative_base()
 CHARACTER_ID = 'shen_yan'
@@ -132,12 +133,14 @@ def embed(value, *, expand=True):
 
 @dataclass(frozen=True)
 class RetrievalPolicy:
-    """Internal experiment controls; defaults preserve the deployed ranker."""
+    """Internal experiment controls; routing/guards default on for real retrieval."""
     query_expansion: bool = True
     hybrid: bool = True
     rerank: bool = True
     candidate_limit: int | None = None
     domain_admission: bool = True
+    identity_routing: bool = True
+    evidence_guard: bool = True
 
 
 def rank_memories(rows, query, *, now, limit=5, budget=1200,
@@ -146,17 +149,28 @@ def rank_memories(rows, query, *, now, limit=5, budget=1200,
     if limit < 1 or budget < 1 or (policy.candidate_limit is not None and policy.candidate_limit < 1):
         raise ValueError('retrieval budgets must be positive')
     q = embed(query, expand=policy.query_expansion)
-    qt = terms(rewrite(query) if policy.query_expansion else query)
+    query_text = rewrite(query) if policy.query_expansion else query
+    qt = terms(query_text)
+    need = evidence_need(query)
+    name_query = need.subject == 'player' and need.field == 'name'
+    anchors = terms(content_text(query_text)) if policy.evidence_guard else set()
     recall = policy.domain_admission and policy.rerank and any(word in query for word in ('记得我','我的经历','重要的事','关于我','记住了什么'))
     scored = []
     for m in rows:
+        routed = policy.identity_routing and name_query and player_name_fact(m.fact)
+        if policy.identity_routing and name_query and not routed: continue
+        if policy.evidence_guard:
+            if not compatible(need,m.fact): continue
+            # Explicit fields have typed support checks. Other questions need a
+            # content anchor; common pronouns/vector collisions are insufficient.
+            if not need.field and anchors and not anchors & terms(content_text(rewrite(m.fact))): continue
         overlap = len(qt & terms(rewrite(m.fact))) / max(1, len(qt)) if policy.hybrid else 0
         cosine = sum(a*b for a,b in zip(q,m.embedding))
         direct = policy.rerank and ((m.slot == 'name' and any(w in query for w in ('名字','叫什么'))) or
                                    (m.slot == 'city' and any(w in query for w in ('住哪','住在','城市'))))
         admitted_direct = policy.domain_admission and direct
-        if not (overlap >= .025 or cosine >= .12 or admitted_direct or recall): continue
-        if vector_ids is not None and m.id not in vector_ids and overlap == 0 and not admitted_direct: continue
+        if not (overlap >= .025 or cosine >= .12 or admitted_direct or recall or routed): continue
+        if vector_ids is not None and m.id not in vector_ids and overlap == 0 and not admitted_direct and not routed: continue
         base = .55*cosine + .3*overlap
         age = max(0, (now-m.updated_at).total_seconds()/86400)
         score = base
@@ -164,13 +178,14 @@ def rank_memories(rows, query, *, now, limit=5, budget=1200,
             score += .1*m.importance
             score += .05/(1+age/30)
             score += int(direct)
-        scored.append((base, score, m))
+        score += int(routed)
+        scored.append((base, score, m, routed))
     if policy.candidate_limit is not None:
-        scored.sort(key=lambda x:x[0], reverse=True)
+        scored.sort(key=lambda x:(x[3],x[0]), reverse=True)
         scored = scored[:policy.candidate_limit]
     scored.sort(key=lambda x:x[1], reverse=True)
     results, used = [], 0
-    for _, _, m in scored[:limit]:
+    for _, _, m, _ in scored[:limit]:
         if used + len(m.fact) > budget: continue
         results.append(m)
         used += len(m.fact)
