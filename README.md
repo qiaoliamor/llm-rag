@@ -194,4 +194,4 @@ uv run --frozen python scripts/test_postgres.py
 M5来源时间修复通过[PR #13](https://github.com/qiaoliamor/llm-rag/pull/13)交付（合入main生效）：长期记忆不证明“刚才告诉我”，事件日期不当讲述日期；有限输出检查复用一次重写及兜底。命令行验证408通过/24跳过，临时PG专项169通过。提示设计、真实Gemini前后对照及失败边界见 [来源时间记录](docs/MEMORY_SOURCE_TIME.md)。可显式运行 `.venv/bin/python scripts/evaluate_memory_source.py --repeats 1 --interval 12`；只发送固定合成探针，最多6请求，会消耗供应商额度；默认2重复共12请求，不自动重试。
 
 
-M5店内近况与地名完整性修复：新增默认启用的场景边界提示与有限输出检查，不从书店身份推断当天客流、库存或已完成动作，不把地名缩写当作同一地点。默认后端448通过/25跳过，独立临时PG专项171通过；设计、真实Gemini前后回复与边界见 [场景与地名记录](docs/SCENE_PLACE_GROUNDING.md)。可显式运行 `.venv/bin/python scripts/evaluate_grounding.py --repeats 1 --interval 12`，默认6请求、最多12请求，仅固定合成数据，会消耗供应商额度，不自动重试。
+M5店内近况与地名完整性修复（交付记录：[PR #14](https://github.com/qiaoliamor/llm-rag/pull/14)）：新增默认启用的场景边界提示与有限输出检查，不从书店身份推断当天客流、库存或已完成动作，不把地名缩写当作同一地点。默认后端448通过/25跳过，独立临时PG专项171通过；设计、真实Gemini前后回复与边界见 [场景与地名记录](docs/SCENE_PLACE_GROUNDING.md)。可显式运行 `.venv/bin/python scripts/evaluate_grounding.py --repeats 1 --interval 12`，默认6请求、最多12请求，仅固定合成数据，会消耗供应商额度，不自动重试。

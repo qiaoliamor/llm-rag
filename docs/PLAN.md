@@ -1,6 +1,6 @@
 # 实施计划
 
-> 2026-11-04：M0–M3及W01/W02已交付；M4情绪支持闭环交付见 [PR #8](https://github.com/qiaoliamor/llm-rag/pull/8)，包含合并审阅修复。M5已合并组件基线和检索修复，来源时间修复PR #13已合并，场景与地名完整性修复在任务分支交付，正式模型质量评测及M6发布尚待完成。M2 B01–B03仍未完成；设计/验证见 [EMOTION.md](EMOTION.md) 和 [M4_TEST_REPORT.md](M4_TEST_REPORT.md)。
+> 2026-11-04：M0–M3及W01/W02已交付；M4情绪支持闭环交付见 [PR #8](https://github.com/qiaoliamor/llm-rag/pull/8)，包含合并审阅修复。M5已合并组件基线和检索修复，来源时间修复PR #13已合并，场景与地名完整性修复交付见 [PR #14](https://github.com/qiaoliamor/llm-rag/pull/14)，正式模型质量评测及M6发布尚待完成。M2 B01–B03仍未完成；设计/验证见 [EMOTION.md](EMOTION.md) 和 [M4_TEST_REPORT.md](M4_TEST_REPORT.md)。
 
 ## 1. 实施原则
 
