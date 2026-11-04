@@ -95,7 +95,7 @@ class MockProvider:
             return '听起来这件事占了你不少心思。要不要先在这里歇一会儿，和我说说最让你在意的部分？'
         if any(w in message for w in ('记得', '刚才')) and len(history) > 1:
             previous = next((m['content'] for m in reversed(history[:-1]) if m['role'] == 'user'), '')
-            return f'刚才你说：“{previous[:120]}”。我在听，你愿意再多说一点吗？'
+            return f'你前面说：“{previous[:120]}”。我在听，你愿意再多说一点吗？'
         return '嗯，我在听。你愿意说说，这件事里你最在意的是什么吗？'
 
 

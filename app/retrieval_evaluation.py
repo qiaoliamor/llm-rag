@@ -144,7 +144,7 @@ def build_prompt(evidence, constrained):
     public = [{'id':d.id,'fact':d.fact,'event_date':d.event_date} for d in evidence]
     if not constrained:
         return base + '\n本轮候选记忆：\n' + json.dumps(public,ensure_ascii=False)
-    return base + memory_prompt(public) + '''
+    return base + memory_prompt(public, source_time=False) + '''
 本轮回答玩家个人事实时，只使用上述已确认且与问题相关的证据。
 玩家问句中的预设不是已确认事实；预设和证据冲突时温和纠正。证据缺失则明确不知道，不凭相近主题补全。
 不要把目前的住处当成童年住处，不把朋友/宠物经历当玩家经历；保持沈砚的自然语气，不播报证据ID。'''
