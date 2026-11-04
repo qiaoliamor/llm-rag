@@ -360,3 +360,28 @@ def test_name_route_cannot_bypass_expiry_role_or_vector_version(database_url):
         assert store.retrieve(uid,'我的名字是什么？')==[]
         with store.db.begin() as db:setattr(db.get(Memory,row['id']),field,restore)
     assert [m['id'] for m in store.retrieve(uid,'我的名字是什么？')]==[row['id']]
+
+
+def test_source_prompt_follows_memory_lifecycle(database_url):
+    from app.memory_source import SOURCE_TIME_RULES
+    provider=SimpleNamespace(generate=AsyncMock(return_value='我在听。'))
+    app=app_for(database_url,provider)
+    c,h=boot(app)
+    enable(c,h)
+    m=manual(c,h,'我叫合成来源甲')
+    cookies=dict(c.cookies)
+    restarted=TestClient(app_for(database_url,provider))
+    restarted.cookies.update(cookies)
+    hr={'x-csrf-token':restarted.get('/v1/session').json()['csrf_token']}
+    def ask():
+        result=restarted.post('/v1/chat',headers=hr,json={'message':'我的名字是什么？'})
+        assert result.status_code==200
+        return provider.generate.await_args.args[1]
+    prompt=ask()
+    assert SOURCE_TIME_RULES in prompt and '我叫合成来源甲' in prompt
+    updated=restarted.patch('/v1/memories/'+m['id'],headers=hr,json={'version':m['version'],'fact':'我叫合成来源乙'}).json()['item']
+    prompt=ask()
+    assert '我叫合成来源乙' in prompt and '我叫合成来源甲' not in prompt
+    assert restarted.delete('/v1/memories/'+m['id'],headers=hr,params={'version':updated['version']}).status_code==200
+    prompt=ask()
+    assert SOURCE_TIME_RULES not in prompt and '合成来源乙' not in prompt
