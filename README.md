@@ -126,7 +126,7 @@ uv run --frozen pytest -q
 uv run --frozen python scripts/evaluate.py --limit 100
 ```
 
-M2 历史结果为20项前端、174项默认后端通过；M4历史为36项前端、284项默认后端通过/20项PG跳过、临时库专项161项通过，见 [M4测试记录](docs/M4_TEST_REPORT.md)。M5当前后端448通过/25跳过，组件开发集68/68；新增检索消融及12次真实合成提示配对，正式模型质量未验收，见 [M5记录](docs/M5_TEST_REPORT.md)。数据库专项脚本 `uv run --frozen python scripts/test_postgres.py` 只创建并删除临时库，不操作真实记忆数据。后端测试前必须先构建前端。原有 100 条合成场景及接口、隔离、重写、密钥缺失、配额、超时等回归保留；新增静态资源检查验证 React 构建能通过现有路径和 CSP 加载。离线评测只验证 mock 链路，不衡量情感理解或幻觉率。脚本提供 direct（直接提示）、rag（简单关键词正史检索）、canon（完整正史）三个对照入口。实际聊天现已检索已确认玩家记忆；该脚本仍是角色正史的三组简易对照，不等于完整记忆评测。
+M2 历史结果为20项前端、174项默认后端通过；M4历史为36项前端、284项默认后端通过/20项PG跳过、临时库专项161项通过，见 [M4测试记录](docs/M4_TEST_REPORT.md)。M5当前后端478通过/25跳过，组件开发集68/68；新增检索消融及12次真实合成提示配对，正式模型质量未验收，见 [M5记录](docs/M5_TEST_REPORT.md)。数据库专项脚本 `uv run --frozen python scripts/test_postgres.py` 只创建并删除临时库，不操作真实记忆数据。后端测试前必须先构建前端。原有 100 条合成场景及接口、隔离、重写、密钥缺失、配额、超时等回归保留；新增静态资源检查验证 React 构建能通过现有路径和 CSP 加载。离线评测只验证 mock 链路，不衡量情感理解或幻觉率。脚本提供 direct（直接提示）、rag（简单关键词正史检索）、canon（完整正史）三个对照入口。实际聊天现已检索已确认玩家记忆；该脚本仍是角色正史的三组简易对照，不等于完整记忆评测。
 
 本地填好密钥后可执行下列小规模真实测试；会消耗当前供应商额度，付费档可能产生费用；每组最多 `limit` 次、共三组：
 
@@ -195,3 +195,13 @@ M5来源时间修复通过[PR #13](https://github.com/qiaoliamor/llm-rag/pull/13
 
 
 M5店内近况与地名完整性修复（交付记录：[PR #14](https://github.com/qiaoliamor/llm-rag/pull/14)）：新增默认启用的场景边界提示与有限输出检查，不从书店身份推断当天客流、库存或已完成动作，不把地名缩写当作同一地点。默认后端448通过/25跳过，独立临时PG专项171通过；设计、真实Gemini前后回复与边界见 [场景与地名记录](docs/SCENE_PLACE_GROUNDING.md)。可显式运行 `.venv/bin/python scripts/evaluate_grounding.py --repeats 1 --interval 12`，默认6请求、最多12请求，仅固定合成数据，会消耗供应商额度，不自动重试。
+
+
+M5完整事实支持审计：新增52条固定合成回复、93个连续标注片段；参考标签独立于词面规则，检测“地名正确但附加事实无据”等问题。当前生产规则在51条可裁决样本上TP14/FP5/FN15/TN17，另1条未决；这些是开发诊断，不是模型幻觉率。生产规则本批未改。设计、完整发现和后续任务见 [事实支持评测](docs/FACT_SUPPORT_EVALUATION.md)。
+
+```sh
+.venv/bin/python scripts/evaluate_fact_support.py
+.venv/bin/python scripts/evaluate_fact_support.py --format markdown
+```
+
+默认退出0仅表示审计有效；可加 `--fail-on-findings` 作质量门禁，当前有已知发现故预期返回1。无需密钥、网络或数据库，不加载.env；478项默认测试通过、25项PG变体跳过，PG171项沿用PR #14相同生产代码，不重复专项。未执行原保留集，M5仍进行中。
