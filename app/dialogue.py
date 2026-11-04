@@ -80,7 +80,7 @@ class MockProvider:
         marker = '以下为玩家明确确认的长期记忆数据'
         if marker in prompt and any(w in message for w in ('记得', '面试', '应聘', '求职', '名字', '住哪', '喜欢', '经历')):
             try:
-                memories = json.loads(prompt[prompt.index('\n[', prompt.index(marker)) + 1:].split('\n上次输出')[0])
+                memories = json.loads(prompt[prompt.index('\n[', prompt.index(marker)) + 1:].split('\n', 1)[0])
                 return '我记得你确认过：' + '；'.join(m['fact'] for m in memories) + '。现在想聊聊这件事吗？'
             except (ValueError, KeyError): pass
         if any(w in message for w in ('几岁', '年龄')):

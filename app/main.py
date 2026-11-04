@@ -14,6 +14,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 from .config import ROOT, Settings
 from .weather import OpenMeteoProvider, MockWeatherProvider, WeatherError, MESSAGES, query_weather, weather_prompt, validate_city, weather_reply_conflicts, weather_fallback
 from .emotion import EmotionState, EmotionSettingsInput, CorrectionInput, Estimate, ModelEmotionProvider, MockEmotionProvider, assess, emotion_prompt, decorate, emotion_reply_conflicts, emotion_fallback
+from .grounding import grounding_prompt, grounding_conflicts
 from .memory_source import source_time_conflicts
 from .memory import MemoryStore, extract_candidates, memory_prompt
 from .dialogue import CHARACTER, FALLBACK, build_provider, ProviderFailure, conflicts, instructions
@@ -204,15 +205,15 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
             mood_result = await assess(emotion, session.emotion, mood_settings, history)
             verify_epoch(session, snapshot['epoch'])
             session.pending_weather = pending
-            prompt = instructions() + weather_prompt(weather_result) + memory_prompt(evidence) + emotion_prompt(mood_result, mood_settings)
+            prompt = instructions() + weather_prompt(weather_result) + memory_prompt(evidence) + emotion_prompt(mood_result, mood_settings) + grounding_prompt(evidence, body.message)
             model_history = [{'role':m['role'], 'content':m['content']} for m in history]
             try:
                 async with asyncio.timeout(settings.api_timeout_seconds * 2 + 2):
                     reply = await provider.generate(model_history, prompt)
-                    guarded = source_time_conflicts(reply, model_history) or conflicts(reply, body.message) or weather_reply_conflicts(reply, weather_result) or emotion_reply_conflicts(reply, mood_result)
+                    guarded = grounding_conflicts(reply, evidence, body.message) or source_time_conflicts(reply, model_history) or conflicts(reply, body.message) or weather_reply_conflicts(reply, weather_result) or emotion_reply_conflicts(reply, mood_result)
                     if guarded:
-                        reply = await provider.generate(model_history, prompt + '\n上次输出违反角色、来源时间或天气表达规则。重新回答：长期记忆不证明刚才/今天告诉我，改用不带来源时间的“我记得”，不要编造讲述时间。只用已知事实，以沈砚的自然语气关心，不播报来源/日期，不用您；当前天气只作估计。情绪只是可纠正参考，不诊断、不报分数，尊重自述和倾听偏好。')
-                        if source_time_conflicts(reply, model_history) or conflicts(reply, body.message):
+                        reply = await provider.generate(model_history, prompt + '\n上次输出违反场景、地名、角色、来源时间或天气表达规则。重新回答：删除没有证据的店内动态近况，地点名称照证据完整写出或用代词承接，不缩写地名。长期记忆不证明刚才/今天告诉我，改用不带来源时间的“我记得”，不要编造讲述时间。只用已知事实，以沈砚的自然语气关心，不播报来源/日期，不用您；当前天气只作估计。情绪只是可纠正参考，不诊断、不报分数，尊重自述和倾听偏好。')
+                        if grounding_conflicts(reply, evidence, body.message) or source_time_conflicts(reply, model_history) or conflicts(reply, body.message):
                             reply = FALLBACK
                         elif weather_reply_conflicts(reply, weather_result):
                             reply = weather_fallback(weather_result)

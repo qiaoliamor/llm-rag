@@ -10,6 +10,7 @@ from fastapi.testclient import TestClient
 from app.config import Settings, ROOT
 from app.dialogue import GeminiProvider, OpenAIProvider, MockProvider, build_provider, instructions
 from app.main import create_app
+from app.grounding import grounding_prompt
 
 
 def config(**overrides):
@@ -50,7 +51,7 @@ def test_real_sdk_wire_and_multiturn(monkeypatch):
         payload = json.loads(request.content)
         assert payload['model'] == 'gemini-3.5-flash-lite'
         assert payload['max_tokens'] == 500
-        assert payload['messages'][0] == {'role':'system', 'content':instructions()}
+        assert payload['messages'][0] == {'role':'system', 'content':instructions()+grounding_prompt([],payload['messages'][-1]['content'])}
         assert 'store' not in payload and 'instructions' not in payload
         requests.append(payload)
         return httpx2.Response(200, json=completion())
