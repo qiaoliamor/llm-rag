@@ -232,3 +232,8 @@ memory_query以有限规则识别主体/字段/时间与正文锚点，rank_memo
 ## M5完整事实支持审计（2026-11-04）
 
 新增独立离线fact_support_evaluation入口，只读版本化合成证据和整段回复参考标注，不加载Settings/.env，不初始化app.main、数据库或API。Pydantic强制连续跨度覆盖、证据作用域与正史/当前用户一致；guard_predictions仅接收文本和证据，不接收标签。使用生产同一检查OR，分别统计语义/形式混淆、参考事实支持组成与应答义务。它不对未标注新回复自动做语义判断，不改变在线聊天。 完整协议、参考例子和发现见 [事实支持评测](FACT_SUPPORT_EVALUATION.md)。
+
+
+## M5在线按需记忆与语义审查（2026-11-04）
+
+新增memory_routing、semantic_review、reply_pipeline三层：先授权/明确规则或含糊模型路由，再按需调用原MemoryStore；生成后严格校验语义片段的全文覆盖、可见证据ID、标签与置信，程序计算决定与原因。语义通过可纠正软规则误判，硬角色/工具边界保留。所有等待后epoch变更撤销，不新增分析缓存或持久化；原接口字段保留，仅加路由/审查状态。 设计、配置和测试见 [在线方案](DEMAND_MEMORY_AND_SEMANTIC_REVIEW.md)。

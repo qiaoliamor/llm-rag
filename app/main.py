@@ -12,12 +12,14 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from .config import ROOT, Settings
-from .weather import OpenMeteoProvider, MockWeatherProvider, WeatherError, MESSAGES, query_weather, weather_prompt, validate_city, weather_reply_conflicts, weather_fallback
-from .emotion import EmotionState, EmotionSettingsInput, CorrectionInput, Estimate, ModelEmotionProvider, MockEmotionProvider, assess, emotion_prompt, decorate, emotion_reply_conflicts, emotion_fallback
-from .grounding import grounding_prompt, grounding_conflicts
-from .memory_source import source_time_conflicts
+from .memory_routing import route_memory, NO_MEMORY_CONTEXT
+from .semantic_review import ModelAnalysisProvider
+from .reply_pipeline import generate_checked
+from .weather import OpenMeteoProvider, MockWeatherProvider, WeatherError, MESSAGES, query_weather, weather_prompt, validate_city
+from .emotion import EmotionState, EmotionSettingsInput, CorrectionInput, Estimate, ModelEmotionProvider, MockEmotionProvider, assess, emotion_prompt, decorate
+from .grounding import grounding_prompt
 from .memory import MemoryStore, extract_candidates, memory_prompt
-from .dialogue import CHARACTER, FALLBACK, build_provider, ProviderFailure, conflicts, instructions
+from .dialogue import CHARACTER, build_provider, ProviderFailure, instructions
 
 
 @dataclass
@@ -84,11 +86,14 @@ class WeatherSettingsInput(BaseModel):
     city_id: int | None = Field(default=None, gt=0)
 
 
-def create_app(settings=None, provider=None, weather_provider=None, emotion_provider=None):
+def create_app(settings=None, provider=None, weather_provider=None, emotion_provider=None, memory_router=None, semantic_judge=None):
     settings = settings or Settings()
     provider = provider or build_provider(settings)
     weather = weather_provider or (MockWeatherProvider() if settings.weather_provider == 'mock' else OpenMeteoProvider())
     emotion = emotion_provider or (MockEmotionProvider() if settings.chat_provider == 'mock' else ModelEmotionProvider(settings))
+    auxiliary = ModelAnalysisProvider(settings) if settings.chat_provider != 'mock' else None
+    router = memory_router if memory_router is not None else auxiliary
+    judge = semantic_judge if semantic_judge is not None else auxiliary
     store = MemoryStore(settings.memory_database_url.get_secret_value())
     app = FastAPI(docs_url=None, redoc_url=None)
     app.state.sessions = sessions = {}
@@ -198,7 +203,10 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
                 session.memory_epoch = snapshot['epoch']
             turn = session.emotion.turn + 1
             history = session.messages[-24:] + [{'role': 'user', 'content': body.message, 'id':f'u{turn}'}]
-            evidence = store.retrieve(session.user_id, body.message)
+            route = await route_memory(body.message, history, enabled=snapshot['memory_enabled'],
+                router=router,timeout=settings.memory_route_timeout_seconds,routing_enabled=settings.memory_router_enabled)
+            verify_epoch(session,snapshot['epoch'])
+            evidence = store.retrieve(session.user_id, route.query) if route.need_memory else []
             weather_result, pending = await query_weather(weather, body.message, store.weather_settings(session.user_id), session.pending_weather)
             verify_epoch(session, snapshot['epoch'])
             mood_settings = store.emotion_settings(session.user_id)
@@ -206,19 +214,14 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
             verify_epoch(session, snapshot['epoch'])
             session.pending_weather = pending
             prompt = instructions() + weather_prompt(weather_result) + memory_prompt(evidence) + emotion_prompt(mood_result, mood_settings) + grounding_prompt(evidence, body.message)
+            if not route.need_memory:
+                prompt += NO_MEMORY_CONTEXT
             model_history = [{'role':m['role'], 'content':m['content']} for m in history]
             try:
-                async with asyncio.timeout(settings.api_timeout_seconds * 2 + 2):
-                    reply = await provider.generate(model_history, prompt)
-                    guarded = grounding_conflicts(reply, evidence, body.message) or source_time_conflicts(reply, model_history) or conflicts(reply, body.message) or weather_reply_conflicts(reply, weather_result) or emotion_reply_conflicts(reply, mood_result)
-                    if guarded:
-                        reply = await provider.generate(model_history, prompt + '\n上次输出违反场景、地名、角色、来源时间或天气表达规则。重新回答：删除没有证据的店内动态近况，地点名称照证据完整写出或用代词承接，不缩写地名。长期记忆不证明刚才/今天告诉我，改用不带来源时间的“我记得”，不要编造讲述时间。只用已知事实，以沈砚的自然语气关心，不播报来源/日期，不用您；当前天气只作估计。情绪只是可纠正参考，不诊断、不报分数，尊重自述和倾听偏好。')
-                        if grounding_conflicts(reply, evidence, body.message) or source_time_conflicts(reply, model_history) or conflicts(reply, body.message):
-                            reply = FALLBACK
-                        elif weather_reply_conflicts(reply, weather_result):
-                            reply = weather_fallback(weather_result)
-                        elif emotion_reply_conflicts(reply, mood_result):
-                            reply = emotion_fallback(mood_result,mood_settings)
+                async with asyncio.timeout(settings.api_timeout_seconds * 2 + settings.semantic_review_timeout_seconds * 2 + 2):
+                    reply, guarded, review_status = await generate_checked(provider,model_history,prompt,body.message,
+                        evidence,weather_result,mood_result,mood_settings,judge=judge,
+                        review_enabled=settings.semantic_review_enabled,review_timeout=settings.semantic_review_timeout_seconds)
             except TimeoutError:
                 raise ProviderFailure('timeout', '模型响应超时，请稍后重试。', 504) from None
             verify_epoch(session, snapshot['epoch'])
@@ -233,7 +236,8 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
             else: session.emotion.assessment = None
             session.messages = (history + [{'role': 'assistant', 'content': reply, **({'weather': weather_result} if weather_result and weather_result['status'] == 'ok' else {})}])[-24:]
             return {'emotion': mood_result, 'weather': weather_result, 'reply': reply, 'request_id': request.state.request_id, 'guarded': guarded, 'memory_candidates': candidates,
-                    'retrieved_memory_ids': [m['id'] for m in evidence]}
+                    'retrieved_memory_ids': [m['id'] for m in evidence],
+                    'memory_route':route.public(),'semantic_review':review_status}
 
     @app.delete('/v1/session')
     async def reset(request: Request):

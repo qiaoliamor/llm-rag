@@ -11,10 +11,11 @@ from app.config import Settings, ROOT
 from app.dialogue import GeminiProvider, OpenAIProvider, MockProvider, build_provider, instructions
 from app.main import create_app
 from app.grounding import grounding_prompt
+from app.memory_routing import NO_MEMORY_CONTEXT
 
 
 def config(**overrides):
-    return Settings(_env_file=None, chat_provider='gemini', gemini_api_key='test-gemini-private', **overrides)
+    return Settings(_env_file=None, chat_provider='gemini', gemini_api_key='test-gemini-private', semantic_review_enabled=False, **overrides)
 
 
 def install_transport(monkeypatch, handler):
@@ -51,7 +52,7 @@ def test_real_sdk_wire_and_multiturn(monkeypatch):
         payload = json.loads(request.content)
         assert payload['model'] == 'gemini-3.5-flash-lite'
         assert payload['max_tokens'] == 500
-        assert payload['messages'][0] == {'role':'system', 'content':instructions()+grounding_prompt([],payload['messages'][-1]['content'])}
+        assert payload['messages'][0] == {'role':'system', 'content':instructions()+grounding_prompt([],payload['messages'][-1]['content'])+NO_MEMORY_CONTEXT}
         assert 'store' not in payload and 'instructions' not in payload
         requests.append(payload)
         return httpx2.Response(200, json=completion())

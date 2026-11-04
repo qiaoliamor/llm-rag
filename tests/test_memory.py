@@ -417,3 +417,40 @@ def test_protected_place_context_follows_authorization_and_crud(database_url):
     history,prompt=ask(restarted,hr)
     assert '合成新禾市' not in prompt and '合成新禾市' not in str(history)
     assert '合成未确认市' not in prompt
+
+
+def test_demand_route_and_judge_only_see_current_authorized_memories(database_url):
+    from app.semantic_review import Review
+    seen=[]
+    async def review(reply,history,evidence):
+        seen.append(evidence)
+        return Review(decision='accept',confidence=.95,segments=[{'text':reply,'kind':'question',
+            'verdict':'not_applicable','evidence_ids':[],'reason':'nonfactual'}])
+    provider=SimpleNamespace(generate=AsyncMock(return_value='你想继续聊聊这件事吗？'))
+    judge=SimpleNamespace(review=review)
+    def make():return create_app(Settings(_env_file=None,chat_provider='mock',memory_database_url=database_url),provider,semantic_judge=judge)
+    app=make();c,h=boot(app);enable(c,h)
+    m=manual(c,h,'我住在合成旧城')
+    manual(c,h,'我住在合成候选城',False)
+    def ask(client,headers):
+        r=client.post('/v1/chat',headers=headers,json={'message':'我住哪儿？'})
+        assert r.status_code==200
+        return r.json(),str(seen[-1])
+    result,bundle=ask(c,h)
+    assert result['memory_route']['need_memory'] and '合成旧城' in bundle and '合成候选城' not in bundle
+    other,ho=boot(app);enable(other,ho)
+    result,bundle=ask(other,ho)
+    assert not result['retrieved_memory_ids'] and '合成旧城' not in bundle
+    updated=c.patch('/v1/memories/'+m['id'],headers=h,json={'version':m['version'],'fact':'我住在合成新城'}).json()['item']
+    restarted=TestClient(make());restarted.cookies.update(dict(c.cookies))
+    hr={'x-csrf-token':restarted.get('/v1/session').json()['csrf_token']}
+    _,bundle=ask(restarted,hr)
+    assert '合成新城' in bundle and '合成旧城' not in bundle
+    enable(restarted,hr,False)
+    result,bundle=ask(restarted,hr)
+    assert not result['memory_route']['need_memory'] and '合成新城' not in bundle
+    enable(restarted,hr,True)
+    assert restarted.delete('/v1/memories/'+m['id'],headers=hr,params={'version':updated['version']}).status_code==200
+    result,bundle=ask(restarted,hr)
+    assert not result['retrieved_memory_ids'] and '合成新城' not in bundle
+    assert '合成候选城' not in bundle
