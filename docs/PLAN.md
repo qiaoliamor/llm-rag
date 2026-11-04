@@ -1,6 +1,6 @@
 # 实施计划
 
-> 2026-11-04：M0–M3及W01/W02已交付；M4情绪支持闭环交付见 [PR #8](https://github.com/qiaoliamor/llm-rag/pull/8)，包含合并审阅修复。M5已合并组件基线和检索修复，来源时间提示及回归通过[PR #13](https://github.com/qiaoliamor/llm-rag/pull/13)交付（合入main生效），正式模型质量评测及M6发布尚待完成。M2 B01–B03仍未完成；设计/验证见 [EMOTION.md](EMOTION.md) 和 [M4_TEST_REPORT.md](M4_TEST_REPORT.md)。
+> 2026-11-04：M0–M3及W01/W02已交付；M4情绪支持闭环交付见 [PR #8](https://github.com/qiaoliamor/llm-rag/pull/8)，包含合并审阅修复。M5已合并组件基线和检索修复，来源时间修复PR #13已合并，场景与地名完整性修复交付见 [PR #14](https://github.com/qiaoliamor/llm-rag/pull/14)，正式模型质量评测及M6发布尚待完成。M2 B01–B03仍未完成；设计/验证见 [EMOTION.md](EMOTION.md) 和 [M4_TEST_REPORT.md](M4_TEST_REPORT.md)。
 
 ## 1. 实施原则
 
@@ -108,3 +108,8 @@ M5检索修复进度：姓名候选路由和无答案证据兼容检查已落地
 ## M5来源时间修复（2026-11-04）
 
 本批修复长期记忆的无依据来源时间，补命令行回归和独立合成Gemini提示配对；M5仍进行中。后续扩展完整事实支持/复杂释义与独立人工评测，不开始M6。 设计、对照回复、失败及未验证范围见 [来源时间记录](MEMORY_SOURCE_TIME.md)。
+
+
+## M5场景与地名完整性（2026-11-04）
+
+本批针对PR #13真实合成输出中的动态场景编造与地名缩写做定向修复，补命令行回归和前后配对；下一步仍是独立释义、完整事实支持与自然度验证，M5不标整体完成，不开始M6。 具体Prompt、验证与局限见 [场景与地名记录](SCENE_PLACE_GROUNDING.md)。

@@ -222,3 +222,8 @@ memory_query以有限规则识别主体/字段/时间与正文锚点，rank_memo
 ## M5来源时间修复（2026-11-04）
 
 聊天生成在已有角色/天气/情绪检查之外，增加 `source_time_conflicts(reply, model_history)`。记忆提示默认附加来源时间规则；event_date仍为事件日期，不新增或伪造讲述时间字段。命中有限规则后复用一次重写，重写仍违规则通用兜底；上游失败不写历史，epoch并发撤回规则保留。旧检索提示实验显式使用source_time=False，维持历史基线。 设计、对照回复、失败及未验证范围见 [来源时间记录](MEMORY_SOURCE_TIME.md)。
+
+
+## M5场景与地名完整性（2026-11-04）
+
+生产聊天在原角色/天气/情绪/来源时间提示后追加grounding_prompt(evidence, query)，即使无记忆也约束场景。protected_places只消费已授权检索到的事实和本条明确住所陈述，不扫描其他记忆；JSON数据不是指令。grounding_conflicts复用既有一次重写及FALLBACK，不增加重试预算或持久化字段。没有可信动态场景工具时，不确认/反向否认店况；未来添加场景工具需同步扩展可信证据校验。 具体Prompt、验证与局限见 [场景与地名记录](SCENE_PLACE_GROUNDING.md)。

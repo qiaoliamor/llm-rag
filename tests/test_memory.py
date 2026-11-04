@@ -385,3 +385,35 @@ def test_source_prompt_follows_memory_lifecycle(database_url):
     assert restarted.delete('/v1/memories/'+m['id'],headers=hr,params={'version':updated['version']}).status_code==200
     prompt=ask()
     assert SOURCE_TIME_RULES not in prompt and '合成来源乙' not in prompt
+
+
+def test_protected_place_context_follows_authorization_and_crud(database_url):
+    provider=SimpleNamespace(generate=AsyncMock(return_value='我在听。'))
+    app=app_for(database_url,provider);c,h=boot(app);enable(c,h)
+    m=manual(c,h,'我住在合成青禾市')
+    manual(c,h,'我住在合成未确认市',False)
+    def ask(client,headers):
+        result=client.post('/v1/chat',headers=headers,json={'message':'我住哪儿？'})
+        assert result.status_code==200
+        return provider.generate.await_args.args
+    _,prompt=ask(c,h)
+    assert '合成青禾市' in prompt and '合成未确认市' not in prompt
+    other,ho=boot(app);enable(other,ho)
+    _,prompt=ask(other,ho)
+    assert '合成青禾市' not in prompt
+    updated=c.patch('/v1/memories/'+m['id'],headers=h,json={'version':m['version'],'fact':'我住在合成新禾市'}).json()['item']
+    restarted=TestClient(app_for(database_url,provider));restarted.cookies.update(dict(c.cookies))
+    hr={'x-csrf-token':restarted.get('/v1/session').json()['csrf_token']}
+    history,prompt=ask(restarted,hr)
+    assert '合成新禾市' in prompt and '合成青禾市' not in prompt
+    assert '合成青禾市' not in str(history)
+    enable(restarted,hr,False)
+    _,prompt=ask(restarted,hr)
+    assert '合成新禾市' not in prompt
+    enable(restarted,hr,True)
+    _,prompt=ask(restarted,hr)
+    assert '合成新禾市' in prompt
+    assert restarted.delete('/v1/memories/'+m['id'],headers=hr,params={'version':updated['version']}).status_code==200
+    history,prompt=ask(restarted,hr)
+    assert '合成新禾市' not in prompt and '合成新禾市' not in str(history)
+    assert '合成未确认市' not in prompt
