@@ -1,6 +1,6 @@
 # M5 首批分析、组件基线与规则完善
 
-更新日期：2026-11-04（Asia/Tokyo）。状态：**M5进行中，首批PR #10已合并，第二批检索消融PR #11已合并，检索修复PR #12已合并（744776e），来源时间修复在任务分支交付，未整体验收**。基线main为 `90350e4`（M4 PR #8）；分支 `codex/m5-evaluation-baseline`。此前EMOTION.md流程说明已通过 [PR #9](https://github.com/qiaoliamor/llm-rag/pull/9) squash合并至main（4513496）；PR #10已变基到该基线，文档与代码通过各自PR依次交付。
+更新日期：2026-11-04（Asia/Tokyo）。状态：**M5进行中，首批PR #10已合并，第二批检索消融PR #11已合并，检索修复PR #12已合并（744776e），来源时间修复通过[PR #13](https://github.com/qiaoliamor/llm-rag/pull/13)交付（合入main生效），未整体验收**。基线main为 `90350e4`（M4 PR #8）；分支 `codex/m5-evaluation-baseline`。此前EMOTION.md流程说明已通过 [PR #9](https://github.com/qiaoliamor/llm-rag/pull/9) squash合并至main（4513496）；PR #10已变基到该基线，文档与代码通过各自PR依次交付。
 
 ## 1. 分析与本批范围
 
@@ -121,3 +121,10 @@ CRUD适用性：新评测入口只读合成定义、临时建立/查询/清理�
 ## 11. 长期记忆来源时间修复（2026-11-04）
 
 增加memory-source-time-v1提示与有限输出检查，默认后端408通过/24跳过，独立临时PG169通过；包括跨重启记忆新增/确认/纠正/删除对提示的影响。前端未改，不重复前端测试。真实模型使用独立合成来源时间探针；保留首轮语义失败和第二轮限流，不以命名值正确代替整句有据。具体Prompt、逐条回复、人工审阅与局限见 [来源时间记录](MEMORY_SOURCE_TIME.md)。M5仍进行中。
+
+
+## 12. PR #13 合并审阅
+
+2026-11-04，功能提交 `2dac0e3`。核对来源时间与事件日期边界、当前原话支持条件、有限规则重写/兜底及上游失败不落历史、记忆生命周期与授权预过滤，未发现阻碍本批合并的问题。复跑 `.venv/bin/python -m pytest -q`：408通过/24项PG变体跳过；`.venv/bin/python scripts/test_postgres.py`：169通过，独立临时库自动清理，计数与默认套件重叠。PR无远端CI检查，以上为本地命令行结果。
+
+审阅收尾仅更新文档交付状态，未改功能代码或数据；未重复Gemini调用、未运行保留集、前端未变不重复构建。差异/提交历史/跟踪路径、本地敏感值及密钥模式、Python语法和Markdown链接检查通过。既有30请求（22成功/8限流）、所有合成原文及Prompt保持不变；完整事实支持、复杂释义与其他无据场景仍未验收，M5继续。交付见 [PR #13](https://github.com/qiaoliamor/llm-rag/pull/13)，状态随合入main生效。

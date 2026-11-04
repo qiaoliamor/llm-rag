@@ -191,4 +191,4 @@ uv run --frozen python scripts/test_postgres.py
 旧组保持、新R/S/F分别比较路由/证据检查/组合。可用 `--live --retrieval-variant F_retrieval_fix --live-limit 3 --repeats 2 --max-calls 12` 显式做修复后证据的提示配对，会消耗当前供应商额度。本批交付见 [PR #12](https://github.com/qiaoliamor/llm-rag/pull/12)。数值、12份合成回复及有限规则边界见 [检索修复记录](docs/RETRIEVAL_GUARDS.md)；M5仍未整体完成。
 
 
-M5来源时间修复：长期记忆不证明“刚才告诉我”，事件日期不当讲述日期；有限输出检查复用一次重写及兜底。命令行验证408通过/24跳过，临时PG专项169通过。提示设计、真实Gemini前后对照及失败边界见 [来源时间记录](docs/MEMORY_SOURCE_TIME.md)。可显式运行 `.venv/bin/python scripts/evaluate_memory_source.py --repeats 1 --interval 12`；只发送固定合成探针，最多6请求，会消耗供应商额度；默认2重复共12请求，不自动重试。
+M5来源时间修复通过[PR #13](https://github.com/qiaoliamor/llm-rag/pull/13)交付（合入main生效）：长期记忆不证明“刚才告诉我”，事件日期不当讲述日期；有限输出检查复用一次重写及兜底。命令行验证408通过/24跳过，临时PG专项169通过。提示设计、真实Gemini前后对照及失败边界见 [来源时间记录](docs/MEMORY_SOURCE_TIME.md)。可显式运行 `.venv/bin/python scripts/evaluate_memory_source.py --repeats 1 --interval 12`；只发送固定合成探针，最多6请求，会消耗供应商额度；默认2重复共12请求，不自动重试。
