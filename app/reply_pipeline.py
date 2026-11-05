@@ -1,4 +1,5 @@
 """One shared rewrite budget across rules and semantic review."""
+from time import monotonic
 from .dialogue import conflicts,FALLBACK
 from .grounding import grounding_conflicts,scene_conflicts
 from .memory_source import source_time_conflicts
@@ -12,7 +13,7 @@ REWRITE='''\n上次输出违反证据或表达边界。重新回答：删除没�
 async def generate_checked(provider,history,prompt,query,memories,weather,mood,mood_settings,
                            *,judge=None,review_enabled=True,review_timeout=8):
     evidence=evidence_bundle(history,memories,weather,mood)
-    guarded=False;review_calls=0;feedback=''
+    guarded=False;review_calls=0;feedback='';review_spent=0.0
     status='disabled' if not review_enabled else 'mock_or_unavailable'
     for attempt in range(2):
         reply=await provider.generate(history,prompt+(REWRITE+feedback if attempt else ''))
@@ -27,8 +28,13 @@ async def generate_checked(provider,history,prompt,query,memories,weather,mood,m
         factual_scene=False
         if judge is not None and review_enabled:
             if needs_review(reply,evidence=memories,weather=weather,mood=mood,flagged=flagged):
+                remaining=review_timeout-review_spent
+                if remaining<=0:
+                    return FALLBACK,True,{'status':'unavailable','calls':review_calls,'failure':'timeout'}
                 review_calls+=1
-                outcome=await review_reply(judge,reply,history,evidence,timeout=review_timeout)
+                started=monotonic()
+                outcome=await review_reply(judge,reply,history,evidence,timeout=remaining)
+                review_spent+=monotonic()-started
                 decision,review=outcome
                 if decision in ('unavailable','uncertain'):
                     return FALLBACK,True,{'status':decision,'calls':review_calls,'failure':outcome.failure}
@@ -43,7 +49,7 @@ async def generate_checked(provider,history,prompt,query,memories,weather,mood,m
                 guarded=guarded or decision=='revise'
             else:status='skipped'
         if not flagged:return reply,guarded,{'status':status,'calls':review_calls}
-        feedback=rewrite_feedback(review)
+        feedback=rewrite_feedback(review,scene_policy=factual_scene)
         if attempt:
             if role_bad or soft or factual_scene or (review is not None and review.decision=='revise'):reply=FALLBACK
             elif weather_bad:reply=weather_fallback(weather)
