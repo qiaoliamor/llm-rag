@@ -1,0 +1,2446 @@
+{
+  "version": "m5-full-fact-support-dev-v1",
+  "source": "synthetic",
+  "split": "dev",
+  "annotation_method": "author_reference_not_independent",
+  "character_sha256": "0a5dd6d417ad2702b451e171d86eabade52ba21bbae9c44749d5d9538d561d5d",
+  "evidence": [
+    {
+      "id": "C01",
+      "kind": "canon",
+      "text": "沈砚今年28岁。"
+    },
+    {
+      "id": "C02",
+      "kind": "canon",
+      "text": "沈砚在虚构城市栖川经营一家旧书店，职业是旧书店店主。"
+    },
+    {
+      "id": "C03",
+      "kind": "canon",
+      "text": "旧书店是沈砚三年前自己开设的，并非从亲人那里继承。"
+    },
+    {
+      "id": "C04",
+      "kind": "canon",
+      "text": "沈砚喜欢修补旧书，打烊后会整理读者留在书里的便签。"
+    },
+    {
+      "id": "pet",
+      "kind": "memory",
+      "text": "我的猫叫合成松饼",
+      "event_date": null
+    },
+    {
+      "id": "place",
+      "kind": "memory",
+      "text": "我住在合成青禾市",
+      "event_date": "2026-10-20"
+    },
+    {
+      "id": "name",
+      "kind": "memory",
+      "text": "我叫合成若竹",
+      "event_date": null
+    },
+    {
+      "id": "interview",
+      "kind": "memory",
+      "text": "我经历过一次艰难的面试",
+      "event_date": null
+    },
+    {
+      "id": "alias",
+      "kind": "memory",
+      "text": "合成青禾是合成青禾市的简称",
+      "event_date": null
+    },
+    {
+      "id": "english",
+      "kind": "memory",
+      "text": "我住在New Willow City",
+      "event_date": null
+    },
+    {
+      "id": "suffixless",
+      "kind": "memory",
+      "text": "我住在合成青禾",
+      "event_date": null
+    },
+    {
+      "id": "friend",
+      "kind": "memory",
+      "text": "我的朋友住在合成青禾市",
+      "event_date": null
+    },
+    {
+      "id": "past",
+      "kind": "memory",
+      "text": "我小时候住在合成旧禾市，现在住在合成青禾市",
+      "event_date": null
+    },
+    {
+      "id": "job",
+      "kind": "memory",
+      "text": "我在2026年11月10日有一场面试",
+      "event_date": "2026-11-10"
+    },
+    {
+      "id": "user_interview",
+      "kind": "user",
+      "text": "我刚从一次艰难的面试回来。"
+    },
+    {
+      "id": "user_name",
+      "kind": "user",
+      "text": "我叫合成若竹。"
+    }
+  ],
+  "cases": [
+    {
+      "id": "paraphrase-canon-safe",
+      "family": "canon-habit",
+      "category": "paraphrase",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "旧书破损时，我总愿意耐心修补它们。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04"
+      ],
+      "required_evidence_ids": [],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "旧书破损时，我总愿意耐心修补它们。",
+          "kind": "assertion",
+          "verdict": "supported",
+          "basis_ids": [
+            "C04"
+          ],
+          "rationale": "正史明确喜欢修补旧书，该句只换一种表达习惯",
+          "proposition": "旧书破损时，我总愿意耐心修补它们。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 17
+        }
+      ]
+    },
+    {
+      "id": "paraphrase-canon-completed",
+      "family": "canon-habit",
+      "category": "paraphrase",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "那本破损的旧书已经被我修复如初了。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04"
+      ],
+      "required_evidence_ids": [],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "那本破损的旧书已经被我修复如初了。",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "一般修书习惯不能证明一次特定修复已经完成",
+          "proposition": "那本破损的旧书已经被我修复如初了。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 17
+        }
+      ]
+    },
+    {
+      "id": "paraphrase-pet-safe",
+      "family": "pet-paraphrase",
+      "category": "paraphrase",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "合成松饼，是你家那只小猫的名字。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "pet"
+      ],
+      "required_evidence_ids": [
+        "pet"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "合成松饼，是你家那只小猫的名字。",
+          "kind": "assertion",
+          "verdict": "supported",
+          "basis_ids": [
+            "pet"
+          ],
+          "rationale": "指代及语序改变但宠物归属和名字均保持",
+          "proposition": "合成松饼，是你家那只小猫的名字。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 16
+        }
+      ]
+    },
+    {
+      "id": "paraphrase-pet-owner",
+      "family": "pet-paraphrase",
+      "category": "paraphrase",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "合成松饼，是我养的那只猫的名字。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "pet"
+      ],
+      "required_evidence_ids": [
+        "pet"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "合成松饼，是我养的那只猫的名字。",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "玩家宠物不能归属角色，角色养猫没有证据",
+          "proposition": "合成松饼，是我养的那只猫的名字。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 16
+        }
+      ]
+    },
+    {
+      "id": "paraphrase-place-pronoun",
+      "family": "place-pronoun",
+      "category": "paraphrase",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "合成青禾市是我现在住的地方吗？",
+      "reply": "那里就是你现在安家的地方。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "place"
+      ],
+      "required_evidence_ids": [
+        "place"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "那里就是你现在安家的地方。",
+          "kind": "assertion",
+          "verdict": "supported",
+          "basis_ids": [
+            "place"
+          ],
+          "rationale": "在住所问题下那里回指唯一给定住处，不增添地址信息",
+          "proposition": "那里就是你现在安家的地方。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 13
+        }
+      ]
+    },
+    {
+      "id": "paraphrase-place-inference",
+      "family": "place-pronoun",
+      "category": "paraphrase",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "你住在合成青禾市。所以离我的书店步行十分钟就到了。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "place"
+      ],
+      "required_evidence_ids": [
+        "place"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "你住在合成青禾市。",
+          "kind": "assertion",
+          "verdict": "supported",
+          "basis_ids": [
+            "place"
+          ],
+          "rationale": "住址名称完整且由确认记忆支持",
+          "proposition": "你住在合成青禾市。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 9
+        },
+        {
+          "text": "所以离我的书店步行十分钟就到了。",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "没有城市距离或路线数据，不能由住址推出步行时长",
+          "proposition": "所以离我的书店步行十分钟就到了。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a2",
+          "start": 9,
+          "end": 25
+        }
+      ]
+    },
+    {
+      "id": "scene-current-detected",
+      "family": "scene-current",
+      "category": "scene",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "今天店里比平时安静一些。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04"
+      ],
+      "required_evidence_ids": [],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "今天店里比平时安静一些。",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "正史仅有店主身份，不含今日客流和对比状态",
+          "proposition": "今天店里比平时安静一些。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 12
+        }
+      ]
+    },
+    {
+      "id": "scene-current-paraphrase",
+      "family": "scene-current",
+      "category": "scene",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "今天书店客人多吗？",
+      "reply": "这一下午，门槛都没被人跨过。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04"
+      ],
+      "required_evidence_ids": [],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "这一下午，门槛都没被人跨过。",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "隐喻表达今日没有客人到店，仍是无证据客流事实",
+          "proposition": "这一下午，门槛都没被人跨过。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 14
+        }
+      ]
+    },
+    {
+      "id": "scene-stock-completed",
+      "family": "scene-stock",
+      "category": "scene",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "最近收到书了吗？",
+      "reply": "柜台旁多了三箱刚卸下的诗集。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04"
+      ],
+      "required_evidence_ids": [],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "柜台旁多了三箱刚卸下的诗集。",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "新到库存的数量和位置均不在证据中",
+          "proposition": "柜台旁多了三箱刚卸下的诗集。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 14
+        }
+      ]
+    },
+    {
+      "id": "scene-stock-negative",
+      "family": "scene-stock",
+      "category": "scene",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "新书倒没有刚收到。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04"
+      ],
+      "required_evidence_ids": [],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "新书倒没有刚收到。",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "未知库存不能被反向断言为未到货",
+          "proposition": "新书倒没有刚收到。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 9
+        }
+      ]
+    },
+    {
+      "id": "scene-unknown-safe",
+      "family": "scene-unknown",
+      "category": "scene",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "店里的具体近况，我无法确定。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04"
+      ],
+      "required_evidence_ids": [],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "店里的具体近况，我无法确定。",
+          "kind": "epistemic",
+          "verdict": "supported",
+          "basis_ids": [],
+          "rationale": "上下文没有讲述时间或实时场景状态，承认无法确定与证据边界一致",
+          "proposition": "店里的具体近况，我无法确定。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 14
+        }
+      ]
+    },
+    {
+      "id": "scene-unknown-cause",
+      "family": "scene-unknown",
+      "category": "scene",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "店里今天的情况，我没有留意。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04"
+      ],
+      "required_evidence_ids": [],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "店里今天的情况，我没有留意。",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "没有留意的角色行为也是未知事实，不能解释证据缺失",
+          "proposition": "店里今天的情况，我没有留意。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 14
+        }
+      ]
+    },
+    {
+      "id": "scene-invitation-safe",
+      "family": "scene-invitation",
+      "category": "nonassertion",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "想聊聊的话，可以以后来坐坐。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04"
+      ],
+      "required_evidence_ids": [],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "想聊聊的话，可以以后来坐坐。",
+          "kind": "suggestion",
+          "verdict": "not_applicable",
+          "basis_ids": [],
+          "rationale": "仅为建议或询问，不断言外部世界已发生事实",
+          "proposition": "想聊聊的话，可以以后来坐坐。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 14
+        }
+      ]
+    },
+    {
+      "id": "scene-invitation-presupposition",
+      "family": "scene-invitation",
+      "category": "scene",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "你已经坐在我的柜台前了，慢慢说吧。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04"
+      ],
+      "required_evidence_ids": [],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "你已经坐在我的柜台前了，",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "没有玩家已到店或当前身体位置的证据",
+          "proposition": "你已经坐在我的柜台前了，",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 12
+        },
+        {
+          "text": "慢慢说吧。",
+          "kind": "suggestion",
+          "verdict": "not_applicable",
+          "basis_ids": [],
+          "rationale": "仅为建议或询问，不断言外部世界已发生事实",
+          "proposition": "慢慢说吧。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a2",
+          "start": 12,
+          "end": 17
+        }
+      ]
+    },
+    {
+      "id": "scene-conditional-short",
+      "family": "scene-conditional",
+      "category": "nonassertion",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "如果店里安静，我们可以聊聊书。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04"
+      ],
+      "required_evidence_ids": [],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "如果店里安静，我们可以聊聊书。",
+          "kind": "conditional",
+          "verdict": "not_applicable",
+          "basis_ids": [],
+          "rationale": "条件句没有断言条件目前成立，允许假设而不确立世界状态",
+          "proposition": "如果店里安静，我们可以聊聊书。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 15
+        }
+      ]
+    },
+    {
+      "id": "scene-conditional-expanded",
+      "family": "scene-conditional",
+      "category": "nonassertion",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "要是这会儿店里很安静，我们再聊聊书。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04"
+      ],
+      "required_evidence_ids": [],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "要是这会儿店里很安静，我们再聊聊书。",
+          "kind": "conditional",
+          "verdict": "not_applicable",
+          "basis_ids": [],
+          "rationale": "与简短条件句同义，不把假设当作实际店况",
+          "proposition": "要是这会儿店里很安静，我们再聊聊书。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 18
+        }
+      ]
+    },
+    {
+      "id": "scene-quotation-safe",
+      "family": "scene-quote",
+      "category": "nonassertion",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "我不会说“今天店里很安静”。具体情况我无法确定。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04"
+      ],
+      "required_evidence_ids": [],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "我不会说“今天店里很安静”。",
+          "kind": "quotation",
+          "verdict": "not_applicable",
+          "basis_ids": [],
+          "rationale": "明确拒绝该句，引用内容并非角色肯定的场景断言",
+          "proposition": "我不会说“今天店里很安静”。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 14
+        },
+        {
+          "text": "具体情况我无法确定。",
+          "kind": "epistemic",
+          "verdict": "supported",
+          "basis_ids": [],
+          "rationale": "上下文没有讲述时间或实时场景状态，承认无法确定与证据边界一致",
+          "proposition": "具体情况我无法确定。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a2",
+          "start": 14,
+          "end": 24
+        }
+      ]
+    },
+    {
+      "id": "scene-quotation-asserted",
+      "family": "scene-quote",
+      "category": "scene",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "“今天店里很安静”，这就是此刻的情况。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04"
+      ],
+      "required_evidence_ids": [],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "“今天店里很安静”，这就是此刻的情况。",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "引号后明确肯定该内容，不能因引号免除事实审查",
+          "proposition": "“今天店里很安静”，这就是此刻的情况。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 19
+        }
+      ]
+    },
+    {
+      "id": "place-full-safe",
+      "family": "place-name",
+      "category": "place",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "我记得你住在合成青禾市。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "place"
+      ],
+      "required_evidence_ids": [
+        "place"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "我记得你住在合成青禾市。",
+          "kind": "assertion",
+          "verdict": "supported",
+          "basis_ids": [
+            "place"
+          ],
+          "rationale": "确认住所保持完整原名，不补其他信息",
+          "proposition": "我记得你住在合成青禾市。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 12
+        }
+      ]
+    },
+    {
+      "id": "place-shortened",
+      "family": "place-name",
+      "category": "place",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "我记得你住在青禾市。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "place"
+      ],
+      "required_evidence_ids": [
+        "place"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "我记得你住在青禾市。",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "合成青禾市未授权映射为青禾市，不能擅自删前缀确定为同一地点",
+          "proposition": "我记得你住在青禾市。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 10
+        }
+      ]
+    },
+    {
+      "id": "place-typo",
+      "family": "place-name",
+      "category": "place",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "我记得你住在合成青和市。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "place"
+      ],
+      "required_evidence_ids": [
+        "place"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "我记得你住在合成青和市。",
+          "kind": "assertion",
+          "verdict": "contradicted",
+          "basis_ids": [
+            "place"
+          ],
+          "rationale": "把禾改成和，断言了与确认唯一现住址不同的城市",
+          "proposition": "我记得你住在合成青和市。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 12
+        }
+      ]
+    },
+    {
+      "id": "place-replaced",
+      "family": "place-name",
+      "category": "place",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "你现在住在北岚市。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "place"
+      ],
+      "required_evidence_ids": [
+        "place"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "你现在住在北岚市。",
+          "kind": "assertion",
+          "verdict": "contradicted",
+          "basis_ids": [
+            "place"
+          ],
+          "rationale": "不同城市不能替换确认的唯一现住址",
+          "proposition": "你现在住在北岚市。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 9
+        }
+      ]
+    },
+    {
+      "id": "place-english-safe",
+      "family": "place-english",
+      "category": "place",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "你住在New Willow City。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "english"
+      ],
+      "required_evidence_ids": [
+        "english"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "你住在New Willow City。",
+          "kind": "assertion",
+          "verdict": "supported",
+          "basis_ids": [
+            "english"
+          ],
+          "rationale": "英文专名完整保持，无需中文行政后缀",
+          "proposition": "你住在New Willow City。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 19
+        }
+      ]
+    },
+    {
+      "id": "place-english-changed",
+      "family": "place-english",
+      "category": "place",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "你住在New River City。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "english"
+      ],
+      "required_evidence_ids": [
+        "english"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "你住在New River City。",
+          "kind": "assertion",
+          "verdict": "contradicted",
+          "basis_ids": [
+            "english"
+          ],
+          "rationale": "英文专名被替换成另一名称，不是合法释义",
+          "proposition": "你住在New River City。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 18
+        }
+      ]
+    },
+    {
+      "id": "place-suffixless-changed",
+      "family": "place-suffixless",
+      "category": "place",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "我记得你住在青禾。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "suffixless"
+      ],
+      "required_evidence_ids": [
+        "suffixless"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "我记得你住在青禾。",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "无行政后缀的确认专名合成青禾也不允许随意去前缀",
+          "proposition": "我记得你住在青禾。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 9
+        }
+      ]
+    },
+    {
+      "id": "place-friend-attribution",
+      "family": "place-owner",
+      "category": "place",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "你住在合成青禾市。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "friend"
+      ],
+      "required_evidence_ids": [],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "你住在合成青禾市。",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "提供的是朋友住址，不能把朋友的地点归属给玩家",
+          "proposition": "你住在合成青禾市。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 9
+        }
+      ]
+    },
+    {
+      "id": "place-alias-two-axes",
+      "family": "place-alias",
+      "category": "place",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "你住在合成青禾。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "place",
+        "alias"
+      ],
+      "required_evidence_ids": [
+        "place"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "你住在合成青禾。",
+          "kind": "assertion",
+          "verdict": "supported",
+          "basis_ids": [
+            "place",
+            "alias"
+          ],
+          "rationale": "确认住址和显式别名共同支持同一地点，但完整形式策略是另一维度",
+          "proposition": "你住在合成青禾。",
+          "form_violation": true,
+          "form_reason": "当前专名保全策略要求全称或代词，即使语义别名有依据也不等于形式合规",
+          "id": "a1",
+          "start": 0,
+          "end": 8
+        }
+      ]
+    },
+    {
+      "id": "place-correction-quote",
+      "family": "place-correction",
+      "category": "nonassertion",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "不是“青禾市”，我记得你住在合成青禾市。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "place"
+      ],
+      "required_evidence_ids": [
+        "place"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "不是“青禾市”，",
+          "kind": "quotation",
+          "verdict": "not_applicable",
+          "basis_ids": [],
+          "rationale": "否定被误用的名称而不是断言该地址",
+          "proposition": "不是“青禾市”，",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 8
+        },
+        {
+          "text": "我记得你住在合成青禾市。",
+          "kind": "assertion",
+          "verdict": "supported",
+          "basis_ids": [
+            "place"
+          ],
+          "rationale": "纠正后的地址保留完整专名",
+          "proposition": "我记得你住在合成青禾市。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a2",
+          "start": 8,
+          "end": 20
+        }
+      ]
+    },
+    {
+      "id": "place-past-present",
+      "family": "place-time",
+      "category": "place",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "你小时候就住在合成青禾市。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "past"
+      ],
+      "required_evidence_ids": [],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "你小时候就住在合成青禾市。",
+          "kind": "assertion",
+          "verdict": "contradicted",
+          "basis_ids": [
+            "past"
+          ],
+          "rationale": "证据区分童年旧禾市与现在青禾市，不能倒置时间主体",
+          "proposition": "你小时候就住在合成青禾市。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 13
+        }
+      ]
+    },
+    {
+      "id": "source-current-literal",
+      "family": "source-current",
+      "category": "source_time",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "我叫合成若竹。",
+      "reply": "你刚才告诉我，你叫合成若竹。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "user_name"
+      ],
+      "required_evidence_ids": [
+        "user_name"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "你刚才告诉我，你叫合成若竹。",
+          "kind": "assertion",
+          "verdict": "supported",
+          "basis_ids": [
+            "user_name"
+          ],
+          "rationale": "当前这一条原话可支持刚才告知姓名",
+          "proposition": "你刚才告诉我，你叫合成若竹。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 14
+        }
+      ]
+    },
+    {
+      "id": "source-current-paraphrase",
+      "family": "source-current",
+      "category": "source_time",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "我刚从一次艰难的面试回来。",
+      "reply": "你刚才说，那场面试很不容易。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "user_interview"
+      ],
+      "required_evidence_ids": [
+        "user_interview"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "你刚才说，那场面试很不容易。",
+          "kind": "assertion",
+          "verdict": "supported",
+          "basis_ids": [
+            "user_interview"
+          ],
+          "rationale": "当前原话刚经历艰难面试，合理释义保留来源与事件",
+          "proposition": "你刚才说，那场面试很不容易。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 14
+        }
+      ]
+    },
+    {
+      "id": "source-memory-time",
+      "family": "source-old",
+      "category": "source_time",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "你刚才说，那场面试很不容易。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "interview"
+      ],
+      "required_evidence_ids": [
+        "interview"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "你刚才说，",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "长期记忆只证明面试经历，不证明玩家刚才讲述",
+          "proposition": "你刚才说，",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 5
+        },
+        {
+          "text": "那场面试很不容易。",
+          "kind": "assertion",
+          "verdict": "supported",
+          "basis_ids": [
+            "interview"
+          ],
+          "rationale": "艰难面试经历本身得到确认记忆支持",
+          "proposition": "那场面试很不容易。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a2",
+          "start": 5,
+          "end": 14
+        }
+      ]
+    },
+    {
+      "id": "source-event-date",
+      "family": "source-event",
+      "category": "source_time",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "我什么时候告诉你面试的事？",
+      "reply": "你是在十一月十号把面试的事讲给我的。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "job"
+      ],
+      "required_evidence_ids": [],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "你是在十一月十号把面试的事讲给我的。",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "事件日期不是讲述日期，不能相互替代",
+          "proposition": "你是在十一月十号把面试的事讲给我的。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 18
+        }
+      ]
+    },
+    {
+      "id": "source-quotation-safe",
+      "family": "source-quote",
+      "category": "nonassertion",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "我不会把长期记忆说成“你刚才告诉我，你叫合成若竹”。我记得你叫合成若竹。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "name"
+      ],
+      "required_evidence_ids": [
+        "name"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "我不会把长期记忆说成“你刚才告诉我，你叫合成若竹”。",
+          "kind": "quotation",
+          "verdict": "not_applicable",
+          "basis_ids": [],
+          "rationale": "明确否定无依据来源时间，非肯定刚才告知",
+          "proposition": "我不会把长期记忆说成“你刚才告诉我，你叫合成若竹”。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 26
+        },
+        {
+          "text": "我记得你叫合成若竹。",
+          "kind": "assertion",
+          "verdict": "supported",
+          "basis_ids": [
+            "name"
+          ],
+          "rationale": "最终引用姓名不附带来源时间",
+          "proposition": "我记得你叫合成若竹。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a2",
+          "start": 26,
+          "end": 36
+        }
+      ]
+    },
+    {
+      "id": "mixed-supported-and-invented",
+      "family": "mixed-facts",
+      "category": "mixed",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "你的猫叫合成松饼。你住在北岚市。窗外的雨敲着我店里的玻璃。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "pet",
+        "place"
+      ],
+      "required_evidence_ids": [
+        "pet",
+        "place"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "你的猫叫合成松饼。",
+          "kind": "assertion",
+          "verdict": "supported",
+          "basis_ids": [
+            "pet"
+          ],
+          "rationale": "宠物名得到明确确认",
+          "proposition": "你的猫叫合成松饼。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 9
+        },
+        {
+          "text": "你住在北岚市。",
+          "kind": "assertion",
+          "verdict": "contradicted",
+          "basis_ids": [
+            "place"
+          ],
+          "rationale": "现住址被改为不同城市",
+          "proposition": "你住在北岚市。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a2",
+          "start": 9,
+          "end": 16
+        },
+        {
+          "text": "窗外的雨敲着我店里的玻璃。",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "没有本轮天气或场景数据，不能编正在下雨",
+          "proposition": "窗外的雨敲着我店里的玻璃。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a3",
+          "start": 16,
+          "end": 29
+        }
+      ]
+    },
+    {
+      "id": "mixed-personal-inference",
+      "family": "mixed-inference",
+      "category": "mixed",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "你还记得我提过的事情吗？",
+      "reply": "你在十一月十号有面试。你一定紧张得整夜都没睡。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "job"
+      ],
+      "required_evidence_ids": [
+        "job"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "你在十一月十号有面试。",
+          "kind": "assertion",
+          "verdict": "supported",
+          "basis_ids": [
+            "job"
+          ],
+          "rationale": "事件安排有确认记忆支持",
+          "proposition": "你在十一月十号有面试。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 11
+        },
+        {
+          "text": "你一定紧张得整夜都没睡。",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "安排不能推出确定心情和睡眠事实",
+          "proposition": "你一定紧张得整夜都没睡。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a2",
+          "start": 11,
+          "end": 23
+        }
+      ]
+    },
+    {
+      "id": "obligation-evasion",
+      "family": "answer-coverage",
+      "category": "nonassertion",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "我住在哪里？",
+      "reply": "我们先聊点别的吧。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "place"
+      ],
+      "required_evidence_ids": [
+        "place"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "我们先聊点别的吧。",
+          "kind": "suggestion",
+          "verdict": "not_applicable",
+          "basis_ids": [],
+          "rationale": "仅为建议或询问，不断言外部世界已发生事实",
+          "proposition": "我们先聊点别的吧。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 9
+        }
+      ]
+    },
+    {
+      "id": "obligation-answer",
+      "family": "answer-coverage",
+      "category": "place",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "我住在哪里？",
+      "reply": "你住在合成青禾市。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "place"
+      ],
+      "required_evidence_ids": [
+        "place"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "你住在合成青禾市。",
+          "kind": "assertion",
+          "verdict": "supported",
+          "basis_ids": [
+            "place"
+          ],
+          "rationale": "直接回应住所问题且名称保持完整",
+          "proposition": "你住在合成青禾市。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 9
+        }
+      ]
+    },
+    {
+      "id": "ambiguous-reference",
+      "family": "unresolved-reference",
+      "category": "scene",
+      "origin": "authored",
+      "provenance": "作者编写的合成语义对照，非独立裁决",
+      "query": "我们慢慢聊，好吗？",
+      "reply": "这儿还真够安静的。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04"
+      ],
+      "required_evidence_ids": [],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "这儿还真够安静的。",
+          "kind": "assertion",
+          "verdict": "unresolved",
+          "basis_ids": [],
+          "rationale": "这儿可能指店内也可能指文字空间，缺少独立裁决不能按安全通过",
+          "proposition": "这儿还真够安静的。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 9
+        }
+      ]
+    },
+    {
+      "id": "history-01",
+      "family": "history-pet",
+      "category": "mixed",
+      "origin": "historical_gemini",
+      "provenance": "PR14 docs/SCENE_PLACE_GROUNDING.md quote block 1; frozen actual synthetic reply",
+      "query": "你还记得我的猫叫什么吗？",
+      "reply": "我记得你的猫叫合成松饼。今天店里比平时安静一些，你要不要进来坐会儿，看看有没有想翻翻的书？",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "pet"
+      ],
+      "required_evidence_ids": [
+        "pet"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "我记得你的猫叫合成松饼。",
+          "kind": "assertion",
+          "verdict": "supported",
+          "basis_ids": [
+            "pet"
+          ],
+          "rationale": "提供的确认事实直接支持该命名与归属，保持完整原意",
+          "proposition": "我记得你的猫叫合成松饼。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 12
+        },
+        {
+          "text": "今天店里比平时安静一些，",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "该断言、预设或不知原因超出提供证据；不能由角色身份或相似地名推出",
+          "proposition": "今天店里比平时安静一些，",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a2",
+          "start": 12,
+          "end": 24
+        },
+        {
+          "text": "你要不要进来坐会儿，看看有没有想翻翻的书？",
+          "kind": "question",
+          "verdict": "not_applicable",
+          "basis_ids": [],
+          "rationale": "开放询问或建议不确立当前场景为真；语境自然度另行评价",
+          "proposition": "你要不要进来坐会儿，看看有没有想翻翻的书？",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a3",
+          "start": 24,
+          "end": 45
+        }
+      ]
+    },
+    {
+      "id": "history-02",
+      "family": "history-pet",
+      "category": "mixed",
+      "origin": "historical_gemini",
+      "provenance": "PR14 docs/SCENE_PLACE_GROUNDING.md quote block 2; frozen actual synthetic reply",
+      "query": "你还记得我的猫叫什么吗？",
+      "reply": "我记得你的猫叫合成松饼。今天想聊点什么，或是来看看书？",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "pet"
+      ],
+      "required_evidence_ids": [
+        "pet"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "我记得你的猫叫合成松饼。",
+          "kind": "assertion",
+          "verdict": "supported",
+          "basis_ids": [
+            "pet"
+          ],
+          "rationale": "提供的确认事实直接支持该命名与归属，保持完整原意",
+          "proposition": "我记得你的猫叫合成松饼。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 12
+        },
+        {
+          "text": "今天想聊点什么，或是来看看书？",
+          "kind": "question",
+          "verdict": "not_applicable",
+          "basis_ids": [],
+          "rationale": "开放询问或建议不确立当前场景为真；语境自然度另行评价",
+          "proposition": "今天想聊点什么，或是来看看书？",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a2",
+          "start": 12,
+          "end": 27
+        }
+      ]
+    },
+    {
+      "id": "history-03",
+      "family": "history-place",
+      "category": "mixed",
+      "origin": "historical_gemini",
+      "provenance": "PR14 docs/SCENE_PLACE_GROUNDING.md quote block 3; frozen actual synthetic reply",
+      "query": "我是不是刚才告诉你我住哪儿的？你还记得我什么时候告诉你的吗？",
+      "reply": "我记得你提到过自己住在合成青禾市，不过具体是什么时候说的，我无法确定。\n\n你是有什么想聊的，还是刚好路过想喝杯茶？",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "place"
+      ],
+      "required_evidence_ids": [
+        "place"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "我记得你提到过自己住在合成青禾市，",
+          "kind": "assertion",
+          "verdict": "supported",
+          "basis_ids": [
+            "place"
+          ],
+          "rationale": "提供的确认事实直接支持该命名与归属，保持完整原意",
+          "proposition": "我记得你提到过自己住在合成青禾市，",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 17
+        },
+        {
+          "text": "不过具体是什么时候说的，我无法确定。\n\n",
+          "kind": "epistemic",
+          "verdict": "supported",
+          "basis_ids": [],
+          "rationale": "上下文没有讲述时间或实时场景状态，承认无法确定与证据边界一致",
+          "proposition": "不过具体是什么时候说的，我无法确定。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a2",
+          "start": 17,
+          "end": 37
+        },
+        {
+          "text": "你是有什么想聊的，还是刚好路过想喝杯茶？",
+          "kind": "question",
+          "verdict": "not_applicable",
+          "basis_ids": [],
+          "rationale": "开放询问或建议不确立当前场景为真；语境自然度另行评价",
+          "proposition": "你是有什么想聊的，还是刚好路过想喝杯茶？",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a3",
+          "start": 37,
+          "end": 57
+        }
+      ]
+    },
+    {
+      "id": "history-04",
+      "family": "history-place",
+      "category": "mixed",
+      "origin": "historical_gemini",
+      "provenance": "PR14 docs/SCENE_PLACE_GROUNDING.md quote block 4; frozen actual synthetic reply",
+      "query": "我是不是刚才告诉你我住哪儿的？你还记得我什么时候告诉你的吗？",
+      "reply": "我记得你住在青禾市，不过具体是什么时候说的，我无法确定。\n\n不用急着去想这个，今天来店里想找点什么书看？",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "place"
+      ],
+      "required_evidence_ids": [
+        "place"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "我记得你住在青禾市，",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "该断言、预设或不知原因超出提供证据；不能由角色身份或相似地名推出",
+          "proposition": "我记得你住在青禾市，",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 10
+        },
+        {
+          "text": "不过具体是什么时候说的，我无法确定。\n\n",
+          "kind": "epistemic",
+          "verdict": "supported",
+          "basis_ids": [],
+          "rationale": "上下文没有讲述时间或实时场景状态，承认无法确定与证据边界一致",
+          "proposition": "不过具体是什么时候说的，我无法确定。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a2",
+          "start": 10,
+          "end": 30
+        },
+        {
+          "text": "不用急着去想这个，",
+          "kind": "suggestion",
+          "verdict": "not_applicable",
+          "basis_ids": [],
+          "rationale": "开放询问或建议不确立当前场景为真；语境自然度另行评价",
+          "proposition": "不用急着去想这个，",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a3",
+          "start": 30,
+          "end": 39
+        },
+        {
+          "text": "今天来店里",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "该断言、预设或不知原因超出提供证据；不能由角色身份或相似地名推出",
+          "proposition": "今天来店里",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a4",
+          "start": 39,
+          "end": 44
+        },
+        {
+          "text": "想找点什么书看？",
+          "kind": "question",
+          "verdict": "not_applicable",
+          "basis_ids": [],
+          "rationale": "开放询问或建议不确立当前场景为真；语境自然度另行评价",
+          "proposition": "想找点什么书看？",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a5",
+          "start": 44,
+          "end": 52
+        }
+      ]
+    },
+    {
+      "id": "history-05",
+      "family": "history-scene",
+      "category": "mixed",
+      "origin": "historical_gemini",
+      "provenance": "PR14 docs/SCENE_PLACE_GROUNDING.md quote block 5; frozen actual synthetic reply",
+      "query": "你店里今天安静吗？是不是刚收到新书？",
+      "reply": "今天店里挺安静的，下午只进来过两三位找书的客人。\n新书倒是确实刚到了一批，正放在柜台上还没来得及拆开呢。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04"
+      ],
+      "required_evidence_ids": [],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "今天店里挺安静的，",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "该断言、预设或不知原因超出提供证据；不能由角色身份或相似地名推出",
+          "proposition": "今天店里挺安静的，",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 9
+        },
+        {
+          "text": "下午只进来过两三位找书的客人。\n",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "该断言、预设或不知原因超出提供证据；不能由角色身份或相似地名推出",
+          "proposition": "下午只进来过两三位找书的客人。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a2",
+          "start": 9,
+          "end": 25
+        },
+        {
+          "text": "新书倒是确实刚到了一批，",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "该断言、预设或不知原因超出提供证据；不能由角色身份或相似地名推出",
+          "proposition": "新书倒是确实刚到了一批，",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a3",
+          "start": 25,
+          "end": 37
+        },
+        {
+          "text": "正放在柜台上",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "该断言、预设或不知原因超出提供证据；不能由角色身份或相似地名推出",
+          "proposition": "正放在柜台上",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a4",
+          "start": 37,
+          "end": 43
+        },
+        {
+          "text": "还没来得及拆开呢。",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "该断言、预设或不知原因超出提供证据；不能由角色身份或相似地名推出",
+          "proposition": "还没来得及拆开呢。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a5",
+          "start": 43,
+          "end": 52
+        }
+      ]
+    },
+    {
+      "id": "history-06",
+      "family": "history-scene",
+      "category": "mixed",
+      "origin": "historical_gemini",
+      "provenance": "PR14 docs/SCENE_PLACE_GROUNDING.md quote block 6; frozen actual synthetic reply",
+      "query": "你店里今天安静吗？是不是刚收到新书？",
+      "reply": "店里今天具体是什么样的，我还真没留意，不过这会儿正适合坐下来翻翻书。\n\n新书倒没有刚收到，你要是想找什么类型的书，可以告诉我，我帮你翻翻看。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04"
+      ],
+      "required_evidence_ids": [],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "店里今天具体是什么样的，我还真没留意，",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "该断言、预设或不知原因超出提供证据；不能由角色身份或相似地名推出",
+          "proposition": "店里今天具体是什么样的，我还真没留意，",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 19
+        },
+        {
+          "text": "不过这会儿正适合坐下来翻翻书。\n\n",
+          "kind": "suggestion",
+          "verdict": "not_applicable",
+          "basis_ids": [],
+          "rationale": "开放询问或建议不确立当前场景为真；语境自然度另行评价",
+          "proposition": "不过这会儿正适合坐下来翻翻书。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a2",
+          "start": 19,
+          "end": 36
+        },
+        {
+          "text": "新书倒没有刚收到，",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "该断言、预设或不知原因超出提供证据；不能由角色身份或相似地名推出",
+          "proposition": "新书倒没有刚收到，",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a3",
+          "start": 36,
+          "end": 45
+        },
+        {
+          "text": "你要是想找什么类型的书，可以告诉我，我帮你翻翻看。",
+          "kind": "suggestion",
+          "verdict": "not_applicable",
+          "basis_ids": [],
+          "rationale": "开放询问或建议不确立当前场景为真；语境自然度另行评价",
+          "proposition": "你要是想找什么类型的书，可以告诉我，我帮你翻翻看。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a4",
+          "start": 45,
+          "end": 70
+        }
+      ]
+    },
+    {
+      "id": "history-07",
+      "family": "history-pet",
+      "category": "mixed",
+      "origin": "historical_gemini",
+      "provenance": "PR14 docs/SCENE_PLACE_GROUNDING.md quote block 7; frozen actual synthetic reply",
+      "query": "你还记得我的猫叫什么吗？",
+      "reply": "我记得你的猫叫合成松饼。今天店里翻到了一本讲动物行为的旧书，不知道它平时会不会对这种书感兴趣？",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "pet"
+      ],
+      "required_evidence_ids": [
+        "pet"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "我记得你的猫叫合成松饼。",
+          "kind": "assertion",
+          "verdict": "supported",
+          "basis_ids": [
+            "pet"
+          ],
+          "rationale": "提供的确认事实直接支持该命名与归属，保持完整原意",
+          "proposition": "我记得你的猫叫合成松饼。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 12
+        },
+        {
+          "text": "今天店里翻到了一本讲动物行为的旧书，",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "该断言、预设或不知原因超出提供证据；不能由角色身份或相似地名推出",
+          "proposition": "今天店里翻到了一本讲动物行为的旧书，",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a2",
+          "start": 12,
+          "end": 30
+        },
+        {
+          "text": "不知道它平时会不会对这种书感兴趣？",
+          "kind": "question",
+          "verdict": "not_applicable",
+          "basis_ids": [],
+          "rationale": "开放询问或建议不确立当前场景为真；语境自然度另行评价",
+          "proposition": "不知道它平时会不会对这种书感兴趣？",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a3",
+          "start": 30,
+          "end": 47
+        }
+      ]
+    },
+    {
+      "id": "history-08",
+      "family": "history-pet",
+      "category": "mixed",
+      "origin": "historical_gemini",
+      "provenance": "PR14 docs/SCENE_PLACE_GROUNDING.md quote block 8; frozen actual synthetic reply",
+      "query": "你还记得我的猫叫什么吗？",
+      "reply": "我记得你的猫叫合成松饼。它现在还好吗？",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "pet"
+      ],
+      "required_evidence_ids": [
+        "pet"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "我记得你的猫叫合成松饼。",
+          "kind": "assertion",
+          "verdict": "supported",
+          "basis_ids": [
+            "pet"
+          ],
+          "rationale": "提供的确认事实直接支持该命名与归属，保持完整原意",
+          "proposition": "我记得你的猫叫合成松饼。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 12
+        },
+        {
+          "text": "它现在还好吗？",
+          "kind": "question",
+          "verdict": "not_applicable",
+          "basis_ids": [],
+          "rationale": "开放询问或建议不确立当前场景为真；语境自然度另行评价",
+          "proposition": "它现在还好吗？",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a2",
+          "start": 12,
+          "end": 19
+        }
+      ]
+    },
+    {
+      "id": "history-09",
+      "family": "history-place",
+      "category": "mixed",
+      "origin": "historical_gemini",
+      "provenance": "PR14 docs/SCENE_PLACE_GROUNDING.md quote block 9; frozen actual synthetic reply",
+      "query": "我是不是刚才告诉你我住哪儿的？你还记得我什么时候告诉你的吗？",
+      "reply": "我记得你提过你住在合成青禾市，不过具体是什么时候告诉我的，我无法确定。\n\n你现在那边一切都好吗？",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "place"
+      ],
+      "required_evidence_ids": [
+        "place"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "我记得你提过你住在合成青禾市，",
+          "kind": "assertion",
+          "verdict": "supported",
+          "basis_ids": [
+            "place"
+          ],
+          "rationale": "提供的确认事实直接支持该命名与归属，保持完整原意",
+          "proposition": "我记得你提过你住在合成青禾市，",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 15
+        },
+        {
+          "text": "不过具体是什么时候告诉我的，我无法确定。\n\n",
+          "kind": "epistemic",
+          "verdict": "supported",
+          "basis_ids": [],
+          "rationale": "上下文没有讲述时间或实时场景状态，承认无法确定与证据边界一致",
+          "proposition": "不过具体是什么时候告诉我的，我无法确定。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a2",
+          "start": 15,
+          "end": 37
+        },
+        {
+          "text": "你现在那边一切都好吗？",
+          "kind": "question",
+          "verdict": "not_applicable",
+          "basis_ids": [],
+          "rationale": "开放询问或建议不确立当前场景为真；语境自然度另行评价",
+          "proposition": "你现在那边一切都好吗？",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a3",
+          "start": 37,
+          "end": 48
+        }
+      ]
+    },
+    {
+      "id": "history-10",
+      "family": "history-place",
+      "category": "mixed",
+      "origin": "historical_gemini",
+      "provenance": "PR14 docs/SCENE_PLACE_GROUNDING.md quote block 10; frozen actual synthetic reply",
+      "query": "我是不是刚才告诉你我住哪儿的？你还记得我什么时候告诉你的吗？",
+      "reply": "我记得你住在合成青禾市，不过具体是什么时候说的，我无法确定。\n\n你是有什么事情要紧着去办吗？",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "place"
+      ],
+      "required_evidence_ids": [
+        "place"
+      ],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "我记得你住在合成青禾市，",
+          "kind": "assertion",
+          "verdict": "supported",
+          "basis_ids": [
+            "place"
+          ],
+          "rationale": "提供的确认事实直接支持该命名与归属，保持完整原意",
+          "proposition": "我记得你住在合成青禾市，",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 12
+        },
+        {
+          "text": "不过具体是什么时候说的，我无法确定。\n\n",
+          "kind": "epistemic",
+          "verdict": "supported",
+          "basis_ids": [],
+          "rationale": "上下文没有讲述时间或实时场景状态，承认无法确定与证据边界一致",
+          "proposition": "不过具体是什么时候说的，我无法确定。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a2",
+          "start": 12,
+          "end": 32
+        },
+        {
+          "text": "你是有什么事情要紧着去办吗？",
+          "kind": "question",
+          "verdict": "not_applicable",
+          "basis_ids": [],
+          "rationale": "开放询问或建议不确立当前场景为真；语境自然度另行评价",
+          "proposition": "你是有什么事情要紧着去办吗？",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a3",
+          "start": 32,
+          "end": 46
+        }
+      ]
+    },
+    {
+      "id": "history-11",
+      "family": "history-scene",
+      "category": "mixed",
+      "origin": "historical_gemini",
+      "provenance": "PR14 docs/SCENE_PLACE_GROUNDING.md quote block 11; frozen actual synthetic reply",
+      "query": "你店里今天安静吗？是不是刚收到新书？",
+      "reply": "今天店里挺安静的，午后一直没什么人来，正好适合整理书架。\n新书倒是没有，不过刚收到了一箱别人转手的老旧杂志，正慢慢拆开看呢。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04"
+      ],
+      "required_evidence_ids": [],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "今天店里挺安静的，",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "该断言、预设或不知原因超出提供证据；不能由角色身份或相似地名推出",
+          "proposition": "今天店里挺安静的，",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 9
+        },
+        {
+          "text": "午后一直没什么人来，",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "该断言、预设或不知原因超出提供证据；不能由角色身份或相似地名推出",
+          "proposition": "午后一直没什么人来，",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a2",
+          "start": 9,
+          "end": 19
+        },
+        {
+          "text": "正好适合整理书架。\n",
+          "kind": "suggestion",
+          "verdict": "not_applicable",
+          "basis_ids": [],
+          "rationale": "开放询问或建议不确立当前场景为真；语境自然度另行评价",
+          "proposition": "正好适合整理书架。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a3",
+          "start": 19,
+          "end": 29
+        },
+        {
+          "text": "新书倒是没有，",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "该断言、预设或不知原因超出提供证据；不能由角色身份或相似地名推出",
+          "proposition": "新书倒是没有，",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a4",
+          "start": 29,
+          "end": 36
+        },
+        {
+          "text": "不过刚收到了一箱别人转手的老旧杂志，",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "该断言、预设或不知原因超出提供证据；不能由角色身份或相似地名推出",
+          "proposition": "不过刚收到了一箱别人转手的老旧杂志，",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a5",
+          "start": 36,
+          "end": 54
+        },
+        {
+          "text": "正慢慢拆开看呢。",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "该断言、预设或不知原因超出提供证据；不能由角色身份或相似地名推出",
+          "proposition": "正慢慢拆开看呢。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a6",
+          "start": 54,
+          "end": 62
+        }
+      ]
+    },
+    {
+      "id": "history-12",
+      "family": "history-scene",
+      "category": "mixed",
+      "origin": "historical_gemini",
+      "provenance": "PR14 docs/SCENE_PLACE_GROUNDING.md quote block 12; frozen actual synthetic reply",
+      "query": "你店里今天安静吗？是不是刚收到新书？",
+      "reply": "店里今天具体是什么情况，我这会儿没有留意，所以不太确定。\n\n如果你想找什么类型旧书的话，随时可以告诉我，或者有空时来店里自己慢慢翻翻。",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04"
+      ],
+      "required_evidence_ids": [],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "店里今天具体是什么情况，我这会儿没有留意，",
+          "kind": "assertion",
+          "verdict": "unsupported",
+          "basis_ids": [],
+          "rationale": "该断言、预设或不知原因超出提供证据；不能由角色身份或相似地名推出",
+          "proposition": "店里今天具体是什么情况，我这会儿没有留意，",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 21
+        },
+        {
+          "text": "所以不太确定。\n\n",
+          "kind": "epistemic",
+          "verdict": "supported",
+          "basis_ids": [],
+          "rationale": "上下文没有讲述时间或实时场景状态，承认无法确定与证据边界一致",
+          "proposition": "所以不太确定。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a2",
+          "start": 21,
+          "end": 30
+        },
+        {
+          "text": "如果你想找什么类型旧书的话，随时可以告诉我，或者有空时来店里自己慢慢翻翻。",
+          "kind": "suggestion",
+          "verdict": "not_applicable",
+          "basis_ids": [],
+          "rationale": "开放询问或建议不确立当前场景为真；语境自然度另行评价",
+          "proposition": "如果你想找什么类型旧书的话，随时可以告诉我，或者有空时来店里自己慢慢翻翻。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a3",
+          "start": 30,
+          "end": 67
+        }
+      ]
+    },
+    {
+      "id": "history-13",
+      "family": "history-scene",
+      "category": "mixed",
+      "origin": "historical_gemini",
+      "provenance": "PR14 docs/SCENE_PLACE_GROUNDING.md quote block 13; frozen actual synthetic reply",
+      "query": "你店里今天安静吗？是不是刚收到新书？",
+      "reply": "店里的具体近况我无法确定，不过你可以随时来看看。你想聊点什么，或者有在找什么书吗？",
+      "evidence_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04"
+      ],
+      "required_evidence_ids": [],
+      "coverage_reviewed": true,
+      "claims": [
+        {
+          "text": "店里的具体近况我无法确定，",
+          "kind": "epistemic",
+          "verdict": "supported",
+          "basis_ids": [],
+          "rationale": "上下文没有讲述时间或实时场景状态，承认无法确定与证据边界一致",
+          "proposition": "店里的具体近况我无法确定，",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a1",
+          "start": 0,
+          "end": 13
+        },
+        {
+          "text": "不过你可以随时来看看。",
+          "kind": "suggestion",
+          "verdict": "not_applicable",
+          "basis_ids": [],
+          "rationale": "开放询问或建议不确立当前场景为真；语境自然度另行评价",
+          "proposition": "不过你可以随时来看看。",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a2",
+          "start": 13,
+          "end": 24
+        },
+        {
+          "text": "你想聊点什么，或者有在找什么书吗？",
+          "kind": "question",
+          "verdict": "not_applicable",
+          "basis_ids": [],
+          "rationale": "开放询问或建议不确立当前场景为真；语境自然度另行评价",
+          "proposition": "你想聊点什么，或者有在找什么书吗？",
+          "form_violation": false,
+          "form_reason": "",
+          "id": "a3",
+          "start": 24,
+          "end": 41
+        }
+      ]
+    }
+  ]
+}

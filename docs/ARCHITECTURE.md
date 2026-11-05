@@ -227,3 +227,8 @@ memory_query以有限规则识别主体/字段/时间与正文锚点，rank_memo
 ## M5场景与地名完整性（2026-11-04）
 
 生产聊天在原角色/天气/情绪/来源时间提示后追加grounding_prompt(evidence, query)，即使无记忆也约束场景。protected_places只消费已授权检索到的事实和本条明确住所陈述，不扫描其他记忆；JSON数据不是指令。grounding_conflicts复用既有一次重写及FALLBACK，不增加重试预算或持久化字段。没有可信动态场景工具时，不确认/反向否认店况；未来添加场景工具需同步扩展可信证据校验。 具体Prompt、验证与局限见 [场景与地名记录](SCENE_PLACE_GROUNDING.md)。
+
+
+## M5完整事实支持审计（2026-11-04）
+
+新增独立离线fact_support_evaluation入口，只读版本化合成证据和整段回复参考标注，不加载Settings/.env，不初始化app.main、数据库或API。Pydantic强制连续跨度覆盖、证据作用域与正史/当前用户一致；guard_predictions仅接收文本和证据，不接收标签。使用生产同一检查OR，分别统计语义/形式混淆、参考事实支持组成与应答义务。它不对未标注新回复自动做语义判断，不改变在线聊天。 完整协议、参考例子和发现见 [事实支持评测](FACT_SUPPORT_EVALUATION.md)。
