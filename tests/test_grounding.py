@@ -122,7 +122,7 @@ def test_live_fake_provider_is_bounded_and_reports_redacted_failure(monkeypatch)
 def test_disposable_pipeline_uses_existing_guard_and_at_most_two_calls(monkeypatch):
     from scripts import evaluate_grounding as evaluation
     provider=SimpleNamespace(generate=AsyncMock(return_value='店里今天具体是什么情况，我没有留意。'))
-    monkeypatch.setattr(evaluation,'Settings',lambda:Settings(_env_file=None,chat_provider='gemini',gemini_api_key='test-placeholder'))
+    monkeypatch.setattr(evaluation,'Settings',lambda:Settings(_env_file=None,chat_provider='gemini',gemini_api_key='test-placeholder',semantic_review_enabled=False))
     monkeypatch.setattr(evaluation,'build_provider',lambda settings:provider)
     report=evaluation.run_pipeline()
     assert report['status_code']==200 and report['guarded']

@@ -277,7 +277,7 @@ def test_confirmed_personal_context_is_passed_alongside_weather(tmp_path):
     item=c.post('/v1/memories',headers=h,json={'fact':'我明天有设计师面试'}).json()['item']
     c.patch('/v1/memories/'+item['id'],headers=h,json={'version':item['version'],'confirm':True})
     c.patch('/v1/weather/settings',headers=h,json={'enabled':True,'city_id':1})
-    data=send(c,h,'明天面试，天气怎么样？')
+    data=send(c,h,'结合我之前的面试安排，明天天气怎么样？')
     assert item['id'] in data['retrieved_memory_ids']
     prompt=model.generate.call_args.args[1]
     assert '我明天有设计师面试' in prompt and '本轮天气工具数据' in prompt

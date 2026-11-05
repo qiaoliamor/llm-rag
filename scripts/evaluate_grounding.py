@@ -106,7 +106,9 @@ def run_pipeline():
                     return {'version':'scene-place-v1.1-pipeline','model':settings.selected_model,
                             'case':CASES[-1],'status_code':response.status_code,'reply':data.get('reply'),
                             'guarded':data.get('guarded'),'code':data.get('code'),
-                            'api_calls':len(requests),'requests':requests}
+                            'api_calls':len(requests)+data.get('semantic_review',{}).get('calls',0),
+                            'generation_calls':len(requests),'semantic_review':data.get('semantic_review'),
+                            'memory_route':data.get('memory_route'),'requests':requests}
             finally:
                 app.state.memory_store.engine.dispose()
                 if str(bootstrap_app.state.memory_store.engine.url)==url:
