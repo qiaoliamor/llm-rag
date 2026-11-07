@@ -82,7 +82,7 @@ def test_prompt_source_covers_negative_claims_and_presuppositions():
     assert CONVERSATION_FACT_RULES in instructions('canon')
     assert CONVERSATION_FACT_RULES in instructions('rag')
     assert CONVERSATION_FACT_RULES in instructions('direct')
-    for phrase in ('角色边界中的“未知”','接收记录为空','今天已到店','明天打算来','先审前提'):
+    for phrase in ('角色边界的未知','接收记录为空','今天已到店','明天打算来','先审前提'):
         assert phrase in INDEXED_PROMPT
 
 

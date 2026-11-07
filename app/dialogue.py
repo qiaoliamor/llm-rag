@@ -3,13 +3,15 @@ import re
 from .config import ROOT
 
 CHARACTER = json.loads((ROOT / 'characters/shen_yan.json').read_text())
+SCENE_PROFILE = json.loads((ROOT / 'characters/shen_yan_scene.json').read_text())
 FALLBACK = '这件事我还不能确定，不想随口编一个答案。我们可以先聊聊你想知道的部分。'
 
 CONVERSATION_FACT_RULES = '''
 【消息状态与到店前提】
-只根据本轮可见证据表达事实；“没有证据证明收到”不等于“没有收到”。没有可信的消息记录时，不说“我没收到消息/通知”“没人联系我”，也不编没留意或未同步等原因。需要时只说“具体近况我还不能确定”，随后自然回应玩家，不必反复解释能力或数据来源。
+你身处并熟悉自己的书店，使用下方虚构场景设定自然回应。玩家问店里是否安静，可以说说店内/窗外的安静、书页声或手边的书，再轻声接住话题；不要回答“具体近况我还不能确定”“我查不到店况”，不要把自己说成不知道自家环境的系统，也不用向玩家解释叙事许可。
+虚构氛围可适度即兴，消息记录和具体收货等事件不在这项许可内。“没有证据证明收到”不等于“没有收到”；不要用“我没收到消息/通知”“没人联系我”填补未知事件，也不编没留意或未同步等原因。自然转向书或玩家的话题即可，不机械播报能力边界。
 网页聊天不代表玩家在书店，也不代表今天会来。没有玩家本轮明确到店原话，不说“你今天过来”“你这次来”“既然你到了”，也不问“今天过来是找书还是坐坐”来暗含到店事实。可以问“你今天想聊点什么？”或说“以后有空可以来坐坐”，保持沈砚温和自然的语气，不加“假设你已到店”之类生硬说明。
-玩家明确说已到店时可顺着该自述回应；“打算/以后/上次来过”不证明现在已到店，助手自己以前说过也不算证据。收尾前核对每个分句与问句的隐含前提；不知道就省去该前提，用中性关怀承接，不用一句谦逊的“不清楚”掩盖后半句的无据事实。
+玩家明确说已到店时可顺着该自述回应；“打算/以后/上次来过”不证明现在已到店，助手自己以前说过也不算证据。收尾前区分可即兴的虚构氛围与需证据的事件/玩家事实，省去无据的后者，用自然关怀承接。
 '''
 
 
@@ -30,6 +32,7 @@ def instructions(mode='canon', query=''):
 '''
     card = {k: v for k, v in CHARACTER.items() if k != 'canon'}
     prompt = base + CONVERSATION_FACT_RULES + '\n角色卡：' + json.dumps(card, ensure_ascii=False)
+    prompt += '\n虚构书店场景与叙事许可：' + json.dumps(SCENE_PROFILE,ensure_ascii=False)
     if mode == 'canon':
         prompt += '\n正史证据：' + json.dumps(CHARACTER['canon'], ensure_ascii=False)
     elif mode == 'rag':

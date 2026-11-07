@@ -17,7 +17,7 @@ from app.grounding import (GROUNDING_RULES,grounding_prompt,grounding_conflicts,
     '新书倒没有刚收到。','店里今天具体是什么样的，我还真没留意。',
     '今天店里翻到了一本讲动物行为的旧书。','刚收到了一箱别人转手的老旧杂志。',
 ])
-def test_unsupported_dynamic_scene(reply):
+def test_legacy_scene_signal_remains_available_for_semantic_override(reply):
     assert scene_conflicts(reply)
 
 
@@ -56,10 +56,12 @@ def test_multiple_places_current_assertion_and_no_question_evidence():
     assert protected_places([{'fact':'我的猫叫松饼'}])==[]
 
 
-def test_prompt_without_memory_still_prohibits_scene_fabrication():
+def test_prompt_separates_licensed_atmosphere_from_event_fabrication():
     assert GROUNDING_RULES in grounding_prompt([])
     assert '合成青禾市' in grounding_prompt([{'fact':'我住在合成青禾市'}])
     assert grounding_conflicts('今天店里很安静。',[])
+    assert '低风险氛围可以自然即兴' in GROUNDING_RULES
+    assert '具体收货' in GROUNDING_RULES
 
 
 @pytest.mark.parametrize('reply',['今天店里很安静。','我记得你住在青禾市。',

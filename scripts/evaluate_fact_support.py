@@ -11,7 +11,7 @@ from app.fact_support_evaluation import evaluate
 def markdown(report):
     s=report['summary'];p=s['policy_confusion'];m=s['semantic_confusion']
     lines=['# 完整事实支持开发集审计','',
-           '这是固定合成参考标注与现有规则的对比；不是自动语义裁判、独立盲评或模型生成质量评分。','',
+           '这是旧严格场景策略的固定合成标注与词面规则对比；不含新虚构氛围许可，不是当前角色扮演评分，也不是自动语义裁判或独立盲评。','',
            f"数据版本：{report['dataset_version']}；SHA256：`{report['dataset_sha256']}`。",'',
            '| 项目 | 计数 |','| --- | --- |',
            f"| 回复 / 事实断言 | {s['responses']} / {s['factual_claims']} |",

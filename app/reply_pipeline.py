@@ -7,7 +7,7 @@ from .weather import weather_reply_conflicts,weather_fallback
 from .emotion import emotion_reply_conflicts,emotion_fallback
 from .semantic_review import needs_review,evidence_bundle,review_reply,rewrite_feedback
 
-REWRITE='''\n上次输出违反证据或表达边界。重新回答：删除没有证据的店内动态近况，地点名称照证据完整写出或用代词承接，不缩写地名。长期记忆不证明刚才/今天告诉我，改用不带来源时间的“我记得”，不要编造讲述时间。只用已知事实，以沈砚的自然语气关心，不播报来源/日期，不用您；当前天气只作估计。情绪只是可纠正参考，不诊断、不报分数，尊重自述和倾听偏好。'''
+REWRITE='''\n上次输出违反证据或表达边界。重新回答：保留场景设定授权的温暖氛围，删除无据的具体事件或玩家经历；不要再用不知道自家店况的口吻，像熟悉店内环境的沈砚自然接话。地点名称照证据完整写出或用代词承接，不缩写地名。长期记忆不证明刚才/今天告诉我，改用不带来源时间的“我记得”，不要编造讲述时间。以沈砚的自然语气关心，不播报来源/日期，不用您；当前现实天气只作估计。情绪只是可纠正参考，不诊断、不报分数，尊重自述和倾听偏好。'''
 
 
 async def generate_checked(provider,history,prompt,query,memories,weather,mood,mood_settings,
@@ -40,10 +40,11 @@ async def generate_checked(provider,history,prompt,query,memories,weather,mood,m
                     return FALLBACK,True,{'status':decision,'calls':review_calls,'failure':outcome.failure}
                 # A validated high-confidence accept may correct lexical false
                 # positives, but cannot override hard role/tool constraints.
-                # No trusted dynamic scene provider exists yet: role identity
-                # cannot prove an asserted current shop state. Nonfactual
-                # conditions/quotes remain eligible for lexical correction.
-                factual_scene=bool(review and any(s.kind in ('assertion','epistemic') and scene_conflicts(s.text) for s in review.segments))
+                # Role identity alone cannot prove events. A supported segment
+                # citing the explicit fiction license may override legacy scene
+                # patterns; semantic scope still depends on the judge.
+                factual_scene=bool(review and any(s.kind in ('assertion','epistemic') and scene_conflicts(s.text)
+                    and not (s.verdict=='supported' and 'scene_profile' in s.evidence_ids) for s in review.segments))
                 flagged=hard or factual_scene or decision=='revise'
                 status='revised' if attempt else 'accepted'
                 guarded=guarded or decision=='revise'
