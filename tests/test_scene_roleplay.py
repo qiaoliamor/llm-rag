@@ -110,7 +110,7 @@ def test_sdk_sends_bounded_assistant_context_as_non_player_evidence():
         assert len(data['fictional_dialogue_context'])==4
         assert all(set(m)=={'role','content'} for m in data['fictional_dialogue_context'])
         assert not any(e.get('text','').startswith('虚构玩家姓名') for e in data['evidence'])
-        output={'confidence':.95,'units':[{'id':'u0','kind':'assertion','verdict':'supported','evidence_ids':['scene_profile']}]}
+        output={'confidence':.95,'role_issues':[],'units':[{'id':'u0','kind':'assertion','verdict':'supported','evidence_ids':['scene_profile']}]}
         return httpx2.Response(200,json={'id':'test','object':'chat.completion','created':0,'model':'test',
             'choices':[{'index':0,'finish_reason':'stop','message':{'role':'assistant','content':json.dumps(output)}}]})
     async def check():

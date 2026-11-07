@@ -27,7 +27,7 @@ def test_units_cover_exact_original_without_model_copy(text):
 @pytest.mark.parametrize('ids',[[],['u0'],['u0','u0'],['u1','u0'],['u0','u2'],['u0','u1','u2']])
 def test_missing_duplicate_reordered_and_extra_units_fail_closed(ids):
     provider=ModelAnalysisProvider(Settings(_env_file=None,chat_provider='mock'))
-    provider.parse=AsyncMock(return_value=IndexedReview(confidence=.95,units=[
+    provider.parse=AsyncMock(return_value=IndexedReview(confidence=.95,role_issues=[],units=[
         {'id':id,'kind':'nonfactual','verdict':'not_applicable','evidence_ids':[]} for id in ids]))
     outcome=asyncio.run(review_reply(provider,'你好。你想聊什么？',[],[]))
     assert outcome.status=='unavailable' and outcome.failure=='invalid_output'
@@ -46,7 +46,7 @@ def test_local_limits_do_not_call_model(text):
 def test_mixed_unit_keeps_all_text_and_unsupported_clause():
     provider=ModelAnalysisProvider(Settings(_env_file=None,chat_provider='mock'))
     text='你住在合成青禾市，走十分钟就能到书店。'
-    provider.parse=AsyncMock(return_value=IndexedReview(confidence=.95,units=[{
+    provider.parse=AsyncMock(return_value=IndexedReview(confidence=.95,role_issues=[],units=[{
         'id':'u0','kind':'assertion','verdict':'unsupported','evidence_ids':[]}]))
     result=asyncio.run(provider.review(text,[],[]))
     assert result.decision=='revise' and result.segments[0].text==text
@@ -60,7 +60,7 @@ def test_real_sdk_failure_codes_and_zero_retries(provider_name,mode):
     calls=[]
     def handler(request):
         calls.append(json.loads(request.content))
-        output={'confidence':.2 if mode=='low_confidence' else .95,'units':[
+        output={'confidence':.2 if mode=='low_confidence' else .95,'role_issues':[],'units':[
             {'id':'u0','kind':'assertion','verdict':'supported','evidence_ids':['missing' if mode=='unknown_id' else 'C01']}]}
         message={'role':'assistant','content':json.dumps(output)}
         if mode=='malformed':message['content']='{"confidence":'
@@ -116,7 +116,7 @@ def test_indexed_sdk_rewrite_rechecks_final_and_never_saves_draft(tmp_path):
     def handler(request):
         payload=json.loads(request.content);requests.append(payload)
         units=json.loads(payload['messages'][1]['content'])['units']
-        content={'confidence':.95,'units':[{'id':u['id'],'kind':'assertion' if len(requests)==1 else 'nonfactual',
+        content={'confidence':.95,'role_issues':[],'units':[{'id':u['id'],'kind':'assertion' if len(requests)==1 else 'nonfactual',
                  'verdict':'unsupported' if len(requests)==1 else 'not_applicable','evidence_ids':[]} for u in units]}
         return httpx2.Response(200,json={'id':'test','object':'chat.completion','created':0,'model':'test',
             'choices':[{'index':0,'finish_reason':'stop','message':{'role':'assistant','content':json.dumps(content)}}]})

@@ -198,7 +198,7 @@ def test_real_sdk_structured_protocol_with_memory_transport(provider_name):
         p=json.loads(request.content);seen.append(p)
         schema=p['response_format']['json_schema']['name']
         content=({'need_memory':True,'query':'我的经历','reason':'personal_history_needed','confidence':.9}
-                 if schema=='RouteDecision' else {'confidence':.95,'units':[{'id':'u0','kind':'assertion','verdict':'supported','evidence_ids':['C01']}]} )
+                 if schema=='RouteDecision' else {'confidence':.95,'role_issues':[],'units':[{'id':'u0','kind':'assertion','verdict':'supported','evidence_ids':['C01']}]} )
         return httpx2.Response(200,json={'id':'test','object':'chat.completion','created':0,'model':'test',
             'choices':[{'index':0,'finish_reason':'stop','message':{'role':'assistant','content':json.dumps(content)}}]})
     # A fresh transport client is used for each call (SDK closes it).
@@ -249,9 +249,9 @@ def test_lightweight_wire_cannot_bypass_domain_validation():
     from app.semantic_review import IndexedReview
     settings=Settings(_env_file=None,chat_provider='mock')
     for invalid in [
-        {'confidence':.95,'units':[]},
-        {'confidence':.95,'units':[{'id':'u0','kind':'assertion','verdict':'supported','evidence_ids':[]}]},
-        {'confidence':.95,'units':[{'id':'u0','kind':'nonfactual','verdict':'supported','evidence_ids':['C01']}]},
+        {'confidence':.95,'role_issues':[],'units':[]},
+        {'confidence':.95,'role_issues':[],'units':[{'id':'u0','kind':'assertion','verdict':'supported','evidence_ids':[]}]},
+        {'confidence':.95,'role_issues':[],'units':[{'id':'u0','kind':'nonfactual','verdict':'supported','evidence_ids':['C01']}]},
     ]:
         provider=ModelAnalysisProvider(settings)
         provider.parse=AsyncMock(return_value=IndexedReview.model_validate(invalid))
@@ -290,7 +290,7 @@ def test_only_insignificant_sentence_whitespace_is_normalized():
 @pytest.mark.parametrize('verdict,kind,expected',[('unsupported','assertion','revise'),('not_applicable','nonfactual','accept')])
 def test_provider_decision_and_reason_are_derived_from_validated_labels(verdict,kind,expected):
     from app.semantic_review import IndexedReview
-    wire=IndexedReview(confidence=.95,units=[{'id':'u0','kind':kind,'verdict':verdict,'evidence_ids':[]}])
+    wire=IndexedReview(confidence=.95,role_issues=[],units=[{'id':'u0','kind':kind,'verdict':verdict,'evidence_ids':[]}])
     provider=ModelAnalysisProvider(Settings(_env_file=None,chat_provider='mock'))
     provider.parse=AsyncMock(return_value=wire)
     result=run(provider.review('合成内容',history('你好'),[]))
@@ -301,8 +301,8 @@ def test_provider_decision_and_reason_are_derived_from_validated_labels(verdict,
 def test_transport_rejects_unknown_labels_or_model_supplied_decisions():
     from app.semantic_review import IndexedReview
     for data in [
-        {'confidence':.9,'units':[{'id':'u0','kind':'invented','verdict':'supported','evidence_ids':['C01']}]},
-        {'decision':'accept','confidence':.9,'units':[]},
+        {'confidence':.9,'role_issues':[],'units':[{'id':'u0','kind':'invented','verdict':'supported','evidence_ids':['C01']}]},
+        {'decision':'accept','confidence':.9,'role_issues':[],'units':[]},
     ]:
         with pytest.raises(ValidationError):IndexedReview.model_validate(data)
 

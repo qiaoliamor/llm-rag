@@ -40,7 +40,7 @@ def test_sdk_carries_scope_rules_and_maps_fixture_verdicts(text,query,verdict,id
         data=json.loads(payload['messages'][1]['content'])
         assert data['evidence'][-1]['text']==query
         kind='nonfactual' if verdict=='not_applicable' else 'epistemic' if not ids and verdict=='supported' else 'assertion'
-        output={'confidence':.95,'units':[{'id':u['id'],'kind':kind,'verdict':verdict,'evidence_ids':ids} for u in data['units']]}
+        output={'confidence':.95,'role_issues':[],'units':[{'id':u['id'],'kind':kind,'verdict':verdict,'evidence_ids':ids} for u in data['units']]}
         return httpx2.Response(200,json={'id':'test','object':'chat.completion','created':0,'model':'test',
             'choices':[{'index':0,'finish_reason':'stop','message':{'role':'assistant','content':json.dumps(output)}}]})
     async def check():
