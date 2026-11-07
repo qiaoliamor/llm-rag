@@ -1,0 +1,707 @@
+{
+  "version": "narrative-reference-audit-v1",
+  "reviewer": "implementer_second_pass_not_independent",
+  "target_sha256": "11d2be9f0361821380c19d6112e6c6611d0f45d79a231345546b87e8691ebbfe",
+  "sources": [
+    {
+      "path": "app/dialogue.py",
+      "sha256": "092491f4834edefcc858d1cf27485bea310cb99415a98e9e5cde5932436d220a"
+    },
+    {
+      "path": "app/grounding.py",
+      "sha256": "3400a681a35599bf2b01cb1d315442738cc1e807dbd86cedae92eaa4d4b4a90e"
+    },
+    {
+      "path": "app/memory_source.py",
+      "sha256": "405781002ad85e9db0410334e628bc6a2dd7e9d41278103322bc8076a5b7ce66"
+    },
+    {
+      "path": "app/semantic_review.py",
+      "sha256": "57e47acd4b414317c86753737cfbafe69d2735d824b05c814c57b0717b2e18c3"
+    },
+    {
+      "path": "characters/shen_yan.json",
+      "sha256": "0a5dd6d417ad2702b451e171d86eabade52ba21bbae9c44749d5d9538d561d5d"
+    },
+    {
+      "path": "characters/shen_yan_scene.json",
+      "sha256": "d7ebcd2f227d459a81ebf3fd6d9ea83d5a1edadfdebdb2b7891f52b64dfda403"
+    },
+    {
+      "path": "evaluations/fact_support_dev.json",
+      "sha256": "f3a2f1d8c4a7559598464479147e007df02031d23074bb952a6bb8134bf4ad19"
+    },
+    {
+      "path": "evaluations/m5_scenarios.json",
+      "sha256": "fa1a51b318e14ffccd9d04289bf076e5b066a3c3318f8e4f369ba328899a7d6a"
+    },
+    {
+      "path": "evaluations/narrative_calibration_dev.json",
+      "sha256": "f4391fc9b27e170c5ceea37c1d289ce78ec102ddc452f0faae6cbbaff61d5f5b"
+    },
+    {
+      "path": "evaluations/retrieval_dev.json",
+      "sha256": "8b6d863b63986b2733ca4b9dfd100be4c8c5dc6b14a941f3806cddb17aa228df"
+    },
+    {
+      "path": "evaluations/retrieval_guard_regressions.json",
+      "sha256": "df44afc4043c7c6d51bd35fdc41edd17afdab2e66e70953acf8fdd4a9573a491"
+    },
+    {
+      "path": "prompts/DESIGN.md",
+      "sha256": "6a626c8b898b256e08c3caeb3bb455c7142ffbdc49c91b714ccafba03fd954c7"
+    },
+    {
+      "path": "tests/scenarios.json",
+      "sha256": "dd67d6012782ab519871fd4a67285a5c1a52b48e57d9e1fc59df2bea743dc982"
+    },
+    {
+      "path": "tests/test_app.py",
+      "sha256": "f2e46cec3bf77debed1b64f80702c8abb645b250e7c577722cc6f85c9a749a39"
+    },
+    {
+      "path": "tests/test_conversation_fact_prompts.py",
+      "sha256": "7b2061a05620a92e91f5e4fe8a8c0852e3fbd4c224edbc72a6b5ad523415eb45"
+    },
+    {
+      "path": "tests/test_emotion.py",
+      "sha256": "c5b694689551e80ea1787ed91e94bb82caf463804f8af8667f486e625f0f1e55"
+    },
+    {
+      "path": "tests/test_evaluation.py",
+      "sha256": "b4a39cce6c29184a07b96620779ca9b832418fab00cf5182f65505064bd37b99"
+    },
+    {
+      "path": "tests/test_fact_support_evaluation.py",
+      "sha256": "898b42bd546ef6dd443a110c3d336f05c55fa5d7d9ee8446b75e2b1c0ee07fc2"
+    },
+    {
+      "path": "tests/test_frontend.py",
+      "sha256": "776381e2b1334e395b9b4426ba21b7f6de515aa340d75bb9293a5c6ca786cff0"
+    },
+    {
+      "path": "tests/test_gemini.py",
+      "sha256": "8c986820094b3dc6301891b6cdb884aeb72933bfcce2659bf3b24288c68cec4a"
+    },
+    {
+      "path": "tests/test_grounding.py",
+      "sha256": "e6227e0e2e9d9824cb9cd5337f1c36a57f1611d2f93ca8f6c573e9eba3139b0f"
+    },
+    {
+      "path": "tests/test_memory.py",
+      "sha256": "ed99f72391fefa5d36498f520348f6327407631446c9ae9850e930d03c3c6429"
+    },
+    {
+      "path": "tests/test_memory_query.py",
+      "sha256": "1847c625b3dc8ba134b05fd9da97052878308d2ab4705ff69402e9f1c5edd473"
+    },
+    {
+      "path": "tests/test_memory_source.py",
+      "sha256": "6c804dcb7dbd71118f5899672229b257b1f01347a271286fb2a61629e25829f0"
+    },
+    {
+      "path": "tests/test_narrative_boundary.py",
+      "sha256": "bb692ec80dde7c2bba46a3308a27c78fed90204b35ba88ec04598929a87e7687"
+    },
+    {
+      "path": "tests/test_narrative_calibration.py",
+      "sha256": "eddeee7ddab52b0e57d84646f0b98853f965b9d2ec96de7fc3fb0ca7297e25be"
+    },
+    {
+      "path": "tests/test_online_semantics.py",
+      "sha256": "cbc5ac3fed6dd80601cd6d398eeb50046c6078306654aa37907fed3de2f996b9"
+    },
+    {
+      "path": "tests/test_retrieval_evaluation.py",
+      "sha256": "2a93995a5e1c7fd1a26c84e6d86b863026ef38d94c2c226617234455f0dd5e7d"
+    },
+    {
+      "path": "tests/test_scene_roleplay.py",
+      "sha256": "ba94f28aa74665eb6aa01471fa602aa065024a9d8dbabd6eca0203ac47b4b16d"
+    },
+    {
+      "path": "tests/test_semantic_stability.py",
+      "sha256": "e7bdb1ffa6245a28cd69394de8837f8933220fa7f23113266e319bc06b4da808"
+    },
+    {
+      "path": "tests/test_shop_voice_review.py",
+      "sha256": "eec54d80f9121a312ce88ee3a17e575785182278b5a4a95537f60326e5e842ff"
+    },
+    {
+      "path": "tests/test_weather.py",
+      "sha256": "0788fcd6d71b8021a1f246b7f9fac5381ff44655178e08efd783e7c8780dac59"
+    }
+  ],
+  "reviews": [
+    {
+      "case_id": "scene-stock-completed",
+      "family": "completed-event",
+      "fact_issue": true,
+      "role_issue": false,
+      "conclusion": "retain",
+      "note": "复核：具体收货无直接证据。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "evaluations/fact_support_dev.json",
+          "anchor": "scene-stock-completed",
+          "relation": "exact_reply"
+        }
+      ]
+    },
+    {
+      "case_id": "place-correction-quote",
+      "family": "quotation-scope",
+      "fact_issue": false,
+      "role_issue": false,
+      "conclusion": "retain",
+      "note": "复核：否定错误简称并引用完整住址，不是肯定错误地名。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "evaluations/fact_support_dev.json",
+          "anchor": "place-correction-quote",
+          "relation": "exact_reply"
+        }
+      ]
+    },
+    {
+      "case_id": "approved-atmosphere",
+      "family": "licensed-atmosphere",
+      "fact_issue": false,
+      "role_issue": false,
+      "conclusion": "retain",
+      "note": "复核：许可的声音、光线和意向问句，不预设到店。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "characters/shen_yan_scene.json",
+          "anchor": "style_example",
+          "relation": "exact_reply"
+        }
+      ]
+    },
+    {
+      "case_id": "ordinary-action",
+      "family": "licensed-atmosphere",
+      "fact_issue": false,
+      "role_issue": false,
+      "conclusion": "retain",
+      "note": "复核：普通日常动作属于虚构场景许可。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "characters/shen_yan_scene.json",
+          "anchor": "放下手里的书",
+          "relation": "same_mechanism"
+        }
+      ]
+    },
+    {
+      "case_id": "background-reader",
+      "family": "licensed-atmosphere",
+      "fact_issue": false,
+      "role_issue": false,
+      "conclusion": "retain",
+      "note": "复核：无需证明背景读者身份。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "characters/shen_yan_scene.json",
+          "anchor": "未具名的背景读者",
+          "relation": "same_mechanism"
+        }
+      ]
+    },
+    {
+      "case_id": "owner-remote-paraphrase",
+      "family": "owner-voice",
+      "fact_issue": false,
+      "role_issue": true,
+      "conclusion": "retain",
+      "note": "复核：店主回避自家环境，口吻问题与事实轴分开。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。 旧审计对环境未知的安全标签不适用当前店主口吻；旧标签原样保留。",
+      "references": [
+        {
+          "path": "evaluations/fact_support_dev.json",
+          "anchor": "scene-unknown-safe",
+          "relation": "policy_changed"
+        }
+      ]
+    },
+    {
+      "case_id": "voice-and-atmosphere",
+      "family": "owner-voice",
+      "fact_issue": false,
+      "role_issue": true,
+      "conclusion": "retain",
+      "note": "复核：后半句许可不能抵消前半句的系统口吻。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "app/semantic_review.py",
+          "anchor": "具体近况我还不能确定，不过窗外这会儿倒是挺安静的。",
+          "relation": "exact_reply"
+        }
+      ]
+    },
+    {
+      "case_id": "external-delivery-unknown",
+      "family": "unknown-external-event",
+      "fact_issue": false,
+      "role_issue": false,
+      "conclusion": "retain",
+      "note": "复核：外部具体事件未知，不是不知道自家环境。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "app/semantic_review.py",
+          "anchor": "不知道出版社何时送货",
+          "relation": "same_mechanism"
+        }
+      ]
+    },
+    {
+      "case_id": "quoted-voice",
+      "family": "quotation-scope",
+      "fact_issue": false,
+      "role_issue": false,
+      "conclusion": "retain",
+      "note": "复核：批评引语，不是店主承认不知道环境。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "app/semantic_review.py",
+          "anchor": "明确在引用/批评一句不合角色的话",
+          "relation": "same_mechanism"
+        }
+      ]
+    },
+    {
+      "case_id": "mixed-transaction",
+      "family": "completed-event",
+      "fact_issue": true,
+      "role_issue": false,
+      "conclusion": "retain",
+      "note": "复核：许可氛围不支持玩家寄书及收货事件。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "app/semantic_review.py",
+          "anchor": "店里安静，刚收到十箱你寄来的书",
+          "relation": "same_mechanism"
+        }
+      ]
+    },
+    {
+      "case_id": "arrival-presupposition",
+      "family": "arrival-evidence",
+      "fact_issue": true,
+      "role_issue": false,
+      "conclusion": "retain",
+      "note": "复核：线上问候不支持玩家到店。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "app/semantic_review.py",
+          "anchor": "你今天过来，是想找本什么书，还是随便转转？",
+          "relation": "exact_reply"
+        }
+      ]
+    },
+    {
+      "case_id": "future-invitation",
+      "family": "arrival-evidence",
+      "fact_issue": false,
+      "role_issue": false,
+      "conclusion": "retain",
+      "note": "复核：未来邀请不陈述已到店。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "evaluations/fact_support_dev.json",
+          "anchor": "scene-invitation-safe",
+          "relation": "same_mechanism"
+        }
+      ]
+    },
+    {
+      "case_id": "arrival-question",
+      "family": "arrival-evidence",
+      "fact_issue": false,
+      "role_issue": false,
+      "conclusion": "retain",
+      "note": "复核：询问前提本身，不默认到店。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "app/semantic_review.py",
+          "anchor": "你现在到店里了吗？",
+          "relation": "exact_reply"
+        }
+      ]
+    },
+    {
+      "case_id": "invented-shared-past",
+      "family": "player-shared-past",
+      "fact_issue": true,
+      "role_issue": false,
+      "conclusion": "retain",
+      "note": "复核：虚构共同过去和玩家动作。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "characters/shen_yan_scene.json",
+          "anchor": "玩家经历/已到店、共同过去",
+          "relation": "same_mechanism"
+        }
+      ]
+    },
+    {
+      "case_id": "biography-conflict",
+      "family": "canon-biography",
+      "fact_issue": true,
+      "role_issue": false,
+      "conclusion": "retain",
+      "note": "复核：与C03正史矛盾。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "characters/shen_yan.json",
+          "anchor": "旧书店是沈砚三年前自己开设的，并非从亲人那里继承。",
+          "relation": "counterexample"
+        }
+      ]
+    },
+    {
+      "case_id": "biography-unknown",
+      "family": "canon-biography",
+      "fact_issue": true,
+      "role_issue": false,
+      "conclusion": "retain",
+      "note": "复核：氛围许可不支持童年亲属经历。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "tests/scenarios.json",
+          "anchor": "你小时候和父母住在哪里？",
+          "relation": "same_mechanism"
+        }
+      ]
+    },
+    {
+      "case_id": "real-weather-inference",
+      "family": "real-weather-boundary",
+      "fact_issue": true,
+      "role_issue": false,
+      "conclusion": "retain",
+      "note": "复核：没有天气工具，不可编造玩家当地温度降雨。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "tests/test_narrative_boundary.py",
+          "anchor": "窗外的斜阳说明你所在的北京现在25度。",
+          "relation": "same_mechanism"
+        }
+      ]
+    },
+    {
+      "case_id": "fictional-light",
+      "family": "licensed-atmosphere",
+      "fact_issue": false,
+      "role_issue": false,
+      "conclusion": "retain",
+      "note": "复核：虚构场景光线，不是玩家所在地天气。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "characters/shen_yan_scene.json",
+          "anchor": "暖灯亮起、放下手里的书",
+          "relation": "same_mechanism"
+        }
+      ]
+    },
+    {
+      "case_id": "negative-message-record",
+      "family": "negative-event",
+      "fact_issue": true,
+      "role_issue": false,
+      "conclusion": "retain",
+      "note": "复核：否定的接收记录也需要依据。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "app/semantic_review.py",
+          "anchor": "也没收到什么新的消息",
+          "relation": "same_mechanism"
+        }
+      ]
+    },
+    {
+      "case_id": "role-and-fact",
+      "family": "owner-voice",
+      "fact_issue": true,
+      "role_issue": true,
+      "conclusion": "retain",
+      "note": "复核：系统口吻与无据到店同时存在。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "app/semantic_review.py",
+          "anchor": "氛围与日常动作不能给这些命题作证",
+          "relation": "same_mechanism"
+        }
+      ]
+    },
+    {
+      "case_id": "memory-source-invented",
+      "family": "source-time",
+      "fact_issue": true,
+      "role_issue": false,
+      "conclusion": "retain",
+      "note": "复核：旧记忆不证明刚才讲述。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "evaluations/fact_support_dev.json",
+          "anchor": "source-memory-time",
+          "relation": "same_mechanism"
+        }
+      ]
+    },
+    {
+      "case_id": "memory-content-only",
+      "family": "source-time",
+      "fact_issue": false,
+      "role_issue": false,
+      "conclusion": "retain",
+      "note": "复核：仅复述已确认记忆，不虚构讲述时间。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "evaluations/fact_support_dev.json",
+          "anchor": "source-quotation-safe",
+          "relation": "counterexample"
+        }
+      ]
+    },
+    {
+      "case_id": "explicit-arrival",
+      "family": "arrival-evidence",
+      "fact_issue": false,
+      "role_issue": false,
+      "conclusion": "retain",
+      "note": "复核：当前用户明确表达到店，可据此回应。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "app/semantic_review.py",
+          "anchor": "我已经在你店里了",
+          "relation": "same_mechanism"
+        }
+      ]
+    },
+    {
+      "case_id": "arrival-retracted",
+      "family": "arrival-evidence",
+      "fact_issue": true,
+      "role_issue": false,
+      "conclusion": "new",
+      "note": "复核：最新用户已离开，早先到店不能支持当前仍在店。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "app/semantic_review.py",
+          "anchor": "且无后续离开/否认时",
+          "relation": "counterexample"
+        }
+      ]
+    },
+    {
+      "case_id": "arrival-latest-supported",
+      "family": "arrival-evidence",
+      "fact_issue": false,
+      "role_issue": false,
+      "conclusion": "new",
+      "note": "复核：最新本人明确到店优先于旧计划。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "app/semantic_review.py",
+          "anchor": "我已经在你店里了",
+          "relation": "same_mechanism"
+        }
+      ]
+    },
+    {
+      "case_id": "assistant-self-proof",
+      "family": "assistant-not-evidence",
+      "fact_issue": true,
+      "role_issue": false,
+      "conclusion": "new",
+      "note": "复核：助手先前编造的位置不能给自身后续玩家位置作证。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "app/semantic_review.py",
+          "anchor": "错误的助手台词不能自我作证",
+          "relation": "same_mechanism"
+        }
+      ]
+    },
+    {
+      "case_id": "scene-continuity",
+      "family": "licensed-atmosphere",
+      "fact_issue": false,
+      "role_issue": false,
+      "conclusion": "new",
+      "note": "复核：近期助手氛围可延续，但不扩张为玩家现实事实。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "characters/shen_yan_scene.json",
+          "anchor": "沿用近期对话已建立的氛围",
+          "relation": "same_mechanism"
+        }
+      ]
+    },
+    {
+      "case_id": "fiction-not-player-memory",
+      "family": "assistant-not-evidence",
+      "fact_issue": true,
+      "role_issue": false,
+      "conclusion": "new",
+      "note": "复核：用户明确区分假设与现实，不能将虚构扮演写成现实位置。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "app/semantic_review.py",
+          "anchor": "假设、要求你扮演已到店",
+          "relation": "same_mechanism"
+        }
+      ]
+    },
+    {
+      "case_id": "message-retraction-scope",
+      "family": "negative-event",
+      "fact_issue": false,
+      "role_issue": false,
+      "conclusion": "new",
+      "note": "复核：明确撤回未收消息断言，只表达外部具体记录未知。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "app/semantic_review.py",
+          "anchor": "不是说没收到，而是目前无法确定",
+          "relation": "same_mechanism"
+        }
+      ]
+    },
+    {
+      "case_id": "quotation-not-assertion",
+      "family": "quotation-scope",
+      "fact_issue": false,
+      "role_issue": false,
+      "conclusion": "new",
+      "note": "复核：批评引语的口吻，不是当下承认无法知道自家环境。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "app/semantic_review.py",
+          "anchor": "明确在引用/批评一句不合角色的话",
+          "relation": "same_mechanism"
+        }
+      ]
+    },
+    {
+      "case_id": "disguised-owner-unknown",
+      "family": "owner-voice",
+      "fact_issue": false,
+      "role_issue": true,
+      "conclusion": "new",
+      "note": "复核：改成服务接入仍是远程系统式回避自家环境，不依赖固定关键词。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。 旧审计对环境未知的安全标签不适用当前店主口吻；旧标签原样保留。",
+      "references": [
+        {
+          "path": "evaluations/fact_support_dev.json",
+          "anchor": "scene-unknown-safe",
+          "relation": "policy_changed"
+        }
+      ]
+    },
+    {
+      "case_id": "ambient-conditional-event",
+      "family": "player-shared-past",
+      "fact_issue": true,
+      "role_issue": false,
+      "conclusion": "new",
+      "note": "复核：条件外壳不支持玩家昨晚来店的推论，不能由感受推出过去事实。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "evaluations/fact_support_dev.json",
+          "anchor": "paraphrase-place-inference",
+          "relation": "same_mechanism"
+        }
+      ]
+    },
+    {
+      "case_id": "ambient-biography-cause",
+      "family": "canon-biography",
+      "fact_issue": true,
+      "role_issue": false,
+      "conclusion": "new",
+      "note": "复核：获许可的灯光不授权新增亲属去世或遗物来源。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "tests/test_narrative_boundary.py",
+          "anchor": "窗外安静，我小时候是母亲教我开书店的。",
+          "relation": "same_mechanism"
+        }
+      ]
+    },
+    {
+      "case_id": "ambient-relationship",
+      "family": "canon-biography",
+      "fact_issue": true,
+      "role_issue": false,
+      "conclusion": "new",
+      "note": "复核：自然背景声音不支持亲密关系与共同关键经历。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "tests/test_narrative_boundary.py",
+          "anchor": "书页沙沙响，我们已经恋爱三年了。",
+          "relation": "same_mechanism"
+        }
+      ]
+    },
+    {
+      "case_id": "ambient-external-action",
+      "family": "completed-event",
+      "fact_issue": true,
+      "role_issue": false,
+      "conclusion": "new",
+      "note": "复核：普通动作不支持替玩家完成现实行动或得知其面试安排。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "characters/shen_yan_scene.json",
+          "anchor": "替玩家完成现实行动",
+          "relation": "same_mechanism"
+        }
+      ]
+    },
+    {
+      "case_id": "ambient-weather-cause",
+      "family": "real-weather-boundary",
+      "fact_issue": true,
+      "role_issue": false,
+      "conclusion": "new",
+      "note": "复核：角色虚构光线不能证明玩家城市真实降雨。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "tests/test_narrative_boundary.py",
+          "anchor": "窗外的斜阳说明你所在的北京现在25度。",
+          "relation": "same_mechanism"
+        }
+      ]
+    },
+    {
+      "case_id": "multi-source-correction",
+      "family": "user-correction",
+      "fact_issue": false,
+      "role_issue": false,
+      "conclusion": "new",
+      "note": "复核：最新自述纠正主体，当前转述有直接依据。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "tests/test_memory.py",
+          "anchor": "朋友明天面试",
+          "relation": "same_mechanism"
+        }
+      ]
+    },
+    {
+      "case_id": "place-english-changed",
+      "family": "entity-integrity",
+      "fact_issue": true,
+      "role_issue": false,
+      "conclusion": "new",
+      "note": "复核：New Willow City不能被改写为New River City；最后indexed实验HTTP503，尚未成功复测。 同族表示检查同一证据机制，不表示文本或标签等价；保留开发用途，不计独立样本。",
+      "references": [
+        {
+          "path": "evaluations/fact_support_dev.json",
+          "anchor": "place-english-changed",
+          "relation": "exact_reply"
+        }
+      ]
+    }
+  ]
+}

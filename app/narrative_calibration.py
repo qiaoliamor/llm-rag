@@ -81,9 +81,9 @@ class Dataset(Record):
         return self
 
 
-def load_dataset(path=DATASET):
+def load_dataset(path=DATASET, *, model=Dataset):
     raw = Path(path).read_bytes()
-    data = Dataset.model_validate_json(raw)
+    data = model.model_validate_json(raw)
     for name, digest in [('shen_yan_scene.json', data.scene_sha256), ('shen_yan.json', data.character_sha256)]:
         if hashlib.sha256((ROOT / 'characters' / name).read_bytes()).hexdigest() != digest:
             raise ValueError('policy drift: review labels before reuse')

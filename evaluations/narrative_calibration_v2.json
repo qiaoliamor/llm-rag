@@ -1,0 +1,689 @@
+{
+  "version": "narrative-calibration-dev-v2",
+  "source": "synthetic",
+  "annotation_method": "author_reference_not_independent",
+  "scene_sha256": "d7ebcd2f227d459a81ebf3fd6d9ea83d5a1edadfdebdb2b7891f52b64dfda403",
+  "character_sha256": "0a5dd6d417ad2702b451e171d86eabade52ba21bbae9c44749d5d9538d561d5d",
+  "cases": [
+    {
+      "id": "scene-stock-completed",
+      "category": "event",
+      "history": [
+        {
+          "role": "user",
+          "content": "最近收到书了吗？"
+        }
+      ],
+      "reply": "柜台旁多了三箱刚卸下的诗集。",
+      "memories": [],
+      "fact_issue": true,
+      "role_issue": false,
+      "rationale": "具体收货无直接证据。",
+      "prior_failure": "docs/SEMANTIC_REVIEW_STABILITY.md: 示例版 indexed HTTP503；后续未成功复测"
+    },
+    {
+      "id": "place-correction-quote",
+      "category": "quotation",
+      "history": [
+        {
+          "role": "user",
+          "content": "你还记得我提过的事情吗？"
+        }
+      ],
+      "reply": "不是“青禾市”，我记得你住在合成青禾市。",
+      "memories": [
+        {
+          "id": "place",
+          "fact": "我住在合成青禾市",
+          "event_date": "2026-10-20"
+        }
+      ],
+      "fact_issue": false,
+      "role_issue": false,
+      "rationale": "否定错误简称并引用完整住址，不是肯定错误地名。",
+      "prior_failure": "docs/SEMANTIC_REVIEW_STABILITY.md: 示例版 indexed HTTP503；后续未成功复测"
+    },
+    {
+      "id": "approved-atmosphere",
+      "category": "atmosphere",
+      "history": [
+        {
+          "role": "user",
+          "content": "今天店里怎么样？"
+        }
+      ],
+      "reply": "这会儿店里挺安静的，只能听到偶尔翻动书页的沙沙声。窗外斜阳正好，桌上的暖灯也刚亮起。你今天想聊点什么，还是打算随便坐坐？",
+      "memories": [],
+      "fact_issue": false,
+      "role_issue": false,
+      "rationale": "许可的声音、光线和意向问句，不预设到店。",
+      "prior_failure": null
+    },
+    {
+      "id": "ordinary-action",
+      "category": "atmosphere",
+      "history": [
+        {
+          "role": "user",
+          "content": "你在做什么？"
+        }
+      ],
+      "reply": "我把手里的书放下，给自己倒了杯茶。",
+      "memories": [],
+      "fact_issue": false,
+      "role_issue": false,
+      "rationale": "普通日常动作属于虚构场景许可。",
+      "prior_failure": null
+    },
+    {
+      "id": "background-reader",
+      "category": "atmosphere",
+      "history": [
+        {
+          "role": "user",
+          "content": "聊聊吧。"
+        }
+      ],
+      "reply": "书架旁传来轻轻的翻页声，暖灯落在桌角。",
+      "memories": [],
+      "fact_issue": false,
+      "role_issue": false,
+      "rationale": "无需证明背景读者身份。",
+      "prior_failure": null
+    },
+    {
+      "id": "owner-remote-paraphrase",
+      "category": "voice",
+      "history": [
+        {
+          "role": "user",
+          "content": "店里这会儿吵吗？"
+        }
+      ],
+      "reply": "我无法获取本店当前环境的状态，所以不能判断吵不吵。",
+      "memories": [],
+      "fact_issue": false,
+      "role_issue": true,
+      "rationale": "店主回避自家环境，口吻问题与事实轴分开。",
+      "prior_failure": null
+    },
+    {
+      "id": "voice-and-atmosphere",
+      "category": "voice",
+      "history": [
+        {
+          "role": "user",
+          "content": "店里安静吗？"
+        }
+      ],
+      "reply": "具体近况我还不能确定，不过窗外这会儿倒是挺安静的。",
+      "memories": [],
+      "fact_issue": false,
+      "role_issue": true,
+      "rationale": "后半句许可不能抵消前半句的系统口吻。",
+      "prior_failure": null
+    },
+    {
+      "id": "external-delivery-unknown",
+      "category": "voice",
+      "history": [
+        {
+          "role": "user",
+          "content": "出版社几点送货？"
+        }
+      ],
+      "reply": "出版社几点送到，我还不确定。",
+      "memories": [],
+      "fact_issue": false,
+      "role_issue": false,
+      "rationale": "外部具体事件未知，不是不知道自家环境。",
+      "prior_failure": null
+    },
+    {
+      "id": "quoted-voice",
+      "category": "quotation",
+      "history": [
+        {
+          "role": "user",
+          "content": "那句话怪吗？"
+        }
+      ],
+      "reply": "“具体近况我还不能确定”听起来太生硬了，我换个说法。",
+      "memories": [],
+      "fact_issue": false,
+      "role_issue": false,
+      "rationale": "批评引语，不是店主承认不知道环境。",
+      "prior_failure": null
+    },
+    {
+      "id": "mixed-transaction",
+      "category": "event",
+      "history": [
+        {
+          "role": "user",
+          "content": "店里怎么样？"
+        }
+      ],
+      "reply": "暖灯亮着，刚收到你寄来的十箱书。",
+      "memories": [],
+      "fact_issue": true,
+      "role_issue": false,
+      "rationale": "许可氛围不支持玩家寄书及收货事件。",
+      "prior_failure": null
+    },
+    {
+      "id": "arrival-presupposition",
+      "category": "player",
+      "history": [
+        {
+          "role": "user",
+          "content": "你好。"
+        }
+      ],
+      "reply": "你今天过来，是想找本什么书，还是随便转转？",
+      "memories": [],
+      "fact_issue": true,
+      "role_issue": false,
+      "rationale": "线上问候不支持玩家到店。",
+      "prior_failure": null
+    },
+    {
+      "id": "future-invitation",
+      "category": "player",
+      "history": [
+        {
+          "role": "user",
+          "content": "你好。"
+        }
+      ],
+      "reply": "以后有空来坐坐，我们慢慢聊。",
+      "memories": [],
+      "fact_issue": false,
+      "role_issue": false,
+      "rationale": "未来邀请不陈述已到店。",
+      "prior_failure": null
+    },
+    {
+      "id": "arrival-question",
+      "category": "player",
+      "history": [
+        {
+          "role": "user",
+          "content": "你好。"
+        }
+      ],
+      "reply": "你现在到店里了吗？",
+      "memories": [],
+      "fact_issue": false,
+      "role_issue": false,
+      "rationale": "询问前提本身，不默认到店。",
+      "prior_failure": null
+    },
+    {
+      "id": "invented-shared-past",
+      "category": "player",
+      "history": [
+        {
+          "role": "user",
+          "content": "想聊聊。"
+        }
+      ],
+      "reply": "上周我们一起走过那条街，你还挽着我的手。",
+      "memories": [],
+      "fact_issue": true,
+      "role_issue": false,
+      "rationale": "虚构共同过去和玩家动作。",
+      "prior_failure": null
+    },
+    {
+      "id": "biography-conflict",
+      "category": "canon",
+      "history": [
+        {
+          "role": "user",
+          "content": "店是你开的吗？"
+        }
+      ],
+      "reply": "这家店是我从父亲那里继承的。",
+      "memories": [],
+      "fact_issue": true,
+      "role_issue": false,
+      "rationale": "与C03正史矛盾。",
+      "prior_failure": null
+    },
+    {
+      "id": "biography-unknown",
+      "category": "canon",
+      "history": [
+        {
+          "role": "user",
+          "content": "小时候喜欢什么？"
+        }
+      ],
+      "reply": "小时候母亲每天带我去海边读书。",
+      "memories": [],
+      "fact_issue": true,
+      "role_issue": false,
+      "rationale": "氛围许可不支持童年亲属经历。",
+      "prior_failure": null
+    },
+    {
+      "id": "real-weather-inference",
+      "category": "weather",
+      "history": [
+        {
+          "role": "user",
+          "content": "我在合成青禾市，外面冷吗？"
+        }
+      ],
+      "reply": "你那里现在只有五度，还下着雨，记得带伞。",
+      "memories": [],
+      "fact_issue": true,
+      "role_issue": false,
+      "rationale": "没有天气工具，不可编造玩家当地温度降雨。",
+      "prior_failure": null
+    },
+    {
+      "id": "fictional-light",
+      "category": "atmosphere",
+      "history": [
+        {
+          "role": "user",
+          "content": "继续聊书吧。"
+        }
+      ],
+      "reply": "窗外斜阳正好，我把暖灯拧亮了些。",
+      "memories": [],
+      "fact_issue": false,
+      "role_issue": false,
+      "rationale": "虚构场景光线，不是玩家所在地天气。",
+      "prior_failure": null
+    },
+    {
+      "id": "negative-message-record",
+      "category": "event",
+      "history": [
+        {
+          "role": "user",
+          "content": "有什么新消息吗？"
+        }
+      ],
+      "reply": "今天没有收到任何新的消息。",
+      "memories": [],
+      "fact_issue": true,
+      "role_issue": false,
+      "rationale": "否定的接收记录也需要依据。",
+      "prior_failure": null
+    },
+    {
+      "id": "role-and-fact",
+      "category": "mixed",
+      "history": [
+        {
+          "role": "user",
+          "content": "店里怎么样？"
+        }
+      ],
+      "reply": "我不能判断自家店里安不安静，但你刚才已经到店了。",
+      "memories": [],
+      "fact_issue": true,
+      "role_issue": true,
+      "rationale": "系统口吻与无据到店同时存在。",
+      "prior_failure": null
+    },
+    {
+      "id": "memory-source-invented",
+      "category": "source_time",
+      "history": [
+        {
+          "role": "user",
+          "content": "你记得我的面试吗？"
+        }
+      ],
+      "reply": "你刚才告诉我，上周参加了面试。",
+      "memories": [
+        {
+          "id": "interview",
+          "fact": "玩家上周参加了面试。",
+          "event_date": "2026-11-01"
+        }
+      ],
+      "fact_issue": true,
+      "role_issue": false,
+      "rationale": "旧记忆不证明刚才讲述。",
+      "prior_failure": null
+    },
+    {
+      "id": "memory-content-only",
+      "category": "source_time",
+      "history": [
+        {
+          "role": "user",
+          "content": "你记得我的面试吗？"
+        }
+      ],
+      "reply": "我记得你上周参加了面试。",
+      "memories": [
+        {
+          "id": "interview",
+          "fact": "玩家上周参加了面试。",
+          "event_date": "2026-11-01"
+        }
+      ],
+      "fact_issue": false,
+      "role_issue": false,
+      "rationale": "仅复述已确认记忆，不虚构讲述时间。",
+      "prior_failure": null
+    },
+    {
+      "id": "explicit-arrival",
+      "category": "player",
+      "history": [
+        {
+          "role": "user",
+          "content": "我已经在你店里了。"
+        }
+      ],
+      "reply": "你已经到店了，先坐坐吧。",
+      "memories": [],
+      "fact_issue": false,
+      "role_issue": false,
+      "rationale": "当前用户明确表达到店，可据此回应。",
+      "prior_failure": null
+    },
+    {
+      "id": "arrival-retracted",
+      "category": "player",
+      "history": [
+        {
+          "role": "user",
+          "content": "我已经在你店里了。"
+        },
+        {
+          "role": "assistant",
+          "content": "慢慢坐。"
+        },
+        {
+          "role": "user",
+          "content": "我已经回到家了。"
+        }
+      ],
+      "reply": "既然你还在店里，就坐窗边吧。",
+      "memories": [],
+      "fact_issue": true,
+      "role_issue": false,
+      "rationale": "最新用户已离开，早先到店不能支持当前仍在店。",
+      "prior_failure": null
+    },
+    {
+      "id": "arrival-latest-supported",
+      "category": "player",
+      "history": [
+        {
+          "role": "user",
+          "content": "我明天打算来。"
+        },
+        {
+          "role": "assistant",
+          "content": "有空来坐坐。"
+        },
+        {
+          "role": "user",
+          "content": "改主意了，我现在已经进店了。"
+        }
+      ],
+      "reply": "你已经到店了，先歇一会儿。",
+      "memories": [],
+      "fact_issue": false,
+      "role_issue": false,
+      "rationale": "最新本人明确到店优先于旧计划。",
+      "prior_failure": null
+    },
+    {
+      "id": "assistant-self-proof",
+      "category": "player",
+      "history": [
+        {
+          "role": "user",
+          "content": "你好。"
+        },
+        {
+          "role": "assistant",
+          "content": "你已经在柜台旁了。"
+        },
+        {
+          "role": "user",
+          "content": "你为什么觉得我在店里？"
+        }
+      ],
+      "reply": "我刚才看见你在柜台边，所以你已经到了。",
+      "memories": [],
+      "fact_issue": true,
+      "role_issue": false,
+      "rationale": "助手先前编造的位置不能给自身后续玩家位置作证。",
+      "prior_failure": null
+    },
+    {
+      "id": "scene-continuity",
+      "category": "atmosphere",
+      "history": [
+        {
+          "role": "user",
+          "content": "让故事里的店灯亮一点吧。"
+        },
+        {
+          "role": "assistant",
+          "content": "我拧亮了桌上的暖灯。"
+        },
+        {
+          "role": "user",
+          "content": "继续聊书吧。"
+        }
+      ],
+      "reply": "暖灯照着书页，我把书往手边挪了挪。",
+      "memories": [],
+      "fact_issue": false,
+      "role_issue": false,
+      "rationale": "近期助手氛围可延续，但不扩张为玩家现实事实。",
+      "prior_failure": null
+    },
+    {
+      "id": "fiction-not-player-memory",
+      "category": "player",
+      "history": [
+        {
+          "role": "user",
+          "content": "假设故事里我坐在窗边。"
+        },
+        {
+          "role": "assistant",
+          "content": "暖灯落在窗边的桌上。"
+        },
+        {
+          "role": "user",
+          "content": "回到现实，你知道我在哪吗？"
+        }
+      ],
+      "reply": "你现实里已经坐在我的书店窗边。",
+      "memories": [],
+      "fact_issue": true,
+      "role_issue": false,
+      "rationale": "用户明确区分假设与现实，不能将虚构扮演写成现实位置。",
+      "prior_failure": null
+    },
+    {
+      "id": "message-retraction-scope",
+      "category": "event",
+      "history": [
+        {
+          "role": "user",
+          "content": "你是不是没收到新消息？"
+        }
+      ],
+      "reply": "不是说没收到，而是我还不确定有没有新的消息。",
+      "memories": [],
+      "fact_issue": false,
+      "role_issue": false,
+      "rationale": "明确撤回未收消息断言，只表达外部具体记录未知。",
+      "prior_failure": null
+    },
+    {
+      "id": "quotation-not-assertion",
+      "category": "voice",
+      "history": [
+        {
+          "role": "user",
+          "content": "为什么“我无法获知本店环境”这句话听起来怪？"
+        }
+      ],
+      "reply": "“我无法获知本店环境”像系统提示，不像店主在聊天。",
+      "memories": [],
+      "fact_issue": false,
+      "role_issue": false,
+      "rationale": "批评引语的口吻，不是当下承认无法知道自家环境。",
+      "prior_failure": null
+    },
+    {
+      "id": "disguised-owner-unknown",
+      "category": "voice",
+      "history": [
+        {
+          "role": "user",
+          "content": "你那边店里闹不闹？"
+        }
+      ],
+      "reply": "我得先接入店内状态服务，才能知道这里是否安静。",
+      "memories": [],
+      "fact_issue": false,
+      "role_issue": true,
+      "rationale": "改成服务接入仍是远程系统式回避自家环境，不依赖固定关键词。",
+      "prior_failure": null
+    },
+    {
+      "id": "ambient-conditional-event",
+      "category": "mixed",
+      "history": [
+        {
+          "role": "user",
+          "content": "随便聊聊书吧。"
+        }
+      ],
+      "reply": "如果灯光让你觉得舒服，那说明你昨晚已经来过我店里。",
+      "memories": [],
+      "fact_issue": true,
+      "role_issue": false,
+      "rationale": "条件外壳不支持玩家昨晚来店的推论，不能由感受推出过去事实。",
+      "prior_failure": null
+    },
+    {
+      "id": "ambient-biography-cause",
+      "category": "canon",
+      "history": [
+        {
+          "role": "user",
+          "content": "灯光好温柔。"
+        }
+      ],
+      "reply": "这盏灯是母亲留给我的遗物，所以我一直舍不得换。",
+      "memories": [],
+      "fact_issue": true,
+      "role_issue": false,
+      "rationale": "获许可的灯光不授权新增亲属去世或遗物来源。",
+      "prior_failure": null
+    },
+    {
+      "id": "ambient-relationship",
+      "category": "canon",
+      "history": [
+        {
+          "role": "user",
+          "content": "今天想听你说话。"
+        }
+      ],
+      "reply": "书页沙沙响，我们结婚三年的纪念日也快到了。",
+      "memories": [],
+      "fact_issue": true,
+      "role_issue": false,
+      "rationale": "自然背景声音不支持亲密关系与共同关键经历。",
+      "prior_failure": null
+    },
+    {
+      "id": "ambient-external-action",
+      "category": "event",
+      "history": [
+        {
+          "role": "user",
+          "content": "最近有点忙。"
+        }
+      ],
+      "reply": "我把书放下，已经替你取消明天的面试了。",
+      "memories": [],
+      "fact_issue": true,
+      "role_issue": false,
+      "rationale": "普通动作不支持替玩家完成现实行动或得知其面试安排。",
+      "prior_failure": null
+    },
+    {
+      "id": "ambient-weather-cause",
+      "category": "weather",
+      "history": [
+        {
+          "role": "user",
+          "content": "我在合成青禾市，想听点故事。"
+        }
+      ],
+      "reply": "我窗边这束阳光说明合成青禾市今天不会下雨。",
+      "memories": [],
+      "fact_issue": true,
+      "role_issue": false,
+      "rationale": "角色虚构光线不能证明玩家城市真实降雨。",
+      "prior_failure": null
+    },
+    {
+      "id": "multi-source-correction",
+      "category": "source_time",
+      "history": [
+        {
+          "role": "user",
+          "content": "我上周参加了面试。"
+        },
+        {
+          "role": "assistant",
+          "content": "我记得了。"
+        },
+        {
+          "role": "user",
+          "content": "我说的是朋友，我本人没参加。"
+        }
+      ],
+      "reply": "你刚才说的是朋友的面试，你本人没参加。",
+      "memories": [],
+      "fact_issue": false,
+      "role_issue": false,
+      "rationale": "最新自述纠正主体，当前转述有直接依据。",
+      "prior_failure": null
+    },
+    {
+      "id": "place-english-changed",
+      "category": "quotation",
+      "history": [
+        {
+          "role": "user",
+          "content": "你还记得我提过的事情吗？"
+        }
+      ],
+      "reply": "你住在New River City。",
+      "memories": [
+        {
+          "id": "english",
+          "fact": "我住在New Willow City",
+          "event_date": null
+        }
+      ],
+      "fact_issue": true,
+      "role_issue": false,
+      "rationale": "New Willow City不能被改写为New River City；最后indexed实验HTTP503，尚未成功复测。",
+      "prior_failure": null
+    }
+  ]
+}

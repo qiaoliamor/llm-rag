@@ -86,3 +86,6 @@
 重新运行 `.venv/bin/python -m pytest -q`：**675通过/26跳过**；`.venv/bin/python scripts/evaluate_narrative_calibration.py`：退出0，仅清单校验、零API；`.venv/bin/python scripts/evaluate_fact_support.py`：退出0，旧legacy审计仍TP14/FP5/FN15/TN17及1未决。Python/JSON/Markdown、本PR历史和最终差异、实际本地敏感值/密钥模式、忽略规则和已跟踪运行路径检查通过。
 
 本轮无新增真实模型调用，不重采样旧成功回复。生产数据生命周期/数据库/前端均未变；适用SQLite CRUD/撤回等随默认套件验证，PG173和前端36项/构建沿用既有未改生产版本证据，不重复。原32保留例未执行；其余21条未新增真实模型裁决，口吻正例本轮未真实测试，独立质量与自然度/费用待办保持。无.env、密钥、真实对话/记忆或运行导出提交，M6未开始。合并后按AGENTS.md快进同步main、核对完整文件树，再清理任务分支。
+
+
+v1原23例冻结保留。后续v2的跨文件语义查重/参考复核、新增15例、仅1次英文地名旧失败仍超时及保留集审阅边界见 [NARRATIVE_REFERENCE_AUDIT.md](NARRATIVE_REFERENCE_AUDIT.md)。M5质量待办不因开发复核而完成。
