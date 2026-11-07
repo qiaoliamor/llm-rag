@@ -218,7 +218,7 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
                 prompt += NO_MEMORY_CONTEXT
             model_history = [{'role':m['role'], 'content':m['content']} for m in history]
             try:
-                async with asyncio.timeout(settings.api_timeout_seconds * 2 + settings.semantic_review_timeout_seconds * 2 + 2):
+                async with asyncio.timeout(settings.api_timeout_seconds * 2 + settings.semantic_review_timeout_seconds + 2):
                     reply, guarded, review_status = await generate_checked(provider,model_history,prompt,body.message,
                         evidence,weather_result,mood_result,mood_settings,judge=judge,
                         review_enabled=settings.semantic_review_enabled,review_timeout=settings.semantic_review_timeout_seconds)

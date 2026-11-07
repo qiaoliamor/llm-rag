@@ -198,10 +198,7 @@ def test_real_sdk_structured_protocol_with_memory_transport(provider_name):
         p=json.loads(request.content);seen.append(p)
         schema=p['response_format']['json_schema']['name']
         content=({'need_memory':True,'query':'我的经历','reason':'personal_history_needed','confidence':.9}
-                 if schema=='RouteDecision' else review('我今年28岁。'))
-        if schema=='WireReview':
-            content.pop('decision')
-            for segment in content['segments']:segment.pop('reason')
+                 if schema=='RouteDecision' else {'confidence':.95,'role_issues':[],'units':[{'id':'u0','kind':'assertion','verdict':'supported','evidence_ids':['C01']}]} )
         return httpx2.Response(200,json={'id':'test','object':'chat.completion','created':0,'model':'test',
             'choices':[{'index':0,'finish_reason':'stop','message':{'role':'assistant','content':json.dumps(content)}}]})
     # A fresh transport client is used for each call (SDK closes it).
@@ -213,7 +210,7 @@ def test_real_sdk_structured_protocol_with_memory_transport(provider_name):
         result=await b.review('我今年28岁。',history('你好'),[{'id':'C01'}]);assert result.decision=='accept'
     run(checks())
     assert len(seen)==2 and seen[0]['temperature']==seen[1]['temperature']==0
-    assert seen[0]['max_tokens']==500 and seen[1]['max_tokens']==1000
+    assert seen[0]['max_tokens']==500 and seen[1]['max_tokens']==700
 
 
 def test_epoch_change_during_router_prevents_retrieval(tmp_path):
@@ -249,16 +246,16 @@ def test_actual_auxiliary_timeouts_are_cancelled():
 
 
 def test_lightweight_wire_cannot_bypass_domain_validation():
-    from app.semantic_review import WireReview
+    from app.semantic_review import IndexedReview
     settings=Settings(_env_file=None,chat_provider='mock')
     for invalid in [
-        {'confidence':.95,'segments':[]},
-        {'confidence':.95,'segments':[{'text':'错误','kind':'assertion','verdict':'supported','evidence_ids':[]}]},
-        {'confidence':.95,'segments':[{'text':'错误','kind':'nonfactual','verdict':'supported','evidence_ids':['C01']}]},
+        {'confidence':.95,'role_issues':[],'units':[]},
+        {'confidence':.95,'role_issues':[],'units':[{'id':'u0','kind':'assertion','verdict':'supported','evidence_ids':[]}]},
+        {'confidence':.95,'role_issues':[],'units':[{'id':'u0','kind':'nonfactual','verdict':'supported','evidence_ids':['C01']}]},
     ]:
         provider=ModelAnalysisProvider(settings)
-        provider.parse=AsyncMock(return_value=WireReview.model_validate(invalid))
-        with pytest.raises((ValidationError,KeyError)):
+        provider.parse=AsyncMock(return_value=IndexedReview.model_validate(invalid))
+        with pytest.raises((ValidationError,ValueError,KeyError)):
             run(provider.review('错误',history('你好'),[{'id':'C01'}]))
 
 
@@ -292,8 +289,8 @@ def test_only_insignificant_sentence_whitespace_is_normalized():
 
 @pytest.mark.parametrize('verdict,kind,expected',[('unsupported','assertion','revise'),('not_applicable','nonfactual','accept')])
 def test_provider_decision_and_reason_are_derived_from_validated_labels(verdict,kind,expected):
-    from app.semantic_review import WireReview
-    wire=WireReview(confidence=.95,segments=[{'text':'合成内容','kind':kind,'verdict':verdict,'evidence_ids':[]}])
+    from app.semantic_review import IndexedReview
+    wire=IndexedReview(confidence=.95,role_issues=[],units=[{'id':'u0','kind':kind,'verdict':verdict,'evidence_ids':[]}])
     provider=ModelAnalysisProvider(Settings(_env_file=None,chat_provider='mock'))
     provider.parse=AsyncMock(return_value=wire)
     result=run(provider.review('合成内容',history('你好'),[]))
@@ -302,12 +299,12 @@ def test_provider_decision_and_reason_are_derived_from_validated_labels(verdict,
 
 
 def test_transport_rejects_unknown_labels_or_model_supplied_decisions():
-    from app.semantic_review import WireReview
+    from app.semantic_review import IndexedReview
     for data in [
-        {'confidence':.9,'segments':[{'text':'x','kind':'invented','verdict':'supported','evidence_ids':['C01']}]},
-        {'decision':'accept','confidence':.9,'segments':[]},
+        {'confidence':.9,'role_issues':[],'units':[{'id':'u0','kind':'invented','verdict':'supported','evidence_ids':['C01']}]},
+        {'decision':'accept','confidence':.9,'role_issues':[],'units':[]},
     ]:
-        with pytest.raises(ValidationError):WireReview.model_validate(data)
+        with pytest.raises(ValidationError):IndexedReview.model_validate(data)
 
 
 def test_role_profile_cannot_prove_current_shop_message_activity(tmp_path):

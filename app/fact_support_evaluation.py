@@ -132,7 +132,7 @@ def guard_predictions(reply,query,evidence):
     memories=[{'id':e.id,'fact':e.text,'event_date':e.event_date}
               for e in evidence if e.kind=='memory']
     history=[{'role':'user','content':query}]
-    # Same checks/OR as /v1/chat, no weather/emotion tools in this corpus.
+    # Legacy strict-scene guard audit, not the scene-licensed online pipeline.
     return {'grounding':grounding_conflicts(reply,memories,query),
             'source_time':source_time_conflicts(reply,history),
             'canon':conflicts(reply,query),
@@ -195,7 +195,8 @@ def evaluate(path=DATASET):
         row['finding']='miss' if row['policy_unsafe'] is True and not guarded else 'overblock' if guarded and row['policy_unsafe'] is False else 'unresolved' if row['policy_unsafe'] is None else None
         rows.append(row)
     guard_files=('app/grounding.py','app/memory_source.py','app/dialogue.py','app/weather.py','app/emotion.py')
-    return {'suite':'m5-full-fact-support-v1','dataset_version':data.version,'dataset_sha256':digest,
+    return {'suite':'m5-full-fact-support-v1','scene_policy':'legacy-strict-no-fiction-license',
+            'dataset_version':data.version,'dataset_sha256':digest,
             'split':'dev','annotation_method':data.annotation_method,'model_calls':0,'database_calls':0,
             'character_version':CHARACTER['version'],
             'guard_sha256':{p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in guard_files},
@@ -203,7 +204,8 @@ def evaluate(path=DATASET):
             'categories':{name:summarize([r for r in rows if r['category']==name]) for name in sorted({r['category'] for r in rows})},
             'origins':{name:summarize([r for r in rows if r['origin']==name]) for name in sorted({r['origin'] for r in rows})},
             'findings':[r for r in rows if r['finding']], 'results':rows,
-            'limits':['Fixed authored synthetic annotations, not semantic inference on arbitrary text.',
+            'limits':['Legacy strict-scene reference labels exclude the new fictional scene license; not current roleplay quality.',
+                      'Fixed authored synthetic annotations, not semantic inference on arbitrary text.',
                       'Offsets enforce text coverage, not semantic atomicity or annotation correctness.',
                       'Author reference labels are not independent human double review or model judgments.',
                       'Development corpus contains historical failures; not heldout performance or live generation quality.',
