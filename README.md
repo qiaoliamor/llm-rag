@@ -217,4 +217,4 @@ PR #16历史版本默认532通过/26跳过，独立临时PG173通过；真实六
 合并前命令行复核633通过/26跳过，独立临时PG173通过（计数重叠）。本次未追加真实API；此前定向口吻和条件句复测通过，早期503/超时/误判全部保留，不能当独立泛化或总体质量验收。当前标准与完整证据见 [场景及口吻记录](docs/SCENE_ROLEPLAY.md)、[协议与失败历史](docs/SEMANTIC_REVIEW_STABILITY.md)。M5继续校准，M6未开始。
 
 
-当前叙事标准的事实/店主口吻双轴开发校准：23条版本化作者参考、42项新增回归，旧52例审计不改。默认运行 `.venv/bin/python scripts/evaluate_narrative_calibration.py` 仅校验清单、无API调用；本轮仅2次旧HTTP503合成审查均符合参考，不能当独立质量验收。完整命令、结果与局限见 [评测校准](docs/NARRATIVE_CALIBRATION.md)，M5继续，M6未开始。
+当前叙事标准的事实/店主口吻双轴开发校准（[PR #19](https://github.com/qiaoliamor/llm-rag/pull/19)，本次squash合并生效）：23条版本化作者参考、42项新增回归，旧52例审计不改。默认运行 `.venv/bin/python scripts/evaluate_narrative_calibration.py` 仅校验清单、无API调用；本轮仅2次旧HTTP503合成审查均符合参考，不能当独立质量验收。完整命令、结果与局限见 [评测校准](docs/NARRATIVE_CALIBRATION.md)，M5继续，M6未开始。
