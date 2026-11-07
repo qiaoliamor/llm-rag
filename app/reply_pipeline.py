@@ -1,6 +1,6 @@
 """One shared rewrite budget across rules and semantic review."""
 from time import monotonic
-from .dialogue import conflicts,FALLBACK
+from .dialogue import conflicts,FALLBACK,CONVERSATION_FACT_RULES
 from .grounding import grounding_conflicts,scene_conflicts
 from .memory_source import source_time_conflicts
 from .weather import weather_reply_conflicts,weather_fallback
@@ -16,7 +16,7 @@ async def generate_checked(provider,history,prompt,query,memories,weather,mood,m
     guarded=False;review_calls=0;feedback='';review_spent=0.0
     status='disabled' if not review_enabled else 'mock_or_unavailable'
     for attempt in range(2):
-        reply=await provider.generate(history,prompt+(REWRITE+feedback if attempt else ''))
+        reply=await provider.generate(history,prompt+(REWRITE+CONVERSATION_FACT_RULES+feedback if attempt else ''))
         role_bad=conflicts(reply,query)
         weather_bad=weather_reply_conflicts(reply,weather)
         mood_bad=emotion_reply_conflicts(reply,mood)
