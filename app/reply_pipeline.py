@@ -7,7 +7,7 @@ from .weather import weather_reply_conflicts,weather_fallback
 from .emotion import emotion_reply_conflicts,emotion_fallback
 from .semantic_review import needs_review,evidence_bundle,review_reply,rewrite_feedback
 
-REWRITE='''\n上次输出违反证据或表达边界。重新回答：保留场景设定授权的温暖氛围，删除无据的具体事件或玩家经历；不要再用不知道自家店况的口吻，像熟悉店内环境的沈砚自然接话。地点名称照证据完整写出或用代词承接，不缩写地名。长期记忆不证明刚才/今天告诉我，改用不带来源时间的“我记得”，不要编造讲述时间。以沈砚的自然语气关心，不播报来源/日期，不用您；当前现实天气只作估计。情绪只是可纠正参考，不诊断、不报分数，尊重自述和倾听偏好。'''
+REWRITE='''\n上次输出违反证据或表达边界。重新回答：保留场景设定授权的温暖氛围、声音和日常动作，只修正无据的重要人物/事件/现实事实或不合角色口吻；无需追究谁翻书，不把普通背景描写改成事实报告。不要再用不知道自家店况的口吻，像熟悉店内环境的沈砚自然接话。地点名称照证据完整写出或用代词承接，不缩写地名。长期记忆不证明刚才/今天告诉我，改用不带来源时间的“我记得”，不要编造讲述时间。以沈砚的自然语气关心，不播报来源/日期，不用您；当前现实天气只作估计。情绪只是可纠正参考，不诊断、不报分数，尊重自述和倾听偏好。'''
 
 
 async def generate_checked(provider,history,prompt,query,memories,weather,mood,mood_settings,
