@@ -1,0 +1,31 @@
+{
+  "version": "sealed-manifest-v2",
+  "status": "frozen_public_candidate_not_independent",
+  "frozen_on": "2026-11-09",
+  "baseline_commit": "edd2d8c161ae8e4160af39cabf55b634847533fd",
+  "case_count": 24,
+  "strata": {
+    "memory": 4,
+    "canon": 4,
+    "weather": 4,
+    "emotion": 4,
+    "security": 4,
+    "narrative": 4
+  },
+  "artifacts": {
+    "cases.json": "4235e968148f9fdc0c25d32781f405e0ed9179b1eeaf39b93b1d52a4c39ae0e0",
+    "author_reference.json": "13d1fbf3592925c018c14d111608942ec50582c995d0842096121727b59e08b9"
+  },
+  "policy_artifacts": {
+    "characters/shen_yan.json": "0a5dd6d417ad2702b451e171d86eabade52ba21bbae9c44749d5d9538d561d5d",
+    "characters/shen_yan_scene.json": "d7ebcd2f227d459a81ebf3fd6d9ea83d5a1edadfdebdb2b7891f52b64dfda403",
+    "app/dialogue.py": "f03ff7a29dbb0c6936975f4ee96df931e9929fa8fdb525e6f5e442fce75029d3",
+    "app/semantic_review.py": "03bac544d59e1596a83cbd211eb512be407c02532c2dec4e0ad7dcd27997f640"
+  },
+  "independent_annotation": "pending",
+  "blind_review": "pending",
+  "model_execution": "not_run",
+  "acceptance": "not_assessed",
+  "parent_manifest_sha256": "1afc05dfcc20715497f20e5c211a498194962d43a22369f9c0198a8b778d513f",
+  "revision_reason": "s03区分最新主体纠正与否认历史原话；本任务同步修改生成/审查Prompt，v2冻结新政策哈希，baseline_commit为任务起点而非新Prompt完整提交。"
+}

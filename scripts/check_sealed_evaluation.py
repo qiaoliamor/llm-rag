@@ -15,7 +15,7 @@ def main():
     try:
         manifest=verify(content=args.validate_content)
         result={'check':'integrity_and_schema' if args.validate_content else 'integrity_only',
-                'case_count':manifest.case_count,'status':manifest.status,'model_calls':0,
+                'bundle_version':manifest.version,'case_count':manifest.case_count,'status':manifest.status,'model_calls':0,
                 'independent_annotation':manifest.independent_annotation,
                 'blind_review':manifest.blind_review,'acceptance':manifest.acceptance}
         if args.prepare_annotation:result['packet']=prepare(args.prepare_annotation)
