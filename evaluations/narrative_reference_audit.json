@@ -28,6 +28,10 @@
       "sha256": "d7ebcd2f227d459a81ebf3fd6d9ea83d5a1edadfdebdb2b7891f52b64dfda403"
     },
     {
+      "path": "evaluations/fact_role_pairs_dev.json",
+      "sha256": "a5ac98e2d29da36a3004e5bba8e11b652ff3148fc35fbe02cacc47a80515f126"
+    },
+    {
       "path": "evaluations/fact_support_dev.json",
       "sha256": "f3a2f1d8c4a7559598464479147e007df02031d23074bb952a6bb8134bf4ad19"
     },
@@ -70,6 +74,10 @@
     {
       "path": "tests/test_evaluation.py",
       "sha256": "b4a39cce6c29184a07b96620779ca9b832418fab00cf5182f65505064bd37b99"
+    },
+    {
+      "path": "tests/test_fact_role_pairs.py",
+      "sha256": "40bc5474a3d74ec41cc5ec1bfce1ebd479e3792e0c42ce0ba0cf64eff9f7563a"
     },
     {
       "path": "tests/test_fact_support_evaluation.py",
