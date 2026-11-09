@@ -223,4 +223,4 @@ PR #16历史版本默认532通过/26跳过，独立临时PG173通过；真实六
 M5跨文件语义查重与参考复核（PR #20交付，本次squash合并生效）：32个现有源文件、38条双轴开发参考（保留v1原23条，新增15条），登记14个机制族及逐条来源关系。全量715通过/26跳过；仅1次旧失败英文地名审查仍超时，不算质量通过。旧保留文本已为查重静态审阅，正式独立验收须另设新封存数据。详见 [复核与剩余任务](docs/NARRATIVE_REFERENCE_AUDIT.md)，M6未开始。
 
 
-M5独立评测准备（2026-11-09，本任务PR待审）：新增 [独立评测协议](docs/INDEPENDENT_EVALUATION.md)、24条公开冻结候选和标签隐藏校准包工具。命令 `.venv/bin/python scripts/check_sealed_evaluation.py` 默认只做哈希校验、零API；`--validate-content`检查结构，不计算模型质量。全量744通过/26跳过；独立标注/盲评/正式未见集及真实验收尚未执行，既有8.003秒超时保留，M6未开始。
+M5独立评测准备（2026-11-09，PR #21交付，本次squash合并生效）：新增 [独立评测协议](docs/INDEPENDENT_EVALUATION.md)、24条公开冻结候选和标签隐藏校准包工具。命令 `.venv/bin/python scripts/check_sealed_evaluation.py` 默认只做哈希校验、零API；`--validate-content`检查结构，不计算模型质量。全量744通过/26跳过；独立标注/盲评/正式未见集及真实验收尚未执行，既有8.003秒超时保留，M6未开始。
