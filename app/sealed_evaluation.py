@@ -153,10 +153,10 @@ def prepare(output,*,bundle=BUNDLE,seed=None):
     try:
         for rater in ('rater_a','rater_b'):
             order=list(tasks);rng.shuffle(order)
-            packet={'purpose':'synthetic_process_calibration_not_independent_trial',
+            packet={'purpose':'synthetic_process_calibration_not_independent_trial','annotation_schema':'offline-ratings-v1','reviewer':None,
                     'profiles':profiles,'tasks':order,
-                    'ratings':[{'task_id':t['task_id'],'claims':None,'fact_issue':None,'role_issue':None,
-                                'naturalness':None,'character_voice':None,'care_fit':None,
+                    'ratings':[{'task_id':t['task_id'],'claims':None,'fact_issue':None,'role_issue':None,'role_issue_spans':None,
+                                'naturalness':None,'character_voice':None,'care_fit':None,'care_fit_na_reason':None,'answered':None,
                                 'unresolved':None,'comment':None} for t in order]}
             (temp/f'{rater}.json').write_text(json.dumps(packet,ensure_ascii=False,indent=2)+'\n')
         (temp/'custodian_mapping.json').write_text(json.dumps({'mapping':mapping,
