@@ -1,0 +1,29 @@
+{
+  "version": "sealed-manifest-v1",
+  "status": "frozen_public_candidate_not_independent",
+  "frozen_on": "2026-11-09",
+  "baseline_commit": "dcae3f8494fee837390dc7e9858385221bf54261",
+  "case_count": 24,
+  "strata": {
+    "memory": 4,
+    "canon": 4,
+    "weather": 4,
+    "emotion": 4,
+    "security": 4,
+    "narrative": 4
+  },
+  "artifacts": {
+    "cases.json": "a5963fabddd0c18a592e4cc146d9a14828de543ee4fc1dbdc7211aee5282dcb1",
+    "author_reference.json": "d29f5e8559b4b7cec7262385ee141b245692bed1591559d70d70d1599e6c88d8"
+  },
+  "policy_artifacts": {
+    "characters/shen_yan.json": "0a5dd6d417ad2702b451e171d86eabade52ba21bbae9c44749d5d9538d561d5d",
+    "characters/shen_yan_scene.json": "d7ebcd2f227d459a81ebf3fd6d9ea83d5a1edadfdebdb2b7891f52b64dfda403",
+    "app/dialogue.py": "092491f4834edefcc858d1cf27485bea310cb99415a98e9e5cde5932436d220a",
+    "app/semantic_review.py": "57e47acd4b414317c86753737cfbafe69d2735d824b05c814c57b0717b2e18c3"
+  },
+  "independent_annotation": "pending",
+  "blind_review": "pending",
+  "model_execution": "not_run",
+  "acceptance": "not_assessed"
+}
