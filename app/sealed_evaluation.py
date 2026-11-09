@@ -10,7 +10,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 ROOT=Path(__file__).resolve().parent.parent
-BUNDLE=ROOT/'evaluations/sealed/v1'
+BUNDLE=ROOT/'evaluations/sealed/v2'
 STRATA=('memory','canon','weather','emotion','security','narrative')
 ARTIFACTS={'cases.json','author_reference.json'}
 POLICIES={'characters/shen_yan.json','characters/shen_yan_scene.json','app/dialogue.py','app/semantic_review.py'}
@@ -47,7 +47,7 @@ class Case(Record):
 
 
 class Cases(Record):
-    version: Literal['sealed-candidate-v1']
+    version: Literal['sealed-candidate-v1','sealed-candidate-v2']
     source: Literal['synthetic']
     visibility: Literal['public_author_exposed']
     cases: list[Case]=Field(min_length=1)
@@ -68,16 +68,18 @@ class Reference(Record):
 
 
 class References(Record):
-    version: Literal['author-draft-v1']
+    version: Literal['author-draft-v1','author-draft-v2']
     independent: Literal[False]
     references: list[Reference]
 
 
 class Manifest(Record):
-    version: Literal['sealed-manifest-v1']
+    version: Literal['sealed-manifest-v1','sealed-manifest-v2']
     status: Literal['frozen_public_candidate_not_independent']
     frozen_on: str
     baseline_commit: str=Field(pattern=r'^[0-9a-f]{40}$')
+    parent_manifest_sha256: str | None=None
+    revision_reason: str | None=None
     case_count: int=Field(gt=0)
     strata: dict[str,int]
     artifacts: dict[str,str]
@@ -91,6 +93,10 @@ class Manifest(Record):
     def paths_and_counts(self):
         from datetime import date
         date.fromisoformat(self.frozen_on)
+        if self.version=='sealed-manifest-v2':
+            parent=self.parent_manifest_sha256 or ''
+            if len(parent)!=64 or any(c not in '0123456789abcdef' for c in parent) or not self.revision_reason:
+                raise ValueError('v2 requires frozen parent and revision reason')
         if set(self.artifacts)!=ARTIFACTS or set(self.policy_artifacts)!=POLICIES:
             raise ValueError('unexpected artifact paths')
         for digest in [*self.artifacts.values(),*self.policy_artifacts.values()]:
@@ -104,6 +110,10 @@ class Manifest(Record):
 def verify(bundle=BUNDLE,*,content=False):
     bundle=Path(bundle)
     manifest=Manifest.model_validate_json((bundle/'manifest.json').read_bytes())
+    if manifest.version=='sealed-manifest-v2':
+        parent=ROOT/'evaluations/sealed/v1/manifest.json'
+        if hashlib.sha256(parent.read_bytes()).hexdigest()!=manifest.parent_manifest_sha256:
+            raise ValueError('frozen v1 parent drift')
     for name,digest in manifest.artifacts.items():
         if hashlib.sha256((bundle/name).read_bytes()).hexdigest()!=digest:
             raise ValueError('frozen artifact drift; create a new version')
@@ -113,6 +123,9 @@ def verify(bundle=BUNDLE,*,content=False):
     if content:
         cases=Cases.model_validate_json((bundle/'cases.json').read_bytes())
         refs=References.model_validate_json((bundle/'author_reference.json').read_bytes())
+        suffix='v2' if manifest.version=='sealed-manifest-v2' else 'v1'
+        if cases.version!='sealed-candidate-'+suffix or refs.version!='author-draft-'+suffix:
+            raise ValueError('bundle schema versions disagree')
         ids=[c.id for c in cases.cases]
         if len(ids)!=manifest.case_count or dict(Counter(c.stratum for c in cases.cases))!=manifest.strata:
             raise ValueError('case counts differ')

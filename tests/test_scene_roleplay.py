@@ -98,8 +98,8 @@ def test_unavailable_review_does_not_let_unreviewed_atmosphere_through(tmp_path)
     judge=SimpleNamespace(review=AsyncMock(side_effect=TimeoutError()))
     client,headers=make(tmp_path,provider,judge)
     response=client.post('/v1/chat',headers=headers,json={'message':'你好'})
-    assert response.json()['reply']!=text
-    assert response.json()['semantic_review']['failure']=='timeout'
+    assert response.status_code==503 and response.json()['code']=='review_busy'
+    assert text not in response.text and '等一会儿' in response.json()['detail']
     assert text not in str(client.get('/v1/session').json()['messages'])
 
 

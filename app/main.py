@@ -15,6 +15,7 @@ from .config import ROOT, Settings
 from .memory_routing import route_memory, NO_MEMORY_CONTEXT
 from .semantic_review import ModelAnalysisProvider
 from .reply_pipeline import generate_checked
+from .availability import BUSY_MESSAGE, CHAT_TRANSIENT_CODES, REVIEW_TRANSIENT_FAILURES
 from .weather import OpenMeteoProvider, MockWeatherProvider, WeatherError, MESSAGES, query_weather, weather_prompt, validate_city
 from .emotion import EmotionState, EmotionSettingsInput, CorrectionInput, Estimate, ModelEmotionProvider, MockEmotionProvider, assess, emotion_prompt, decorate
 from .grounding import grounding_prompt
@@ -141,7 +142,8 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
 
     @app.exception_handler(ProviderFailure)
     async def provider_error(request, exc):
-        return JSONResponse({'code': exc.code, 'detail': exc.message}, status_code=exc.status)
+        detail = BUSY_MESSAGE if request.url.path == '/v1/chat' and exc.code in CHAT_TRANSIENT_CODES else exc.message
+        return JSONResponse({'code': exc.code, 'detail': detail}, status_code=exc.status)
 
     @app.get('/')
     async def index():
@@ -225,6 +227,8 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
             except TimeoutError:
                 raise ProviderFailure('timeout', '模型响应超时，请稍后重试。', 504) from None
             verify_epoch(session, snapshot['epoch'])
+            if review_status.get('status') == 'unavailable' and review_status.get('failure') in REVIEW_TRANSIENT_FAILURES:
+                raise ProviderFailure('review_busy', BUSY_MESSAGE, 503)
             candidates = []
             if snapshot['memory_enabled']:
                 for fact in extract_candidates(body.message):

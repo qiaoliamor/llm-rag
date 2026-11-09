@@ -53,7 +53,8 @@ export default function App() {
       setCandidateCount(data.memory_candidates?.length ?? 0);
     } catch (reason) {
       setMessages(reason instanceof ApiError && reason.code === 'memory_changed' ? [] : previous); setDraft(text);
-      setError(reason instanceof ApiError ? reason.message : '发送失败，请稍后重试。');
+      const transient = reason instanceof ApiError && (reason.status === 0 || (!reason.code && [502, 503, 504].includes(reason.status)) || ['timeout', 'connection', 'upstream_error', 'rate_limit', 'review_busy'].includes(reason.code ?? ''));
+      setError(transient ? '这会儿连接有点慢，先别急，等一会儿再发给我，好吗？' : reason instanceof ApiError ? reason.message : '发送失败，请稍后重试。');
     } finally {
       inFlight.current = false; setBusy(false); setFocusVersion(value => value + 1);
     }

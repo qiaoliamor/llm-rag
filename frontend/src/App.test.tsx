@@ -180,3 +180,31 @@ it('attaches weather evidence to the sent reply and clears it on new conversatio
   await user.click(within(screen.getByRole('dialog')).getByRole('button',{name:'开始新对话'}));
   expect(screen.queryByText(/天气依据/)).not.toBeInTheDocument();
 });
+
+it.each([
+  [503, 'review_busy'], [504, 'timeout'], [503, undefined], [502, 'upstream_error'],
+])('shows warm busy copy for %s/%s, preserves draft and only retries on send', async (status, code) => {
+  const fetchMock=connect({...session,messages:[{role:'assistant',content:'旧的有效回复'}]});
+  render(<App />);const user=await ready();
+  fetchMock.mockResolvedValueOnce(response({code,detail:'temporary-provider-detail'},status));
+  fireEvent.change(screen.getByRole('textbox'),{target:{value:'今天想和你说件事'}});
+  await user.click(screen.getByRole('button',{name:/发送/}));
+  expect(await screen.findByRole('alert')).toHaveTextContent('这会儿连接有点慢，先别急，等一会儿再发给我，好吗？');
+  expect(screen.getByRole('textbox')).toHaveValue('今天想和你说件事');
+  expect(screen.getByText('旧的有效回复')).toBeVisible();
+  expect(fetchMock).toHaveBeenCalledTimes(2);
+  expect(within(screen.getByRole('region',{name:'对话消息'})).queryByText(/连接有点慢/)).not.toBeInTheDocument();
+  fetchMock.mockResolvedValueOnce(response({reply:'我在听，慢慢说。'}));
+  await user.click(screen.getByRole('button',{name:/发送/}));
+  expect(await screen.findByText('我在听，慢慢说。')).toBeVisible();
+  expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  expect(fetchMock).toHaveBeenCalledTimes(3);
+});
+
+it('keeps configuration guidance distinct from temporary busy', async () => {
+  const fetchMock=connect();render(<App />);const user=await ready();
+  fetchMock.mockResolvedValueOnce(response({code:'missing_api_key',detail:'请检查本地密钥配置'},503));
+  fireEvent.change(screen.getByRole('textbox'),{target:{value:'你好'}});
+  await user.click(screen.getByRole('button',{name:/发送/}));
+  expect(await screen.findByRole('alert')).toHaveTextContent('请检查本地密钥配置');
+});
