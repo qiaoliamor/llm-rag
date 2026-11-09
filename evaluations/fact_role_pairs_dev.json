@@ -1,0 +1,341 @@
+{
+  "version": "fact-role-pairs-dev-v1",
+  "source": "synthetic",
+  "annotation_method": "author_reference_not_independent",
+  "scene_sha256": "d7ebcd2f227d459a81ebf3fd6d9ea83d5a1edadfdebdb2b7891f52b64dfda403",
+  "character_sha256": "0a5dd6d417ad2702b451e171d86eabade52ba21bbae9c44749d5d9538d561d5d",
+  "pairs": [
+    {
+      "family": "source_time",
+      "axis": "fact",
+      "allowed": {
+        "id": "fr-source_time-allowed",
+        "category": "source_time",
+        "history": [
+          {
+            "role": "user",
+            "content": "那件事你还记得吗？"
+          }
+        ],
+        "reply": "你参加过那场摄影展，我记得。那段经历现在想起来是什么感觉？",
+        "memories": [
+          {
+            "id": "confirmed-1",
+            "fact": "我在合成蒲月城参加过摄影展。",
+            "event_date": "2026-10-10"
+          }
+        ],
+        "fact_issue": false,
+        "role_issue": false,
+        "rationale": "作者开发参考：记忆支持经历，不支持刚刚讲述；事件日期不等于讲述时间。",
+        "prior_failure": null
+      },
+      "violating": {
+        "id": "fr-source_time-violating",
+        "category": "source_time",
+        "history": [
+          {
+            "role": "user",
+            "content": "那件事你还记得吗？"
+          }
+        ],
+        "reply": "你刚刚才告诉我参加过那场摄影展，我记得。",
+        "memories": [
+          {
+            "id": "confirmed-1",
+            "fact": "我在合成蒲月城参加过摄影展。",
+            "event_date": "2026-10-10"
+          }
+        ],
+        "fact_issue": true,
+        "role_issue": false,
+        "rationale": "作者开发参考：记忆支持经历，不支持刚刚讲述；事件日期不等于讲述时间。",
+        "prior_failure": null
+      }
+    },
+    {
+      "family": "arrival",
+      "axis": "fact",
+      "allowed": {
+        "id": "fr-arrival-allowed",
+        "category": "player",
+        "history": [
+          {
+            "role": "user",
+            "content": "今天想找个人说说话。"
+          }
+        ],
+        "reply": "我把书合上，听你说。要是想来店里坐坐，也可以。",
+        "memories": [],
+        "fact_issue": false,
+        "role_issue": false,
+        "rationale": "作者开发参考：条件邀请允许；聊天没有证明玩家已经走进店里。",
+        "prior_failure": null
+      },
+      "violating": {
+        "id": "fr-arrival-violating",
+        "category": "player",
+        "history": [
+          {
+            "role": "user",
+            "content": "今天想找个人说说话。"
+          }
+        ],
+        "reply": "我把书合上，听你说。既然你已经走进店里，就坐窗边吧。",
+        "memories": [],
+        "fact_issue": true,
+        "role_issue": false,
+        "rationale": "作者开发参考：条件邀请允许；聊天没有证明玩家已经走进店里。",
+        "prior_failure": null
+      }
+    },
+    {
+      "family": "correction",
+      "axis": "fact",
+      "allowed": {
+        "id": "fr-correction-allowed",
+        "category": "player",
+        "history": [
+          {
+            "role": "user",
+            "content": "我以前住合成蒲月城。"
+          },
+          {
+            "role": "assistant",
+            "content": "我记得那个名字。"
+          },
+          {
+            "role": "user",
+            "content": "现在搬到合成霁竹城了，蒲月城是以前。"
+          }
+        ],
+        "reply": "合成霁竹城是你现在住的地方；以前的合成蒲月城，我会分清。",
+        "memories": [],
+        "fact_issue": false,
+        "role_issue": false,
+        "rationale": "作者开发参考：按玩家最新纠正区分当前和过去，不能反转时间主体。",
+        "prior_failure": null
+      },
+      "violating": {
+        "id": "fr-correction-violating",
+        "category": "player",
+        "history": [
+          {
+            "role": "user",
+            "content": "我以前住合成蒲月城。"
+          },
+          {
+            "role": "assistant",
+            "content": "我记得那个名字。"
+          },
+          {
+            "role": "user",
+            "content": "现在搬到合成霁竹城了，蒲月城是以前。"
+          }
+        ],
+        "reply": "合成蒲月城还是你现在住的地方；合成霁竹城只是以前。",
+        "memories": [],
+        "fact_issue": true,
+        "role_issue": false,
+        "rationale": "作者开发参考：按玩家最新纠正区分当前和过去，不能反转时间主体。",
+        "prior_failure": null
+      }
+    },
+    {
+      "family": "canon",
+      "axis": "fact",
+      "allowed": {
+        "id": "fr-canon-allowed",
+        "category": "canon",
+        "history": [
+          {
+            "role": "user",
+            "content": "这家书店是怎么来的？"
+          }
+        ],
+        "reply": "是我三年前自己开的。慢慢把旧书收拢到一起，就有了现在的书店。",
+        "memories": [],
+        "fact_issue": false,
+        "role_issue": false,
+        "rationale": "作者开发参考：正史是自己开设，不能借自然叙事补父亲或继承身世。",
+        "prior_failure": null
+      },
+      "violating": {
+        "id": "fr-canon-violating",
+        "category": "canon",
+        "history": [
+          {
+            "role": "user",
+            "content": "这家书店是怎么来的？"
+          }
+        ],
+        "reply": "是我三年前继承父亲留下来的。慢慢把旧书收拢到一起，就有了现在的书店。",
+        "memories": [],
+        "fact_issue": true,
+        "role_issue": false,
+        "rationale": "作者开发参考：正史是自己开设，不能借自然叙事补父亲或继承身世。",
+        "prior_failure": null
+      }
+    },
+    {
+      "family": "scene_event",
+      "axis": "fact",
+      "allowed": {
+        "id": "fr-scene_event-allowed",
+        "category": "mixed",
+        "history": [
+          {
+            "role": "user",
+            "content": "给我讲讲店里的画面吧。"
+          }
+        ],
+        "reply": "暖灯照着书页，我把桌边的一本书理齐，翻页声轻轻的。",
+        "memories": [],
+        "fact_issue": false,
+        "role_issue": false,
+        "rationale": "作者开发参考：环境和普通动作允许；具体交易完成事件不能由场景许可推出。",
+        "prior_failure": null
+      },
+      "violating": {
+        "id": "fr-scene_event-violating",
+        "category": "mixed",
+        "history": [
+          {
+            "role": "user",
+            "content": "给我讲讲店里的画面吧。"
+          }
+        ],
+        "reply": "暖灯照着书页，我把桌边的一本书理齐，今天出版社的三箱新书已经签收了。",
+        "memories": [],
+        "fact_issue": true,
+        "role_issue": false,
+        "rationale": "作者开发参考：环境和普通动作允许；具体交易完成事件不能由场景许可推出。",
+        "prior_failure": null
+      }
+    },
+    {
+      "family": "weather",
+      "axis": "fact",
+      "allowed": {
+        "id": "fr-weather-allowed",
+        "category": "weather",
+        "history": [
+          {
+            "role": "user",
+            "content": "我在合成蒲月城，陪我聊一会儿吧。"
+          }
+        ],
+        "reply": "我这里的灯光暖暖的。你那边现在是什么天气？",
+        "memories": [],
+        "fact_issue": false,
+        "role_issue": false,
+        "rationale": "作者开发参考：没有天气工具证据，虚构书店光线不能证明玩家城市天气温度。",
+        "prior_failure": null
+      },
+      "violating": {
+        "id": "fr-weather-violating",
+        "category": "weather",
+        "history": [
+          {
+            "role": "user",
+            "content": "我在合成蒲月城，陪我聊一会儿吧。"
+          }
+        ],
+        "reply": "我这里的灯光暖暖的。所以你那边现在也是晴天，二十六度。",
+        "memories": [],
+        "fact_issue": true,
+        "role_issue": false,
+        "rationale": "作者开发参考：没有天气工具证据，虚构书店光线不能证明玩家城市天气温度。",
+        "prior_failure": null
+      }
+    },
+    {
+      "family": "voice",
+      "axis": "role",
+      "allowed": {
+        "id": "fr-voice-allowed",
+        "category": "voice",
+        "history": [
+          {
+            "role": "user",
+            "content": "这会儿书店安静吗？"
+          }
+        ],
+        "reply": "挺安静的，书页翻过去的声音都听得清。我陪你慢慢聊。",
+        "memories": [],
+        "fact_issue": false,
+        "role_issue": false,
+        "rationale": "作者开发参考：店主可自然描述许可环境；机械回避自家环境与客服口吻属于角色轴，不因缺传感器而合理化。",
+        "prior_failure": null
+      },
+      "violating": {
+        "id": "fr-voice-violating",
+        "category": "voice",
+        "history": [
+          {
+            "role": "user",
+            "content": "这会儿书店安静吗？"
+          }
+        ],
+        "reply": "本店当前安静程度尚无法核实，请您稍后查询。我可以提供通用聊天服务。",
+        "memories": [],
+        "fact_issue": false,
+        "role_issue": true,
+        "rationale": "作者开发参考：店主可自然描述许可环境；机械回避自家环境与客服口吻属于角色轴，不因缺传感器而合理化。",
+        "prior_failure": null
+      }
+    },
+    {
+      "family": "quotation",
+      "axis": "fact",
+      "allowed": {
+        "id": "fr-quotation-allowed",
+        "category": "quotation",
+        "history": [
+          {
+            "role": "user",
+            "content": "我没有去过你的店。小说里的台词是“我去过你的店”，刚才我只是在引用它。"
+          },
+          {
+            "role": "assistant",
+            "content": "好，我知道你是在引用。"
+          },
+          {
+            "role": "user",
+            "content": "那你接着陪我聊聊。"
+          }
+        ],
+        "reply": "那句“我去过你的店”是小说里的话，我不会当作你的经历。你想从哪儿接着聊？",
+        "memories": [],
+        "fact_issue": false,
+        "role_issue": false,
+        "rationale": "作者开发参考：引用不自动证明本人经历，助手也不能用自己的旧话证明共同过去。",
+        "prior_failure": null
+      },
+      "violating": {
+        "id": "fr-quotation-violating",
+        "category": "quotation",
+        "history": [
+          {
+            "role": "user",
+            "content": "我没有去过你的店。小说里的台词是“我去过你的店”，刚才我只是在引用它。"
+          },
+          {
+            "role": "assistant",
+            "content": "好，我知道你是在引用。"
+          },
+          {
+            "role": "user",
+            "content": "那你接着陪我聊聊。"
+          }
+        ],
+        "reply": "那句“我去过你的店”虽然是小说里的话，也说明你确实来过。我记得我们见过。",
+        "memories": [],
+        "fact_issue": true,
+        "role_issue": false,
+        "rationale": "作者开发参考：引用不自动证明本人经历，助手也不能用自己的旧话证明共同过去。",
+        "prior_failure": null
+      }
+    }
+  ]
+}

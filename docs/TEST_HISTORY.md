@@ -283,3 +283,14 @@ Python/JSON/Markdown、本PR差异及提交历史、实际本地敏感值/密钥
 本轮真实API调用**0次**，无实际人工评分/裁决/盲评。公开候选、样本不足或独立性未核实仍not_assessed，不能从一致率/声明推导正确率或认证独立；语义蕴含、实际独立评审/正式新集、模型质量/安全/情绪/性能费用等仍未验收，历史8.003秒timeout/CLI退出1完整保留。M5未整体验收，M6未开始。
 
 本PR历史与最终差异、语法/Markdown、实际本地敏感值/密钥模式、忽略规则和已跟踪运行路径检查通过；未提交.env、密钥、真实对话/记忆、评分原件/身份/映射/报告、数据库或日志。交付按本次PR #23 squash合入main生效，随后按AGENTS.md同步main、核对完整文件树并清理任务分支。
+
+
+## 2026-11-09 · 事实与角色成对测试准备（任务分支待审）
+
+新增8组/16条公开合成作者参考，严格成对上下文/单轴标签/唯一ID与政策哈希检查，无真实API入口、不读取配置、不接触真实库或评分原件。新增33项回归验证证据与参考隔离、故意全accept的漏检计分、timeout/503/非法结构/低置信不算成功、非法字段/上下文/标签/政策漂移拒绝及CLI拒绝--live。没有实际模型判读、人工标注、全回复逐片段定位或语义蕴含验证；不宣称质量通过。
+
+命令：`.venv/bin/python -m pytest -q tests/test_fact_role_pairs.py`：33通过（初版专项）；之后补全引用台词上下文，最终`.venv/bin/python -m pytest -q`：**850通过/26跳过**，33新增计入总数、不累加。首次全量收集因新增根目录来源触发`source inventory drift`失败，给审计清单只追加新JSON和测试两个来源后通过；既有32来源指纹、38参考/关系不改，不把清单更新当语义复核。`scripts/check_fact_role_pairs.py`离线退出0，8组/16条、max_calls=0、acceptance=not_assessed。
+
+生产代码/Prompt/玩家接口/表/缓存均未改，无新增玩家CRUD，沿用PR #22前端41项/构建及临时PG173既有证据、不重复、不与全量累加；封存v1/v2、旧23/38/52例、15漏检/5误拦截/1未决、8.003秒timeout/CLI退出1和其他独立质量/性能/费用待办保留。本轮真实API0次，M5未整体验收、M6未开始。详见 [准备说明](FACT_ROLE_TEST_PREPARATION.md)。
+
+补充离线检查：`.venv/bin/python scripts/check_sealed_evaluation.py --validate-content`退出0（24条、independent_annotation/blind_review仍pending、not_assessed）；`.venv/bin/python scripts/audit_narrative_references.py`退出0（旧38例、来源34个）。与main核对封存v1/v2六文件及旧23/38/52例原字节不变、旧32来源指纹和38条参考关系不变；语法与敏感值/密钥模式检查通过。
