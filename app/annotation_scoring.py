@@ -115,10 +115,23 @@ def check_claims(rating,task,known_ids):
     if cursor!=len(task.candidate):raise ValueError('unannotated reply tail')
 
 
+
+def parse_submission(raw,model):
+    # JSON-to-dict parsers commonly keep the last duplicate key. Do not let
+    # duplicate summary labels or provenance fields silently replace each other.
+    def unique_object(pairs):
+        result={}
+        for key,value in pairs:
+            if key in result:raise ValueError('duplicate JSON field')
+            result[key]=value
+        return result
+    return model.model_validate(json.loads(raw,object_pairs_hook=unique_object))
+
+
 def load_inputs(mapping_path,packet_paths,*,bundle=BUNDLE):
     verify(bundle,content=True)
     mapping_bytes=Path(mapping_path).read_bytes()
-    mapping=Mapping.model_validate_json(mapping_bytes)
+    mapping=parse_submission(mapping_bytes,Mapping)
     manifest_bytes=(Path(bundle)/'manifest.json').read_bytes()
     if mapping.manifest_sha256!=hashlib.sha256(manifest_bytes).hexdigest():
         raise ValueError('mapping belongs to another frozen bundle')
@@ -131,7 +144,7 @@ def load_inputs(mapping_path,packet_paths,*,bundle=BUNDLE):
     packets=[];digests=[]
     if not 1<=len(packet_paths)<=2:raise ValueError('need one or two annotation submissions')
     for path in packet_paths:
-        raw=Path(path).read_bytes();packet=Packet.model_validate_json(raw)
+        raw=Path(path).read_bytes();packet=parse_submission(raw,Packet)
         tasks={t.task_id:t for t in packet.tasks};ratings={r.task_id:r for r in packet.ratings}
         if len(tasks)!=len(packet.tasks) or len(ratings)!=len(packet.ratings):raise ValueError('duplicate tasks or ratings')
         if set(tasks)!=set(mapping.mapping) or set(ratings)!=set(tasks):raise ValueError('incomplete/foreign submission')

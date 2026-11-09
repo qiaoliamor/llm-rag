@@ -228,3 +228,20 @@ def test_independent_axes_role_flag_must_have_span_even_unresolved(submissions):
     mapping,paths=submissions
     edit(paths[0],lambda d:d['ratings'][0].update(unresolved=True,role_issue=True))
     with pytest.raises(ValueError,match='role flag'):score_files(mapping,paths)
+
+
+@pytest.mark.parametrize('where',['mapping','packet','rating'])
+def test_raw_duplicate_json_fields_are_rejected(submissions,where):
+    mapping,paths=submissions
+    path=mapping if where=='mapping' else paths[0]
+    raw=path.read_text()
+    if where=='mapping':
+        digest=json.loads(raw)['manifest_sha256']
+        raw='{"manifest_sha256": '+json.dumps(digest)+','+raw[1:]
+    elif where=='packet':
+        raw='{"purpose": "synthetic_process_calibration_not_independent_trial",'+raw[1:]
+    else:
+        raw=raw.replace('"fact_issue": true','"fact_issue": true, "fact_issue": true',1)
+    path.write_text(raw)
+    with pytest.raises(ValueError,match='duplicate JSON field'):
+        score_files(mapping,paths)
