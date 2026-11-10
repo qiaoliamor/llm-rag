@@ -4,6 +4,8 @@ import tempfile
 import pytest
 
 _test_database = tempfile.TemporaryDirectory(prefix='persona-tests-')
+# Historical audit suites remain pinned; companion behavior is tested explicitly.
+os.environ['DIALOGUE_MODE'] = 'audit'
 os.environ['MEMORY_DATABASE_URL'] = 'sqlite:///' + _test_database.name + '/bootstrap.sqlite3'
 
 

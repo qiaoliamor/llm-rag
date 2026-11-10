@@ -55,7 +55,6 @@ export const deleteAllMemories = (csrf: string) => request('/v1/memories', { met
 export const setMemorySettings = (memory_enabled: boolean, timezone: string, csrf: string) => request('/v1/settings', {
   method: 'PATCH', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf }, body: JSON.stringify({ memory_enabled, timezone }),
 });
-export const getProject = () => request<{ todo: string; plan: string }>('/v1/project');
 
 export const getWeatherSettings = () => request<import('./types').WeatherSettings>('/v1/weather/settings');
 export const searchWeatherCities = (city: string) => request<{ items: import('./types').WeatherPlace[] }>(`/v1/weather/locations?q=${encodeURIComponent(city)}`);

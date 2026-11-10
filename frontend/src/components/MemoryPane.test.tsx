@@ -2,7 +2,6 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { expect, it, vi } from 'vitest';
 import { MemoryPane } from './MemoryPane';
-import { ProjectPane } from './ProjectPane';
 import type { MemoryItem, MemoryList } from '../types';
 
 const item: MemoryItem = { id:'test-id', fact:'我下周二有合成面试', category:'event',status:'candidate',event_date:'2026-11-03', source_message_id:'test-message',source_kind:'chat',version:1,created_at:'2026-10-31T00:00:00Z',updated_at:'2026-10-31T00:00:00Z',conflicts:[] };
@@ -55,11 +54,4 @@ it('adds manual candidates without automatically confirming', async () => {
   await user.type(input,'我下周二有合成面试');await user.click(screen.getByRole('button',{name:'添加候选'}));
   await screen.findByRole('button',{name:'确认记住'});
   expect(fetchMock.mock.calls[1][0]).toBe('/v1/memories');expect(fetchMock.mock.calls[1][1].method).toBe('POST');
-});
-
-it('shows both task list and plan through the project progress entry', async () => {
-  vi.stubGlobal('fetch',vi.fn().mockResolvedValue(response({todo:'# 开发任务清单\n- [x] M1\n- [ ] M3',plan:'# 实施计划\nM2 记忆'})));
-  render(<ProjectPane/>);expect(await screen.findByText(/开发任务清单/)).toBeVisible();
-  await userEvent.setup().click(screen.getByRole('button',{name:'实施计划'}));
-  expect(screen.getByText(/M2 记忆/)).toBeVisible();
 });

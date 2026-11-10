@@ -23,7 +23,6 @@
 .pane-error, .memory-delete-confirm { color: #984e3c; background: #f8ede7; padding: 12px; border-radius: 7px; font-size: 12px; }
 .pane-notice { color: var(--green); background: #e9eee2; padding: 12px; font-size: 12px; }
 .memory-hint { border-radius: 0; background: #e9eee2; color: var(--green); }
-.project-document { white-space: pre-wrap; overflow-wrap: anywhere; font: 13px/1.9 ui-monospace, monospace; background: #f0f2e9; padding: 18px; border-radius: 8px; }
 @media(max-width:850px) { .workspace-nav { padding: 10px 25px; } .workspace-pane { padding: 15px 25px 25px; } }
 @media(max-width:600px) { .workspace-nav { padding: 8px 15px; gap: 4px; } .workspace-nav button { padding: 9px 12px; } .workspace-pane { padding: 14px 18px 25px; } .workspace-pane h3 { font-size: 22px; } }
 

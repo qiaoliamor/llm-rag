@@ -97,7 +97,7 @@
     },
     {
       "path": "tests/test_memory.py",
-      "sha256": "ed99f72391fefa5d36498f520348f6327407631446c9ae9850e930d03c3c6429"
+      "sha256": "3632dcb02b332627864c070057194de5893580a963dd7d0654ac3d88c1b51546"
     },
     {
       "path": "tests/test_memory_query.py",
