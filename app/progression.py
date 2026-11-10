@@ -155,10 +155,27 @@ class Progression:
             return self.snapshot(db,account,bond)
 
     def successful_turn(self, uid, started_at):
-        # Only successful turns count, and only the interval BEFORE generation.
-        # No points for model latency, refreshes, failed sends or a lone idle tab.
+        account, _ = self.complete_turn(uid, started_at)
+        return account
+
+    def complete_turn(self, uid, started_at, *, facts=(), source=None, epoch=None):
+        """Commit candidate memories and time credit together, before session history."""
         with self.transaction(uid) as db:
+            if epoch is not None and db.get(Player, uid).epoch != epoch:
+                raise ProviderFailure('memory_changed', '设置已变化，本轮回复已撤销，请重新发送。', 409)
             account,bond = self.rows(db,uid)
+            candidates = []
+            for fact in facts:
+                candidate = self.store.candidate(uid, fact, source, epoch, transaction=db)
+                if candidate and candidate['status']=='candidate': candidates.append(candidate)
+            if started_at is not None:
+                self._credit_time(bond, started_at)
+            return self.snapshot(db,account,bond),candidates
+
+    def _credit_time(self, bond, started_at):
+        # Only count the interval BEFORE generation. Stale/overlapping responses
+        # must not rewind either the daily allowance or the completion anchor.
+        if bond.last_turn is None or started_at > bond.last_turn:
             day = started_at.date().isoformat()
             if bond.talk_day!=day:
                 bond.talk_day=day; bond.talk_points_today=0; bond.pending_seconds=0
@@ -171,8 +188,6 @@ class Progression:
                     points = min(points,10-bond.talk_points_today,100-bond.score)
                     bond.score+=points; bond.talk_points_today+=points
                     bond.pending_seconds=remainder
-            # A second session's older in-flight request cannot rewind the anchor.
-            completed_at=self.clock()
-            if bond.last_turn is None or completed_at>bond.last_turn:
-                bond.last_turn=completed_at
-            return self.snapshot(db,account,bond)
+        completed_at=self.clock()
+        if bond.last_turn is None or completed_at>bond.last_turn:
+            bond.last_turn=completed_at

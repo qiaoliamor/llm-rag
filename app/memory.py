@@ -4,6 +4,7 @@ import json
 import math
 import re
 import secrets
+from contextlib import nullcontext
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -396,8 +397,9 @@ class MemoryStore:
                 result.append(data)
             return result
 
-    def candidate(self, uid, fact, source, epoch, manual=False):
-        with self.db.begin() as db:
+    def candidate(self, uid, fact, source, epoch, manual=False, *, transaction=None):
+        # A completed chat may share its transaction with progression rewards.
+        with (nullcontext(transaction) if transaction is not None else self.db.begin()) as db:
             p = self._player(db, uid, True)
             if not p.memory_enabled or p.epoch!=epoch: return None
             if not manual and db.get(Revocation, self._fingerprint(uid,fact)): return None

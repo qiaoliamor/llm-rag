@@ -273,9 +273,14 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
             verify_epoch(session, snapshot['epoch'])
             if review_status.get('status') == 'unavailable' and review_status.get('failure') in REVIEW_TRANSIENT_FAILURES:
                 raise ProviderFailure('review_busy', BUSY_MESSAGE, 503)
+            facts = extract_candidates(body.message) if snapshot['memory_enabled'] and abilities['memory'] else []
             candidates = []
-            if snapshot['memory_enabled'] and abilities['memory']:
-                for fact in extract_candidates(body.message):
+            account_result = None
+            if growth:
+                account_result,candidates = growth.complete_turn(session.user_id, turn_started if not guarded else None,
+                    facts=facts, source=request.state.request_id, epoch=snapshot['epoch'])
+            else:
+                for fact in facts:
                     candidate = store.candidate(session.user_id, fact, request.state.request_id, snapshot['epoch'])
                     if candidate and candidate['status'] == 'candidate': candidates.append(candidate)
             session.emotion.turn = turn
@@ -284,7 +289,7 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
             else: session.emotion.assessment = None
             session.messages = (history + [{'role': 'assistant', 'content': reply, **({'weather': weather_result} if weather_result and weather_result['status'] == 'ok' else {})}])[-24:]
             return {'emotion': mood_result, 'weather': weather_result, 'reply': reply, 'request_id': request.state.request_id, 'guarded': guarded, 'memory_candidates': candidates,
-                    **({'account':growth.successful_turn(session.user_id,turn_started)} if growth and not guarded else {}),
+                    **({'account':account_result} if account_result is not None else {}),
                     'retrieved_memory_ids': [m['id'] for m in evidence],
                     'memory_route':route.public(),'semantic_review':review_status}
 

@@ -289,3 +289,44 @@ def test_weather_is_available_at_60_and_emotion_waits_until_90(app):
     with app.state.memory_store.db.begin() as db:
         db.get(Bond,(user,'shen_yan')).score=90
     assert c.patch('/v1/emotion/settings',headers=h,json={'enabled':True}).status_code==200
+
+
+def test_old_cross_midnight_completion_cannot_reset_daily_allowance(app):
+    c,_,_=boot(app);growth=app.state.progression;user=uid(app,c)
+    now=datetime(2026,11,11,0,20)
+    with app.state.memory_store.db.begin() as db:
+        bond=db.get(Bond,(user,'shen_yan'))
+        bond.score=10;bond.talk_day='2026-11-11';bond.talk_points_today=10;bond.last_turn=now
+    growth.clock=lambda:now
+    growth.successful_turn(user,datetime(2026,11,10,23,59))
+    growth.clock=lambda:now+timedelta(seconds=60)
+    result=growth.successful_turn(user,growth.clock())
+    assert result['character']['score']==10
+    with app.state.memory_store.db() as db:
+        bond=db.get(Bond,(user,'shen_yan'))
+        assert bond.talk_day=='2026-11-11' and bond.talk_points_today==10
+
+
+@pytest.mark.parametrize('failure',['reward','candidate'])
+def test_failed_completion_rolls_back_history_candidates_and_reward(app,monkeypatch,failure):
+    c,h,_=boot(app);growth=app.state.progression;store=app.state.memory_store;user=uid(app,c)
+    start=datetime(2026,11,10)
+    with store.db.begin() as db:
+        bond=db.get(Bond,(user,'shen_yan'));bond.score=30;bond.last_turn=start
+    assert c.patch('/v1/settings',headers=h,json={'memory_enabled':True}).status_code==200
+    growth.clock=lambda:start+timedelta(seconds=60)
+    snapshot=growth.snapshot
+    def failing_snapshot(db,account,bond):
+        if bond.score>30:raise RuntimeError('synthetic reward storage failure')
+        return snapshot(db,account,bond)
+    with monkeypatch.context() as patch:
+        if failure=='reward':patch.setattr(growth,'snapshot',failing_snapshot)
+        else:patch.setattr(store,'candidate',Mock(side_effect=RuntimeError('synthetic memory storage failure')))
+        with TestClient(app,raise_server_exceptions=False) as client:
+            client.cookies.update(c.cookies)
+            result=client.post('/v1/chat',headers=h,json={'message':'我明天有一场面试。'})
+        assert result.status_code==500
+    session=next(s for s in app.state.sessions.values() if s.user_id==user)
+    assert session.messages==[]
+    assert store.list(user)==[]
+    assert growth.get(user)['character']['score']==30
