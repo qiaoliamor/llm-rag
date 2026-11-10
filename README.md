@@ -1,238 +1,53 @@
 # 心语 · Persona RAG
 
-面向女性玩家游戏的个性化角色对话系统。通过可追溯记忆、检索增强生成与提示工程，让角色持续关心玩家，并保持稳定的人格与背景。
+面向女性玩家游戏的原创角色对话原型：React + TypeScript网页、FastAPI后端，支持Gemini/OpenAI/mock、确认式长期记忆、天气关怀和可纠正情绪参考。
 
-**当前进度：M4已交付，M5评测、按需记忆与在线语义审查迭代中（实验，未整体验收）；前端 React + TypeScript。** 已实现原创角色沈砚、Gemini API 与 OpenAI Responses API 接入、多轮短期上下文、独立浏览器会话、清空对话、基础角色事实检查及离线演示。已增加确认式长期记忆、混合检索及网页查看/纠正/删除；新增默认关闭的天气查询与关怀；新增默认关闭、可纠正的情绪估计与倾听偏好。
+M1–M4功能闭环已实现，M5仍在质量验证，M6未开始。亲密度30/60/90依次解锁记忆/天气/情绪资格，仍需各自授权；钱包只是演示币，没有真实支付或正式账号体系。
 
-## 在哪里查看计划
+- [文档入口：每个模块的功能、设计、实现与测试](docs/README.md)
+- [当前任务清单](TODOLIST.md) · [阶段计划](docs/PLAN.md) · [测试及历史原文](docs/TEST_HISTORY.md)
+- 开发前阅读 [AGENTS.md](AGENTS.md)，贡献规则见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
-根目录 [TODOLIST.md](TODOLIST.md) 是完整任务清单，[docs/PLAN.md](docs/PLAN.md) 是阶段计划。这些开发文档仅在仓库中维护，不在玩家网页展示。
+## 本地运行
 
-开发前先阅读 [项目操作规则](AGENTS.md)：任务分支、命令行检查、PR合并与秘密保护。
+需要Python 3.11+、uv、Node.js 22.12+和npm；推荐Docker Desktop运行PostgreSQL/pgvector。进入克隆目录后：
 
-## 本地打开
-
-需要 Python 3.11+ 与 [uv](https://docs.astral.sh/uv/getting-started/installation/)。本项目已提交 `uv.lock`，启动时按锁定版本安装依赖。前端需要 Node.js 22.12+ 和 npm（本机已安装）。启动脚本在依赖缺失或锁文件更新时执行 `npm ci`，每次启动执行类型检查、前端构建并交给 FastAPI 提供页面。前端依赖锁定在 `frontend/package-lock.json`，首次安装需要网络。
-
-```bash
-cd /Users/qiaoli/Desktop/program/llm-rag
-# 首次启用 PostgreSQL：先启动 Docker Desktop，再执行一次
+```sh
+# 首次配置PostgreSQL前先启动Docker Desktop；已配置则跳过
 ./scripts/setup-memory-db.sh
 ./scripts/start.sh
 ```
 
-浏览器打开 **[http://127.0.0.1:8000](http://127.0.0.1:8000)**。保持终端运行，按 `Ctrl+C` 停止。其他电脑克隆后先进入自己的项目目录，再运行 `./scripts/start.sh`。本机 PostgreSQL 已配置，后续直接运行 `./scripts/start.sh`；先保证 Docker Desktop 在运行。数据库只监听本机 54329，数据在专用 Docker 卷。初始化会在本地 `.env` 生成数据库凭据，不显示或提交。若端口已占用，先停止原服务，或用 `uv run --frozen uvicorn app.main:app --host 127.0.0.1 --port 8001` 后打开对应地址。
+打开 [http://127.0.0.1:8000](http://127.0.0.1:8000/)，保持终端运行，Ctrl+C停止。脚本按锁文件安装必要依赖、构建React到`app/static/`再启动FastAPI；首次安装需要网络。开发计划只在仓库维护，玩家页面没有计划页。
 
-## 配置 Gemini（默认）
+首次启动从`.env.example`创建本地`.env`，用编辑器填写`GEMINI_API_KEY`，不要贴进聊天或上传Git。源码默认模型为`gemini-3.5-flash-lite`，本地`GEMINI_MODEL`可覆盖；模型名不保证账号权限、免费额度或服务可用性。修改配置后重启。
 
-首次启动会自动从 `.env.example` 创建仅本地使用的 `.env`；本机已经创建好。用编辑器打开 `.env`，填入自己在 [Google AI Studio](https://aistudio.google.com/apikey) 创建的 Gemini API Key：
+- 完全离线：本地设置`CHAT_PROVIDER=mock`、`WEATHER_PROVIDER=mock`，需要时用独立SQLite路径；mock天气明确为合成，不等于真实天气。
+- 可选OpenAI：`CHAT_PROVIDER=openai`并本地填写`OPENAI_API_KEY`/`OPENAI_MODEL`。
+- PostgreSQL默认本机端口54329；SQLite可配置`MEMORY_DATABASE_URL=sqlite:///data/memory.sqlite3`，不称pgvector模式。切换库不会自动迁移记忆；不要删除Docker数据卷来“重置测试”。
+- 8000已占用时先停止自己的旧进程，或用`uv run --frozen uvicorn app.main:app --host 127.0.0.1 --port 8001`。
 
-```dotenv
-CHAT_PROVIDER=gemini
-GEMINI_API_KEY=在本地填写你的Gemini密钥
-GEMINI_MODEL=gemini-3.5-flash-lite
-API_TIMEOUT_SECONDS=30
-```
+## 页面与数据边界
 
-修改后重启服务。此次账号真实测试中，旧模型 `gemini-2.5-flash-lite` 返回“不再向新用户开放”；本地改用 `gemini-3.5-flash-lite` 后成功。M2 已将源码、模板和回归断言统一为新模型；现有本地密钥不被覆盖。模型权限、地区和实际限额以账号为准。代码不负责开通付费或切换计费档，但同一模型也有付费价格，因此不要把模型名称当作强制免费的开关；使用自己的 Free Tier 项目。达到配额后会提示错误，不自动切换其他服务或模型。
+首页只有角色选择/个人账户；进入沈砚聊天。首页仅显示初识/渐熟/默契/知心档位，解锁时短暂提示，已解锁文字可点击查看解释。账户内可管理资料、演示币、礼物和已授权能力；基础聊天始终可用。
 
-使用 Google 官方 [OpenAI 兼容接口](https://ai.google.dev/gemini-api/docs/openai)，复用现有 SDK，无需安装额外 Gemini 依赖。这里的兼容性指接口格式，请求实际发往 Google，使用独立的 `GEMINI_API_KEY`。免费档内容可能用于改进 Google 产品，当前建议只使用合成对话测试。[官方价格与数据说明](https://ai.google.dev/gemini-api/docs/pricing)
+长期记忆需要逐条确认，支持查看/纠正/删除；按需检索，不每轮查库。当前向量为本地字符特征，不是训练语义嵌入；自动提取保守，遗漏可手动添加。身份绑定浏览器Cookie，清Cookie后没有自动找回；完整聊天只在服务内存保留，确认事实本地持久化。
 
-### 可选：继续使用 OpenAI
+允许虚构书店环境、光线、声音和普通动作，重点守住角色正史、玩家经历及工具事实。语义裁判是有限模型检查，不保证理解全部事实。天气是模型估计/预报，情绪是可纠正参考，不是实况传感器或心理诊断。供应商会收到必要聊天/地点数据，详见[隐私](docs/DATA_PRIVACY.md)。
 
-```dotenv
-CHAT_PROVIDER=openai
-OPENAI_API_KEY=在本地填写你的OpenAI密钥
-OPENAI_MODEL=gpt-4.1-mini
-```
-
-两个供应商的密钥互相独立，只使用当前 `CHAT_PROVIDER` 对应的密钥。OpenAI 模型名称可改为账号支持且兼容 Responses API 的模型，不读取 ChatGPT 网页登录态。
-
-密钥仅由 Python 后端读取，不进入网页、Cookie 或 API 响应。`.env`、日志及运行数据已加入 `.gitignore`；不要把真实密钥填入 `.env.example`、源码、Issue 或聊天。公开仓库保留 API 接入代码和空配置模板，以便他人运行，不含个人凭据。
-
-接入方式参考 [OpenAI 官方快速开始](https://developers.openai.com/api/docs/quickstart) 和 [API 认证说明](https://developers.openai.com/api/reference/overview)。OpenAI 模式使用 `store=False`，但这不等同于对供应商所有数据保留行为的承诺，真实接入前请核对账号的数据设置。
-
-## 不填密钥也能试用网页
-
-```bash
-CHAT_PROVIDER=mock ./scripts/start.sh
-```
-
-网页会明确显示“离线演示 · 非真实模型回复”。它使用固定规则，用来检查网页交互及故障路径，不能代表真实模型质量；API 模式缺少密钥或调用失败时会明确报错，不自动切换成模拟回复。
-
-## 长期记忆如何使用
-
-1. 打开网页 **“长期记忆”**，点击“开启长期记忆”（默认关闭），按需要选择事件时区。
-2. 在聊天中明确表达重要经历，例如“我下周二有面试”。系统只提取本轮的保守候选，不自动记为长期事实。
-3. 点击候选提示，逐条点击“确认记住”；没有被规则覆盖的经历可手动添加候选。未经确认不参与检索。
-4. 点击“开始新对话”后，仍可询问“你记得我的求职安排吗”。同一浏览器身份下，已确认记忆保存在本机，服务重启后仍可恢复。
-5. 可纠正内容、单条删除或清空全部；同类事实冲突时明确选择替换旧内容，或作为独立经历保留两条。
-
-纠正、确认、删除及授权变更会清空当前身份的短期聊天，防止旧事实继续影响回复。删除会物理移除记忆原文/向量，保留无原文的撤销指纹与动作版本；重复旧消息不会自动重建已删除记忆，手动重新添加并确认代表重新授权。关闭只停止提取/检索，保留已确认内容，可继续删除。
-
-记忆归属浏览器的随机 HttpOnly Cookie，不是跨设备账号；清除 Cookie、换浏览器或隐私窗口会变成另一个身份。不要清除 Cookie 来测试“新对话”，使用网页按钮即可。当前不提供遗失身份恢复。聊天原文只在内存中，不保存完整聊天日志；候选摘录和确认事实会保存到本地数据库。
-
-### 数据库与检索方式
-
-推荐按上述脚本使用 PostgreSQL + pgvector。`migrations/001_memory.sql` 是初始 schema v1 的参考 SQL（应用同时执行v2时区列、v3天气设置表与v4情绪设置表升级），应用首次启动自动建立缺失表并执行幂等升级、登记版本。测试脚本使用独立临时库，不写真实记忆库。不要执行 `docker compose down -v`，它会删除本项目记忆卷。
-
-不使用 Docker 时，本地 `.env` 可以设置 `MEMORY_DATABASE_URL=sqlite:///data/memory.sqlite3`，使用 SQLite 持久化及进程内精确向量评分；不要把它称为 pgvector 模式。切换数据库不会自动搬运已有记忆，应保持当前配置。两种模式都支持本地记忆管理；当前按单 Uvicorn worker 使用。
-
-检索采用768维本地字符特征哈希与限定同义词扩展，不调用额外嵌入 API。PG 模式在身份、角色、确认状态和有效期过滤后执行精确余弦向量查询，再结合关键词、时效和重要度重排；最多5条、约1200字符记忆进入提示。它是可重复基线，尚未实现训练模型的深层语义嵌入，不能保证任意换一种说法都能召回。
-
-## 天气关怀如何使用
-
-天气使用 Open-Meteo 非商业免费端点，**无需注册、无需天气密钥**。在网页“天气关怀”中开启授权，搜索并选择城市，保存后回到聊天询问“明天天气怎么样？”；也可在消息中明确临时目的地。地点不明或重名会澄清，不通过IP/GPS或记忆猜测位置。天气设置支持查看、修改和删除，与长期记忆授权分开。
-
-沈砚的台词自然结合天气关心，不播报API来源与数据日期；回复下方“天气依据”标明模型估计/整日预报，展开可核对来源、时效与湿度等数值。当前天气为模型估计，未来天气为当地整日预报；支持今天起七天，不提供小时级或历史查询。工具只发送城市/坐标，不发完整聊天给天气供应商；投影后的天气和相关确认记忆才进入对话模型提示。可用 `WEATHER_PROVIDER=mock CHAT_PROVIDER=mock ./scripts/start.sh` 完全离线演示，所有天气会标明合成。商业化前需重新确认天气许可。详见 [天气API与上下文设计](docs/WEATHER.md)。
-
-## 情绪关怀如何使用
-
-网页“情绪关怀”独立授权默认关闭。开启后复用当前Gemini/OpenAI模型和本地密钥，不需要新注册情绪API；最近聊天窗口会额外发送给当前模型分析，因此增加调用量。默认每3轮分析最近6轮，强烈表达可提前，并有冷却。可以选择先倾听、温和鼓励、一起想办法或先询问。
-
-分析只是可纠正的推测；你的自述优先，也可在页面纠正心情/本轮偏好、清空临时推测或删除设置。推测不落盘、不直接写长期记忆，最多10分钟或6轮有效；新对话、设置/授权变更清空旧参考和短期聊天，撤销在途旧回复。关闭后普通对话仍可使用。详见 [情绪设计](docs/EMOTION.md) 和 [M4测试记录](docs/M4_TEST_REPORT.md)。
-
-## 当前行为与边界
-
-- 原创角色沈砚，28岁，栖川旧书店店主；固定角色正史与玩家记忆分开，记忆不能改写正史。
-- 聊天输入上限2000字符，内存保留最近12轮；新对话清空短期历史，长期记忆另行管理。
-- 默认关闭记忆；候选24小时有效。明天/后天/下周某日和明确年月日可解析，模糊日期保留未知；健康、创伤等也需逐条确认。
-- 面试、考试、手术类未来预约到日期后31天退出检索，仍可查看删除；一般历史经历和偏好不按预约规则过期。
-- 角色检查仍是局部规则与一次重写，不能保证杜绝幻觉。天气查询已实现但复杂表达和真实关怀质量仍待评估；情绪估计已实现，但准确率/校准与长期质量仍待评测。
-- API 模式向当前供应商发送提示、短期历史与相关已确认记忆；默认不把所有记忆发送出去。记忆关闭时不检索。
-- 仅本地使用：会话/CSRF/Host 检查不替代生产账户、HTTPS、备份擦除和完整审计。数据库没有新增应用级加密，请谨慎保存敏感内容。
-
-## 前端开发与构建
-
-源代码在 `frontend/src/`，采用 React 组件、TypeScript 严格类型检查与 Vite 构建。原有旧书店风格及聊天交互保留。React 迁移时保留原聊天接口；M2 在兼容旧字段的基础上增加记忆与设置接口，不需要额外启动前端服务或设置 CORS。
-
-```bash
-npm ci --prefix frontend
-npm run build --prefix frontend
-```
-
-构建输出先进入 `frontend/dist/`，再发布到 `app/static/`。这两处生成文件与 `node_modules/` 均不提交；不要直接编辑生成文件。修改前端后重新 build 并刷新网页即可；后端已经运行时无需为了前端构建重启。全新克隆后直接运行 `./scripts/start.sh` 也会自动安装和构建。
-
-Vite 关闭 `.env` 文件加载，前端代码不读取根目录秘密；供应商密钥继续只由 Python 后端加载。不要把密钥放入前端源码或任何 `VITE_*` 变量。
-
-## 测试与实验
-
-```bash
-npm ci --prefix frontend
-npm run build --prefix frontend
-npm run test --prefix frontend
-
-uv run --frozen pytest -q
-uv run --frozen python scripts/evaluate.py --limit 100
-```
-
-M2 历史结果为20项前端、174项默认后端通过；M4历史为36项前端、284项默认后端通过/20项PG跳过、临时库专项161项通过，见 [M4测试记录](docs/M4_TEST_REPORT.md)。M5当前后端917通过/55跳过，组件开发集68/68；新增检索消融及12次真实合成提示配对，正式模型质量未验收，见 [M5记录](docs/M5_TEST_REPORT.md)。数据库专项脚本 `uv run --frozen python scripts/test_postgres.py` 只创建并删除临时库，不操作真实记忆数据。后端测试前必须先构建前端。原有 100 条合成场景及接口、隔离、重写、密钥缺失、配额、超时等回归保留；新增静态资源检查验证 React 构建能通过现有路径和 CSP 加载。离线评测只验证 mock 链路，不衡量情感理解或幻觉率。脚本提供 direct（直接提示）、rag（简单关键词正史检索）、canon（完整正史）三个对照入口。实际聊天现已检索已确认玩家记忆；该脚本仍是角色正史的三组简易对照，不等于完整记忆评测。
-
-本地填好密钥后可执行下列小规模真实测试；会消耗当前供应商额度，付费档可能产生费用；每组最多 `limit` 次、共三组：
-
-```bash
-uv run --frozen python scripts/evaluate.py --live --limit 5
-```
-
-真实测试中的字面片段命中只是初筛，语义正确性仍需人工评审。后续已用本地密钥和 Gemini 3.5 Flash-Lite 完成六轮真实连续对话及一次网页真实交互；发现未知童年回应有无依据解释，尚未做正式质量对照或账单核验。M2 另完成真实跨会话召回、纠正与删除链路。详见 [M2 测试记录](docs/M2_TEST_REPORT.md) 和 [Gemini 适配测试记录](docs/GEMINI_TEST_REPORT.md) 和 [M1 测试记录](docs/M1_TEST_REPORT.md)。
-
-实际 PostgreSQL 回归（先确保本地数据库就绪）：
-
-```bash
-uv run --frozen python scripts/test_postgres.py
-```
-
-脚本创建随机命名临时数据库，执行专项用例后删除该临时库。普通 pytest 强制使用临时 SQLite；两者不使用真实记忆库。
-
-## 项目文档
-
-| 文档 | 内容 |
-| --- | --- |
-| [M2 测试记录](docs/M2_TEST_REPORT.md) | 记忆授权、持久化、检索、删除与真实链路 |
-| [React 迁移记录](docs/FRONTEND_MIGRATION.md) | 组件结构、构建流程、兼容性和本次测试 |
-| [阶段总结](docs/PROJECT_STATUS.md) | 用户意见、设计决策、已完成工作与已知问题 |
-| [前后端架构](docs/ARCHITECTURE.md) | 当前实现、接口、数据流及 M2–M4 目标设计 |
-| [版本测试总表](docs/TEST_HISTORY.md) | 提交对应的测试范围和真实验证结果 |
-| [功能需求](docs/FEATURES.md) | 四项核心功能与验收条件 |
-| [实施计划](docs/PLAN.md) | 架构、数据结构与里程碑 |
-| [任务清单](TODOLIST.md) | 当前进度与后续开发 |
-| [评测方案](docs/EVALUATION.md) | 幻觉、角色一致性和个性化评测 |
-| [数据与隐私](docs/DATA_PRIVACY.md) | 后续持久化阶段的授权和删除设计 |
-| [提示设计](prompts/DESIGN.md) | 提示分层与模板 |
-| [参与贡献](CONTRIBUTING.md) | 开发与贡献约定 |
-
-采用 [MIT License](LICENSE)。仅提交原创或已获授权的角色设定与数据；第三方 API、模型与素材遵守各自条款。
-
-## M5离线组件基线（进行中）
-
-```bash
-.venv/bin/python scripts/evaluate_m5.py --split dev
-```
-
-不需要密钥，不加载.env或真实数据库，使用100个固定合成场景中的68开发案例；其余32个为保留集，本轮不运行。输出JSON包含计数、失败ID、简易Recall@5、天气触发指标和本地组件耗时，不输出对话正文或密钥。非全通过时退出码为1，程序异常也失败退出；完整范围和后续任务见 [M5测试记录](docs/M5_TEST_REPORT.md)。原有 `scripts/evaluate.py` 继续保留为M1字面mock冒烟，不将两种结果混合。
-
-### 检索消融与来源提示对照
-
-```bash
-.venv/bin/python scripts/evaluate_retrieval.py
-```
-
-默认不加载.env或调用API，使用40条合成记录/24个开发查询，比较查询扩展、混合检索、重排和移除因素的结果，报告宏/微Recall、Precision、MRR、nDCG及无答案误召回。可显式加 `--live --live-limit 3 --repeats 2 --max-calls 12` 做同证据D/E来源提示配对，会消耗当前供应商额度。本批交付见 [PR #11](https://github.com/qiaoliamor/llm-rag/pull/11)。完整结果、12份合成回复及局限见 [检索消融报告](docs/RETRIEVAL_ABLATION.md)；当前未观察到稳定提示收益，不作为正式质量验收。
-
-### 姓名与无答案检索修复
-
-生产默认增加本人姓名路由与有限主体/字段/时间证据检查，缺少对应事实不补无关记忆；存在对应确认事实仍可召回。重跑旧开发集和新增回归集：
-
-```bash
-.venv/bin/python scripts/evaluate_retrieval.py
-.venv/bin/python scripts/evaluate_retrieval.py --dataset guard-regressions
-```
-
-旧组保持、新R/S/F分别比较路由/证据检查/组合。可用 `--live --retrieval-variant F_retrieval_fix --live-limit 3 --repeats 2 --max-calls 12` 显式做修复后证据的提示配对，会消耗当前供应商额度。本批交付见 [PR #12](https://github.com/qiaoliamor/llm-rag/pull/12)。数值、12份合成回复及有限规则边界见 [检索修复记录](docs/RETRIEVAL_GUARDS.md)；M5仍未整体完成。
-
-
-M5来源时间修复通过[PR #13](https://github.com/qiaoliamor/llm-rag/pull/13)交付（合入main生效）：长期记忆不证明“刚才告诉我”，事件日期不当讲述日期；有限输出检查复用一次重写及兜底。命令行验证408通过/24跳过，临时PG专项169通过。提示设计、真实Gemini前后对照及失败边界见 [来源时间记录](docs/MEMORY_SOURCE_TIME.md)。可显式运行 `.venv/bin/python scripts/evaluate_memory_source.py --repeats 1 --interval 12`；只发送固定合成探针，最多6请求，会消耗供应商额度；默认2重复共12请求，不自动重试。
-
-
-M5店内近况与地名完整性修复（交付记录：[PR #14](https://github.com/qiaoliamor/llm-rag/pull/14)）：新增默认启用的场景边界提示与有限输出检查，不从书店身份推断当天客流、库存或已完成动作，不把地名缩写当作同一地点。默认后端448通过/25跳过，独立临时PG专项171通过；设计、真实Gemini前后回复与边界见 [场景与地名记录](docs/SCENE_PLACE_GROUNDING.md)。可显式运行 `.venv/bin/python scripts/evaluate_grounding.py --repeats 1 --interval 12`，默认6请求、最多12请求，仅固定合成数据，会消耗供应商额度，不自动重试。
-
-
-M5完整事实支持审计：新增52条固定合成回复、93个连续标注片段；参考标签独立于词面规则，检测“地名正确但附加事实无据”等问题。当前生产规则在51条可裁决样本上TP14/FP5/FN15/TN17，另1条未决；这些是开发诊断，不是模型幻觉率。生产规则本批未改。设计、完整发现和后续任务见 [事实支持评测](docs/FACT_SUPPORT_EVALUATION.md)。
+## 命令行验证
 
 ```sh
-.venv/bin/python scripts/evaluate_fact_support.py
-.venv/bin/python scripts/evaluate_fact_support.py --format markdown
+npm ci --prefix frontend
+npm run build --prefix frontend
+npm test --prefix frontend -- --run
+uv run --frozen pytest -q
+# 如需数据库专项：只创建/删除随机临时PG库，不用真实玩家库测试
+uv run --frozen python scripts/test_postgres.py
+# 只做封存结构/哈希检查，零模型调用
+uv run --frozen python scripts/check_sealed_evaluation.py --validate-content
 ```
 
-默认退出0仅表示审计有效；可加 `--fail-on-findings` 作质量门禁，当前有已知发现故预期返回1。无需密钥、网络或数据库，不加载.env；478项默认测试通过、25项PG变体跳过，PG171项沿用PR #14相同生产代码，不重复专项。未执行原保留集，M5仍进行中。
+PR #28历史基线：917通过/55跳过，独立临时PG233通过（重叠），前端60通过及构建通过；本次文档整理不冒充重跑这些测试。新默认companion和旧audit覆盖口径、历史失败、真实合成观测及未验收项见[测试记录](docs/TEST_HISTORY.md)。真实API测试仅按AGENTS缩量复测旧失败，不在自动检查中加`--live`。
 
-
-M5按需记忆与在线语义审查已实现：明确需要跨会话事实时才检索，普通问候/知识/当前表达不查，含糊个人请求最多一次模型路由；丰富回复经过证据受限审查，最多一次重写及复审，失败保守兜底。默认使用当前本地供应商和密钥；`MEMORY_ROUTER_ENABLED`、`SEMANTIC_REVIEW_ENABLED`可回滚，路由超时默认4秒、每轮裁判共享8秒预算。mock只有规则，不具备真实语义判断。
-
-PR #16历史版本默认532通过/26跳过，独立临时PG173通过；真实六个开发探针5个与参考一致、1超时，不能当独立质量验收或消除幻觉。配置、调用预算、失败历史和真实结果见 [在线方案及记录](docs/DEMAND_MEMORY_AND_SEMANTIC_REVIEW.md)。PR #15已合并（46e2fdd），PR #16已合并（5aec504）；实际店况会话多次审查失败并安全兜底，普通角色介绍链路已通过，结构化稳定性与语义质量仍待独立校准。M5仍进行中。前端未变，重启后端即可使用新的默认行为，无需在聊天中填写密钥。
-
-
-当前交付：[PR #17](https://github.com/qiaoliamor/llm-rag/pull/17) 完成合并审阅，按本次squash合入main生效。包含固定编号的紧凑审查协议、每轮共享8秒裁判预算、独立role_issues口吻检查及场景v1.1。保留自然环境、声音和日常动作，重点核对角色关键事实、玩家经历及真实天气；不把用户认可的自然回复改成客服式能力声明。
-
-合并前命令行复核633通过/26跳过，独立临时PG173通过（计数重叠）。本次未追加真实API；此前定向口吻和条件句复测通过，早期503/超时/误判全部保留，不能当独立泛化或总体质量验收。当前标准与完整证据见 [场景及口吻记录](docs/SCENE_ROLEPLAY.md)、[协议与失败历史](docs/SEMANTIC_REVIEW_STABILITY.md)。M5继续校准，M6未开始。
-
-
-当前叙事标准的事实/店主口吻双轴开发校准（[PR #19](https://github.com/qiaoliamor/llm-rag/pull/19)，本次squash合并生效）：23条版本化作者参考、42项新增回归，旧52例审计不改。默认运行 `.venv/bin/python scripts/evaluate_narrative_calibration.py` 仅校验清单、无API调用；本轮仅2次旧HTTP503合成审查均符合参考，不能当独立质量验收。完整命令、结果与局限见 [评测校准](docs/NARRATIVE_CALIBRATION.md)，M5继续，M6未开始。
-
-
-M5跨文件语义查重与参考复核（PR #20交付，本次squash合并生效）：32个现有源文件、38条双轴开发参考（保留v1原23条，新增15条），登记14个机制族及逐条来源关系。全量715通过/26跳过；仅1次旧失败英文地名审查仍超时，不算质量通过。旧保留文本已为查重静态审阅，正式独立验收须另设新封存数据。详见 [复核与剩余任务](docs/NARRATIVE_REFERENCE_AUDIT.md)，M6未开始。
-
-
-M5独立评测准备（2026-11-09，PR #21交付，本次squash合并生效）：新增 [独立评测协议](docs/INDEPENDENT_EVALUATION.md)、24条公开冻结候选和标签隐藏校准包工具。命令 `.venv/bin/python scripts/check_sealed_evaluation.py` 默认只做哈希校验、零API；`--validate-content`检查结构，不计算模型质量。全量744通过/26跳过；独立标注/盲评/正式未见集及真实验收尚未执行，既有8.003秒超时保留，M6未开始。
-
-
-M5 s03与繁忙体验（PR #22交付，本次squash合并生效）：封存v1保留、v2修订s03并绑定新政策；默认封存工具使用v2。审查暂时不可用返回503/review_busy，网页保留草稿、显示温和提示，需手动重发；配置错误不掩盖。后端774/26、前端41与构建、临时PG173通过，本轮零API。Prompt优先补复杂混合句/到店释义，独立质量和旧超时仍待验收，详见 [设计与测试](docs/M5_BUSY_S03.md)，M6未开始。
-
-
-M5离线标注评分（PR #23交付，本次squash合并生效）：支持1–2份标注的冻结绑定/覆盖/证据校验、分歧与未决清单、一致率/κ及分层评分；公开校准候选、样本不足和独立评审未核实时明确未验收。命令与格式见 [离线评分流程](docs/OFFLINE_ANNOTATION_SCORING.md)，零真实API，不改封存v1/v2，M6未开始。
-
-默认采用自然陪伴流程：问候/普通闲聊不逐句调用裁判，重要记忆/人物与工具事实按需核对。设计、风险与测试范围见 [自然聊天说明](docs/NATURAL_CHAT.md)。需要重现旧严格审计时可设置 `DIALOGUE_MODE=audit`；默认 `companion`，无需改动已有.env。
-
-成长体验（PR #28交付）：主页为角色选择与个人账户；亲密度30/60/90依次解锁记忆/天气/情绪资格，仍需独立授权。钱包仅演示币，充值通道不收真实钱；本地Cookie账户尚无跨设备登录。规则、接口与测试见 [角色成长](docs/RELATIONSHIP_GROWTH.md)。
-
-PR #28交互修订：主页只标初识/渐熟/默契/知心档位，不预告未解锁能力；新解锁时短暂动效提示，之后点击已解锁文字可再次查看说明，不自动授权。
+项目采用MIT许可，仅提交原创/授权素材、代码和合成测试资料；不提交`.env`、密钥、数据库、日志、真实对话/记忆、标注评分原件或运行导出。真实账号、支付、完整注销/备份擦除、多实例发布仍未实现。
