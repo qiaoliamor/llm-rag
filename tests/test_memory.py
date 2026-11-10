@@ -182,14 +182,12 @@ def test_deleted_data_cannot_enter_inflight_reply(database_url):
     assert other.get('/v1/session').json()['messages']==[]
 
 
-def test_input_validation_and_project_visibility(database_url):
+def test_input_validation_and_no_project_document_exposure(database_url):
     c,h=boot(app_for(database_url));enable(c,h)
     for fact in ('','  ','x'*301):
         assert c.post('/v1/memories',headers=h,json={'fact':fact}).status_code==422
     assert c.patch('/v1/settings',headers=h,json={'memory_enabled':True,'timezone':'bad/zone'}).status_code==422
-    progress=c.get('/v1/project').json()
-    assert 'M2' in progress['todo'] and '实施计划' in progress['plan']
-    assert 'GEMINI_API_KEY=' not in progress['todo']
+    assert c.get('/v1/project').status_code==404
 
 
 @pytest.mark.parametrize('message',[

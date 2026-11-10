@@ -22,7 +22,7 @@ export function Sidebar({ character }: { character?: Character }) {
       </div>
       <div className="sidebar-bottom">
         <span className="dot" /> 单角色对话原型 · M2
-        <p>聊天临时保留；开启并确认的记忆保存在本机，可跨新对话引用。通过“长期记忆”管理，通过“计划与进度”查看任务。</p>
+        <p>聊天临时保留；开启并确认的记忆保存在本机，可跨新对话引用。通过“长期记忆”查看、纠正或删除。</p>
       </div>
     </aside>
   );

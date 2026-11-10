@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     api_timeout_seconds: float = Field(default=30, ge=1, le=120)
     memory_router_enabled: bool = True
     semantic_review_enabled: bool = True
+    dialogue_mode: str = Field(default='companion', pattern='^(companion|audit)$')
     memory_route_timeout_seconds: float = Field(default=4, ge=.1, le=10)
     semantic_review_timeout_seconds: float = Field(default=8, ge=.1, le=20)
     session_ttl_seconds: int = Field(default=7200, ge=60)

@@ -47,7 +47,6 @@ flowchart LR
 | `frontend/src/components/ResetDialog.tsx` | 原生 dialog 的 React 封装，处理清空确认与取消 |
 | `frontend/src/api.ts` / `types.ts` | 同源请求、错误映射与 TypeScript 接口类型；不接收密钥 |
 | `frontend/src/components/MemoryPane.tsx` | 记忆开关、候选确认、纠正、冲突处理和删除 |
-| `frontend/src/components/ProjectPane.tsx` | 网页读取任务清单与实施计划 |
 | `frontend/src/style.css` | 沿用原有配色、CSS 插画、布局和移动断点 |
 | `frontend/vite.config.ts` / `scripts/publish.mjs` | 类型检查后的构建、资源路径与产物发布 |
 
@@ -121,7 +120,6 @@ sequenceDiagram
 | `DELETE /v1/memories/{id}?version=...` | 版本号 | 删除原文与向量；保留撤销指纹 |
 | `DELETE /v1/memories` | 无请求体 | 全部清空并使旧epoch失效 |
 | `PATCH /v1/settings` | memory_enabled、timezone | 授权与时区；默认关闭 |
-| `GET /v1/project` | todo、plan 文档文本 | 白名单读取任务清单和实施计划 |
 
 
 `api_key_env` 是 `GEMINI_API_KEY` 这样的变量名称，绝不是密钥值。聊天响应的 `request_id` 对应响应头中的请求 ID；`guarded` 表示触发了当前规则和重写，前端目前没有专门展示它。
@@ -281,3 +279,8 @@ memory_query以有限规则识别主体/字段/时间与正文锚点，rank_memo
 ## 2026-11-09 · 离线标注导入与评分（PR #23交付，本次squash合并生效）
 
 新增1–2份标注导入、冻结映射/任务绑定、完整分片/可见证据/标签分数校验；输出分歧与未决、一致率/Cohen κ/线性加权κ及分层各份评分。身份缺失或相同不冒充两名评审，退化/排除/NA有明确原因；声明独立不等于核实独立。公开候选和不足样本始终not_assessed，不自动裁决/放行M5。新增40项合成回归，本轮零真实API，不改封存v1/v2、原参考或生产Prompt；保留8.003秒超时及全部独立质量待办，M6未开始。格式、命令与边界见 [OFFLINE_ANNOTATION_SCORING.md](OFFLINE_ANNOTATION_SCORING.md)。
+
+
+## 2026-11-10 · 自然陪伴对话与玩家页面整理（任务分支待审）
+
+默认companion：精简生成/审查Prompt，普通问候与许可氛围不再依赖第二模型或旧场景正则；确认记忆、重要人物/玩家事实与真实工具信息按需核对，硬正史/授权隔离/删除/重写预算保持。旧audit流程保留作历史对照。移除“计划与进度”导航、组件和/v1/project接口；开发文档仅留仓库。最终后端884通过/26跳过（20项显式companion，其余旧回归锁定audit），前端41与构建、独立临时PG173通过（不相加）。封存v1/v2不改且仅绑定旧audit政策，不充当新默认质量成绩；本轮零真实API，真实语气与选择性审查泛化等未验证，历史失败和M5待办保留、M6未开始。见 [设计与验证](NATURAL_CHAT.md)。

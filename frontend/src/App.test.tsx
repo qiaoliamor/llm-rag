@@ -29,6 +29,14 @@ function deferred<T>() {
 }
 
 describe('React chat', () => {
+  it('keeps developer plans out of player navigation and never requests them', async () => {
+    const fetchMock = connect();
+    render(<App />); await ready();
+    expect(screen.queryByRole('button', { name: '计划与进度' })).not.toBeInTheDocument();
+    expect(screen.queryByText(/查看任务/)).not.toBeInTheDocument();
+    expect(fetchMock.mock.calls.every(call => call[0] !== '/v1/project')).toBe(true);
+    expect(screen.getByRole('button', { name: '长期记忆' })).toBeVisible();
+  });
   it('restores server history and selected provider after page initialization', async () => {
     connect({ ...session, messages: [{ role: 'user', content: '之前的话' }, { role: 'assistant', content: '我还在听。' }] });
     render(<App />); await ready();

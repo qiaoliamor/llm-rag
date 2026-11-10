@@ -15,6 +15,7 @@ from .config import ROOT, Settings
 from .memory_routing import route_memory, NO_MEMORY_CONTEXT
 from .semantic_review import ModelAnalysisProvider
 from .reply_pipeline import generate_checked
+from . import companion
 from .availability import BUSY_MESSAGE, CHAT_TRANSIENT_CODES, REVIEW_TRANSIENT_FAILURES
 from .weather import OpenMeteoProvider, MockWeatherProvider, WeatherError, MESSAGES, query_weather, weather_prompt, validate_city
 from .emotion import EmotionState, EmotionSettingsInput, CorrectionInput, Estimate, ModelEmotionProvider, MockEmotionProvider, assess, emotion_prompt, decorate
@@ -92,7 +93,8 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
     provider = provider or build_provider(settings)
     weather = weather_provider or (MockWeatherProvider() if settings.weather_provider == 'mock' else OpenMeteoProvider())
     emotion = emotion_provider or (MockEmotionProvider() if settings.chat_provider == 'mock' else ModelEmotionProvider(settings))
-    auxiliary = ModelAnalysisProvider(settings) if settings.chat_provider != 'mock' else None
+    analysis_type = companion.CompanionAnalysisProvider if settings.dialogue_mode == 'companion' else ModelAnalysisProvider
+    auxiliary = analysis_type(settings) if settings.chat_provider != 'mock' else None
     router = memory_router if memory_router is not None else auxiliary
     judge = semantic_judge if semantic_judge is not None else auxiliary
     store = MemoryStore(settings.memory_database_url.get_secret_value())
@@ -215,15 +217,20 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
             mood_result = await assess(emotion, session.emotion, mood_settings, history)
             verify_epoch(session, snapshot['epoch'])
             session.pending_weather = pending
-            prompt = instructions() + weather_prompt(weather_result) + memory_prompt(evidence) + emotion_prompt(mood_result, mood_settings) + grounding_prompt(evidence, body.message)
-            if not route.need_memory:
-                prompt += NO_MEMORY_CONTEXT
+            natural = settings.dialogue_mode == 'companion'
+            if natural:
+                prompt = companion.instructions() + companion.memory_context(evidence, body.message)
+                prompt += weather_prompt(weather_result) + emotion_prompt(mood_result, mood_settings)
+            else:
+                prompt = instructions() + weather_prompt(weather_result) + memory_prompt(evidence) + emotion_prompt(mood_result, mood_settings) + grounding_prompt(evidence, body.message)
+                if not route.need_memory:
+                    prompt += NO_MEMORY_CONTEXT
             model_history = [{'role':m['role'], 'content':m['content']} for m in history]
             try:
                 async with asyncio.timeout(settings.api_timeout_seconds * 2 + settings.semantic_review_timeout_seconds + 2):
                     reply, guarded, review_status = await generate_checked(provider,model_history,prompt,body.message,
                         evidence,weather_result,mood_result,mood_settings,judge=judge,
-                        review_enabled=settings.semantic_review_enabled,review_timeout=settings.semantic_review_timeout_seconds)
+                        review_enabled=settings.semantic_review_enabled,review_timeout=settings.semantic_review_timeout_seconds,companion=natural)
             except TimeoutError:
                 raise ProviderFailure('timeout', '模型响应超时，请稍后重试。', 504) from None
             verify_epoch(session, snapshot['epoch'])
@@ -390,10 +397,6 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
         store.invalidate(session.user_id)
         invalidate_user_history(session.user_id)
         return {'ok': True, 'history_cleared': True}
-
-    @app.get('/v1/project')
-    async def project_progress():
-        return {'todo': (ROOT / 'TODOLIST.md').read_text(), 'plan': (ROOT / 'docs/PLAN.md').read_text()}
 
     app.mount('/static', StaticFiles(directory=ROOT / 'app/static'), name='static')
     return app

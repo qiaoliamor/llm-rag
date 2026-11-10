@@ -6,12 +6,11 @@ import { Composer } from './components/Composer';
 import { MemoryPane } from './components/MemoryPane';
 import { EmotionPane } from './components/EmotionPane';
 import { WeatherPane } from './components/WeatherPane';
-import { ProjectPane } from './components/ProjectPane';
 import { ResetDialog } from './components/ResetDialog';
 import type { Message, SessionResponse } from './types';
 
 export default function App() {
-  const [view, setView] = useState<'chat' | 'memories' | 'project' | 'weather' | 'emotion'>('chat');
+  const [view, setView] = useState<'chat' | 'memories' | 'weather' | 'emotion'>('chat');
   const [candidateCount, setCandidateCount] = useState(0);
   const [memoryBusy, setMemoryBusy] = useState(false);
   const [session, setSession] = useState<SessionResponse | null>(null);
@@ -92,12 +91,10 @@ export default function App() {
           <button disabled={disabled || !session} aria-current={view === 'memories' ? 'page' : undefined} onClick={() => { setView('memories'); setCandidateCount(0); }}>长期记忆</button>
           <button disabled={disabled || !session} aria-current={view === 'weather' ? 'page' : undefined} onClick={() => setView('weather')}>天气关怀</button>
           <button disabled={disabled || !session} aria-current={view === 'emotion' ? 'page' : undefined} onClick={() => setView('emotion')}>情绪关怀</button>
-          <button disabled={disabled} aria-current={view === 'project' ? 'page' : undefined} onClick={() => setView('project')}>计划与进度</button>
         </nav>
         {view === 'memories' && session && <MemoryPane csrf={session.csrf_token}
           onBusyChange={value => { inFlight.current = value; setMemoryBusy(value); }}
           onHistoryCleared={() => { setMessages([]); setCandidateCount(0); setError(''); }} />}
-        {view === 'project' && <ProjectPane />}
         {view === 'emotion' && session && <EmotionPane csrf={session.csrf_token} onBusyChange={value => { inFlight.current=value;setMemoryBusy(value); }} onHistoryCleared={() => {setMessages([]);setCandidateCount(0);setError('');}} />}
         {view === 'weather' && session && <WeatherPane csrf={session.csrf_token} onBusyChange={value => { inFlight.current = value; setMemoryBusy(value); }} onHistoryCleared={() => { setMessages([]); setCandidateCount(0); setError(''); }} />}
         <div className="chat-workspace" hidden={view !== 'chat'}>
