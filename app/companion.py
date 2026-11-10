@@ -3,6 +3,7 @@ import json
 
 from .dialogue import CHARACTER, SCENE_PROFILE
 from .grounding import protected_places
+from .memory_query import evidence_need
 from .semantic_review import IndexedReview, ModelAnalysisProvider
 
 FALLBACK = '我在听。还不清楚的地方，我想先听你说。'
@@ -44,6 +45,10 @@ def memory_context(memories, query):
 def review_required(query, reply, memories, weather, mood, *, flagged=False):
     if flagged or memories or (weather and weather.get('status') == 'ok') or (mood and mood.get('assessment')):
         return True
+    # A personal fact question remains important even if retrieval is disabled
+    # or returns nothing. Absence of stored evidence is not permission to guess.
+    if evidence_need(query).field is not None:
+        return True
     # Small, conservative admission cues, not semantic classification. Do not
     # require a second model merely because a reply is absent from a whitelist.
     cues = ('我记得', '你说过', '你告诉', '你之前', '你上次', '你以前', '你已经',
@@ -51,5 +56,6 @@ def review_required(query, reply, memories, weather, mood, *, flagged=False):
             '我小时候', '我父亲', '我母亲', '我的父', '我的母', '身世', '继承',
             '我替你', '帮你付', '签收', '收到', '预约', '库存', '诊断',
             '记得我的', '我的名字', '我住哪', '你的年龄', '你几岁', '你的职业', '书店怎么',
-            '我叫', '我今年', '我的职业', '你是谁', '你叫什么', '你的名字', '你多大')
+            '我叫', '我今年', '我的职业', '你是谁', '你叫什么', '你的名字', '你多大',
+            '你叫', '你住在', '你的猫')
     return any(cue in query or cue in reply for cue in cues)

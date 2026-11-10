@@ -164,3 +164,15 @@ def test_smalltalk_keeps_multi_turn_context_without_repeated_audits(tmp_path):
     assert len(provider.generate.call_args.args[0]) == 3
     assert len(c.get('/v1/session').json()['messages']) == 4
     judge.review.assert_not_awaited()
+
+
+@pytest.mark.parametrize('query,text', [
+    ('我叫什么名字？', '你叫合成松露。'),
+    ('我住哪儿？', '你住在合成松露市。'),
+])
+def test_missing_or_disabled_memory_does_not_license_personal_fact_guess(tmp_path, query, text):
+    c, h, _, judge = client(tmp_path, text)
+    c.app.state.memory_store.retrieve = Mock(side_effect=AssertionError('memory is disabled'))
+    r = c.post('/v1/chat', headers=h, json={'message':query})
+    assert r.status_code == 503 and judge.review.await_count == 1
+    assert c.get('/v1/session').json()['messages'] == []
