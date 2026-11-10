@@ -21,8 +21,8 @@ export function Sidebar({ character }: { character?: Character }) {
         <p>“有些话，不必急着说完。”</p>
       </div>
       <div className="sidebar-bottom">
-        <span className="dot" /> 单角色对话原型 · M2
-        <p>聊天临时保留；开启并确认的记忆保存在本机，可跨新对话引用。通过“长期记忆”查看、纠正或删除。</p>
+        <span className="dot" /> 不赶时间，慢慢相处
+        <p>聊天与小小心意会积累相处进度。在个人账户查看成长与能力，重要经历仍由你决定是否记住。</p>
       </div>
     </aside>
   );

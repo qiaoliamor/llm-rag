@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import App from './App';
 import { getSession, sendMessage, clearSession } from './api';
-import type { SessionResponse } from './types';
+import type { GrowthAccount, SessionResponse } from './types';
 
 function response(body: unknown, status = 200) {
   return { ok: status >= 200 && status < 300, status, json: async () => body } as Response;
@@ -20,7 +20,10 @@ function connect(data: SessionResponse = session) {
 }
 async function ready() {
   await screen.findByText('● Gemini API · 已配置');
-  return userEvent.setup();
+  const user=userEvent.setup();
+  const choose=screen.queryByRole('button',{name:'和沈砚聊天'});
+  if(choose)await user.click(choose);
+  return user;
 }
 function deferred<T>() {
   let resolve!: (value: T) => void;
@@ -29,13 +32,31 @@ function deferred<T>() {
 }
 
 describe('React chat', () => {
+  it('celebrates a server-confirmed chat unlock and exposes only the earned explanation', async () => {
+    const before:GrowthAccount={profile:{name:'',email:'',phone:''},coins:100,currency_mode:'demo',starting_coins:100,
+      character:{id:'shen_yan',name:'沈砚',score:29,active_seconds:1740,abilities:{memory:false,weather:false,emotion:false}},
+      thresholds:{memory:30,weather:60,emotion:90},gifts:[],ledger:[]};
+    const fetchMock=connect({...session,account:before});
+    render(<App/>);const user=await ready();
+    expect(screen.queryByRole('button',{name:'长期记忆'})).not.toBeInTheDocument();
+    fetchMock.mockResolvedValueOnce(response({reply:'我在呢。',account:{...before,character:{...before.character,score:30,abilities:{memory:true,weather:false,emotion:false}}}}));
+    fireEvent.change(screen.getByRole('textbox'),{target:{value:'你好'}});
+    await user.click(screen.getByRole('button',{name:/发送/}));
+    expect(await screen.findByRole('status')).toHaveTextContent('长期记忆已解锁');
+    expect(screen.queryByRole('button',{name:'天气关怀'})).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button',{name:'收起解锁提醒'}));
+    await user.click(screen.getByRole('button',{name:'长期记忆'}));
+    expect(screen.getByRole('dialog',{name:'能力说明'})).toHaveTextContent('记住重要经历');
+    expect(fetchMock).toHaveBeenCalledTimes(2); // bootstrap + chat, no automatic consent/API
+  });
   it('keeps developer plans out of player navigation and never requests them', async () => {
     const fetchMock = connect();
     render(<App />); await ready();
     expect(screen.queryByRole('button', { name: '计划与进度' })).not.toBeInTheDocument();
     expect(screen.queryByText(/查看任务/)).not.toBeInTheDocument();
     expect(fetchMock.mock.calls.every(call => call[0] !== '/v1/project')).toBe(true);
-    expect(screen.getByRole('button', { name: '长期记忆' })).toBeVisible();
+    expect(screen.getByRole('button', { name: '个人账户' })).toBeVisible();
+    expect(screen.queryByRole('button', { name: '长期记忆' })).not.toBeInTheDocument();
   });
   it('restores server history and selected provider after page initialization', async () => {
     connect({ ...session, messages: [{ role: 'user', content: '之前的话' }, { role: 'assistant', content: '我还在听。' }] });
@@ -145,12 +166,13 @@ describe('React chat', () => {
     const fetchMock = vi.fn().mockRejectedValue(new TypeError('network failure'));
     vi.stubGlobal('fetch', fetchMock); render(<App />);
     expect(await screen.findByRole('alert')).toHaveTextContent('无法连接本地服务');
-    expect(screen.getByRole('button', { name: /发送/ })).toBeDisabled();
+    expect(screen.getByRole('button', { name: '和沈砚聊天' })).toBeDisabled();
   });
 
   it('preserves mock mode labeling and input length limits', async () => {
     connect({ ...session, provider: 'mock', model: '离线演示' }); render(<App />);
     expect(await screen.findByText('● 离线演示 · 非真实模型回复')).toBeVisible();
+    await userEvent.setup().click(screen.getByRole('button',{name:'和沈砚聊天'}));
     const input = screen.getByRole('textbox');
     expect(input).toHaveAttribute('maxlength', '2000');
     fireEvent.change(input, { target: { value: '   ' } });

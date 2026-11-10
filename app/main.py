@@ -2,12 +2,12 @@ import asyncio
 import secrets
 import time
 from dataclasses import dataclass, field
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
@@ -16,6 +16,8 @@ from .memory_routing import route_memory, NO_MEMORY_CONTEXT
 from .semantic_review import ModelAnalysisProvider
 from .reply_pipeline import generate_checked
 from . import companion
+from .progression import Progression
+from typing import Literal
 from .availability import BUSY_MESSAGE, CHAT_TRANSIENT_CODES, REVIEW_TRANSIENT_FAILURES
 from .weather import OpenMeteoProvider, MockWeatherProvider, WeatherError, MESSAGES, query_weather, weather_prompt, validate_city
 from .emotion import EmotionState, EmotionSettingsInput, CorrectionInput, Estimate, ModelEmotionProvider, MockEmotionProvider, assess, emotion_prompt, decorate
@@ -45,6 +47,33 @@ class ChatInput(BaseModel):
         if not value.strip():
             raise ValueError('message cannot be blank')
         return value.strip()
+
+
+class ProfileInput(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    name: str = Field(default='',max_length=40,strict=True)
+    email: str = Field(default='',max_length=254,strict=True)
+    phone: str = Field(default='',max_length=24,strict=True)
+
+    @field_validator('name','email','phone')
+    @classmethod
+    def profile_fields(cls, value, info):
+        import re
+        value=value.strip()
+        if value and info.field_name=='email' and not re.fullmatch(r'[^\s@]+@[^\s@]+\.[^\s@]+',value):
+            raise ValueError('invalid email')
+        if value and info.field_name=='phone' and not re.fullmatch(r'\+?[0-9 ()-]{5,24}',value):
+            raise ValueError('invalid phone')
+        return value
+
+
+class ActionInput(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    request_id: UUID
+
+
+class GiftInput(ActionInput):
+    gift_id: Literal['bookmark','tea','lamp']
 
 
 class MemoryInput(BaseModel):
@@ -98,9 +127,11 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
     router = memory_router if memory_router is not None else auxiliary
     judge = semantic_judge if semantic_judge is not None else auxiliary
     store = MemoryStore(settings.memory_database_url.get_secret_value())
+    growth = Progression(store) if settings.growth_enabled else None
     app = FastAPI(docs_url=None, redoc_url=None)
     app.state.sessions = sessions = {}
     app.state.memory_store = store
+    app.state.progression = growth
     app.state.weather_provider = weather
     app.state.emotion_provider = emotion
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=['127.0.0.1', 'localhost', 'testserver'])
@@ -177,7 +208,8 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
                                  'model': settings.selected_model,
                                  'api_key_env': settings.api_key_env,
                                  'configured': settings.configured,
-                                 'memory_settings': store.settings(user_id)})
+                                 'memory_settings': store.settings(user_id),
+                                 **({'account':growth.get(user_id)} if growth else {})})
         response.set_cookie('persona_player', player_token, httponly=True, samesite='strict', max_age=31536000)
         response.set_cookie('persona_session', sid, httponly=True, samesite='strict', max_age=settings.session_ttl_seconds)
         return response
@@ -199,7 +231,9 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
         if session.lock.locked():
             raise ProviderFailure('busy', '上一条消息还在回复，请稍候。', 409)
         async with session.lock:
+            turn_started = growth.clock() if growth else None
             snapshot = store.settings(session.user_id)
+            abilities = growth.get(session.user_id)['character']['abilities'] if growth else {'memory':True,'emotion':True,'weather':True}
             if session.memory_epoch != snapshot['epoch']:
                 session.messages.clear()
                 session.pending_weather = None
@@ -207,13 +241,16 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
                 session.memory_epoch = snapshot['epoch']
             turn = session.emotion.turn + 1
             history = session.messages[-24:] + [{'role': 'user', 'content': body.message, 'id':f'u{turn}'}]
-            route = await route_memory(body.message, history, enabled=snapshot['memory_enabled'],
+            route = await route_memory(body.message, history, enabled=snapshot['memory_enabled'] and abilities['memory'],
                 router=router,timeout=settings.memory_route_timeout_seconds,routing_enabled=settings.memory_router_enabled)
             verify_epoch(session,snapshot['epoch'])
             evidence = store.retrieve(session.user_id, route.query) if route.need_memory else []
-            weather_result, pending = await query_weather(weather, body.message, store.weather_settings(session.user_id), session.pending_weather)
+            weather_config = store.weather_settings(session.user_id)
+            if not abilities['weather']: weather_config={**weather_config,'enabled':False}
+            weather_result, pending = await query_weather(weather, body.message, weather_config, session.pending_weather)
             verify_epoch(session, snapshot['epoch'])
             mood_settings = store.emotion_settings(session.user_id)
+            if not abilities['emotion']: mood_settings={**mood_settings,'enabled':False}
             mood_result = await assess(emotion, session.emotion, mood_settings, history)
             verify_epoch(session, snapshot['epoch'])
             session.pending_weather = pending
@@ -236,9 +273,14 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
             verify_epoch(session, snapshot['epoch'])
             if review_status.get('status') == 'unavailable' and review_status.get('failure') in REVIEW_TRANSIENT_FAILURES:
                 raise ProviderFailure('review_busy', BUSY_MESSAGE, 503)
+            facts = extract_candidates(body.message) if snapshot['memory_enabled'] and abilities['memory'] else []
             candidates = []
-            if snapshot['memory_enabled']:
-                for fact in extract_candidates(body.message):
+            account_result = None
+            if growth:
+                account_result,candidates = growth.complete_turn(session.user_id, turn_started if not guarded else None,
+                    facts=facts, source=request.state.request_id, epoch=snapshot['epoch'])
+            else:
+                for fact in facts:
                     candidate = store.candidate(session.user_id, fact, request.state.request_id, snapshot['epoch'])
                     if candidate and candidate['status'] == 'candidate': candidates.append(candidate)
             session.emotion.turn = turn
@@ -247,6 +289,7 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
             else: session.emotion.assessment = None
             session.messages = (history + [{'role': 'assistant', 'content': reply, **({'weather': weather_result} if weather_result and weather_result['status'] == 'ok' else {})}])[-24:]
             return {'emotion': mood_result, 'weather': weather_result, 'reply': reply, 'request_id': request.state.request_id, 'guarded': guarded, 'memory_candidates': candidates,
+                    **({'account':account_result} if account_result is not None else {}),
                     'retrieved_memory_ids': [m['id'] for m in evidence],
                     'memory_route':route.public(),'semantic_review':review_status}
 
@@ -275,6 +318,7 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
     @app.post('/v1/memories')
     async def create_memory(body: MemoryInput, request: Request):
         session = get_session(request, True)
+        if growth: growth.require(session.user_id,'memory')
         snapshot = store.settings(session.user_id)
         if not snapshot['memory_enabled']:
             raise ProviderFailure('memory_disabled', '请先开启长期记忆。', 409)
@@ -284,6 +328,7 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
     @app.patch('/v1/memories/{memory_id}')
     async def edit_memory(memory_id: str, body: MemoryEdit, request: Request):
         session = get_session(request, True)
+        if growth and body.confirm: growth.require(session.user_id,'memory')
         if body.keep_both and body.replace_conflicts:
             raise ProviderFailure('invalid_choice', '替换与独立保留只能选择一种。', 422)
         item = store.mutate(session.user_id, memory_id, body.version, body.fact, body.confirm, body.replace_conflicts, keep_both=body.keep_both)
@@ -307,6 +352,7 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
     @app.patch('/v1/settings')
     async def configure_memory(body: MemorySettingsInput, request: Request):
         session = get_session(request, True)
+        if growth and body.memory_enabled: growth.require(session.user_id,'memory')
         result = store.configure(session.user_id, body.memory_enabled, body.timezone)
         invalidate_user_history(session.user_id)
         return {'settings': result, 'history_cleared': True}
@@ -322,7 +368,8 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
 
     @app.get('/v1/weather/locations')
     async def weather_locations(request: Request, q: str):
-        get_session(request)
+        session=get_session(request)
+        if growth: growth.require(session.user_id,'weather')
         validate_city(q)
         return {'items': [p.model_dump() for p in await weather.search(q.strip())]}
 
@@ -332,6 +379,8 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
         # Reuse a trusted saved place for consent toggles, so opt-out works offline.
         epoch = store.settings(session.user_id)['epoch']
         saved = store.weather_settings(session.user_id)['place']
+        if growth and (body.enabled or (body.city_id is not None and (not saved or saved['id']!=body.city_id))):
+            growth.require(session.user_id,'weather')
         place = saved if saved and saved['id'] == body.city_id else ((await weather.place(body.city_id)).model_dump() if body.city_id else None)
         if store.settings(session.user_id)['epoch'] != epoch:
             raise ProviderFailure('memory_changed', '设置已变化，请刷新后重试。', 409)
@@ -366,6 +415,7 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
     @app.patch('/v1/emotion/settings')
     async def configure_emotion(body: EmotionSettingsInput, request: Request):
         session = get_session(request, True)
+        if growth and body.enabled: growth.require(session.user_id,'emotion')
         result = store.configure_emotion(session.user_id, body.model_dump())
         invalidate_user_history(session.user_id)
         return {'settings': result, 'history_cleared': True}
@@ -380,6 +430,7 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
     @app.patch('/v1/emotion/assessment')
     async def correct_emotion(body: CorrectionInput, request: Request):
         session = fresh_emotion_session(request, True)
+        if growth: growth.require(session.user_id,'emotion')
         config = store.emotion_settings(session.user_id)
         if not config['enabled']:
             raise ProviderFailure('emotion_disabled', '请先开启情绪分析。', 409)
@@ -397,6 +448,37 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
         store.invalidate(session.user_id)
         invalidate_user_history(session.user_id)
         return {'ok': True, 'history_cleared': True}
+
+    def account_session(request, mutate=False):
+        session=get_session(request,mutate)
+        if not growth:
+            raise ProviderFailure('growth_disabled','此运行模式未开启成长账户。',503)
+        return session
+
+    @app.get('/v1/account')
+    async def account(request: Request):
+        session=account_session(request)
+        return growth.get(session.user_id)
+
+    @app.patch('/v1/account/profile')
+    async def update_profile(body: ProfileInput, request: Request):
+        session=account_session(request,True)
+        return growth.profile(session.user_id,body.model_dump())
+
+    @app.delete('/v1/account/profile')
+    async def clear_profile(request: Request):
+        session=account_session(request,True)
+        return growth.profile(session.user_id,{'name':'','email':'','phone':''})
+
+    @app.post('/v1/account/demo-credit')
+    async def demo_credit(body: ActionInput, request: Request):
+        session=account_session(request,True)
+        return growth.action(session.user_id,str(body.request_id))
+
+    @app.post('/v1/characters/{character_id}/gifts')
+    async def send_gift(character_id: str, body: GiftInput, request: Request):
+        session=account_session(request,True)
+        return growth.action(session.user_id,str(body.request_id),body.gift_id,character_id)
 
     app.mount('/static', StaticFiles(directory=ROOT / 'app/static'), name='static')
     return app

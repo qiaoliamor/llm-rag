@@ -12,6 +12,7 @@ export interface Character {
 }
 
 export interface SessionResponse {
+  account?: GrowthAccount;
   csrf_token: string;
   messages: Message[];
   character: Character;
@@ -22,6 +23,7 @@ export interface SessionResponse {
 }
 
 export interface ChatResponse {
+  account?: GrowthAccount;
   reply: string;
   request_id: string;
   guarded: boolean;
@@ -95,3 +97,14 @@ export type SupportPreference='ask'|'listen'|'encourage'|'practical';
 export interface EmotionSettings { enabled:boolean; interval:number; window:number; cooldown:number; threshold:number; preference:SupportPreference; }
 export interface EmotionAssessment { labels:EmotionLabel[]; intensity:number; confidence:number; evidence_message_ids:string[]; response_strategy:SupportPreference; source:'user'|'model'; turn:number; observed_at:string; }
 export interface EmotionData { settings:EmotionSettings; assessment:EmotionAssessment|null; }
+
+export interface GrowthAccount {
+  profile: { name: string; email: string; phone: string };
+  coins: number;
+  currency_mode: 'demo';
+  starting_coins: number;
+  character: { id: string; name: string; score: number; active_seconds: number; abilities: { memory: boolean; emotion: boolean; weather: boolean } };
+  thresholds: { memory: number; emotion: number; weather: number };
+  gifts: { id: 'bookmark' | 'tea' | 'lamp'; name: string; price: number; points: number; description: string }[];
+  ledger: { request_id: string; action: string; character_id: string; coins_delta: number; points_delta: number; created_at: string }[];
+}

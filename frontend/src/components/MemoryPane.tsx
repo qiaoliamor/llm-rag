@@ -28,7 +28,7 @@ function MemoryCard({ item, disabled, canEdit, onEdit, onDelete }: {
   </article>;
 }
 
-export function MemoryPane({ csrf, onHistoryCleared, onBusyChange }: { csrf: string; onHistoryCleared: () => void; onBusyChange?: (busy: boolean) => void }) {
+export function MemoryPane({ csrf, onHistoryCleared, onBusyChange, locked=false }: { csrf: string; onHistoryCleared: () => void; onBusyChange?: (busy: boolean) => void; locked?:boolean }) {
   const [data, setData] = useState<MemoryList | null>(null);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -54,9 +54,10 @@ export function MemoryPane({ csrf, onHistoryCleared, onBusyChange }: { csrf: str
   const enabled = data.settings.memory_enabled;
   return <section className="workspace-pane" aria-label="长期记忆管理">
     <h3>让重要的事，被好好记住。</h3>
+    {locked && <p className="pane-notice">亲密度30分解锁使用。现在仍可查看、删除已有记忆或撤回授权。</p>}
     <p className="pane-description">默认关闭。开启后只提取本轮明确表达的重要信息，先形成候选；你确认后，角色才会跨对话引用。健康或创伤等内容也不会自动确认。</p>
     <div className="memory-settings">
-      <button disabled={busy} onClick={() => void run(() => setMemorySettings(!enabled, timezone, csrf), true, enabled ? '长期记忆已关闭，已有确认记忆保留但不再检索。' : '长期记忆已开启，候选仍需逐条确认。')}>{enabled ? '关闭长期记忆' : '开启长期记忆'}</button>
+      <button disabled={busy || (locked && !enabled)} onClick={() => void run(() => setMemorySettings(!enabled, timezone, csrf), true, enabled ? '长期记忆已关闭，已有确认记忆保留但不再检索。' : '长期记忆已开启，候选仍需逐条确认。')}>{enabled ? '关闭长期记忆' : '开启长期记忆'}</button>
       <label>事件时区 <select aria-label="事件时区" value={timezone} disabled={busy} onChange={e => setTimezone(e.target.value)}>
         <option value="Asia/Tokyo">日本 · 东京</option><option value="Asia/Shanghai">中国 · 上海</option><option value="UTC">UTC</option>
       </select></label>
@@ -65,10 +66,10 @@ export function MemoryPane({ csrf, onHistoryCleared, onBusyChange }: { csrf: str
     <p className="pane-description">“开始新对话”只清空聊天，记忆保留。纠正、删除或更改记忆授权会清空当前身份的短期聊天，防止旧信息继续影响回复。清除浏览器 Cookie 会失去当前本地身份，记忆不会转移到新身份。</p>
     {error && <p role="alert" className="pane-error">{error}</p>}
     {notice && <p role="status" className="pane-notice">{notice}</p>}
-    <form className="memory-add" onSubmit={e => { e.preventDefault(); if (!draft.trim() || busy) return; void run(async () => { await addMemory(draft.trim(), csrf); setDraft(''); }, false, '已加入候选，请在下方确认。'); }}>
+    <form className="memory-add" onSubmit={e => { e.preventDefault(); if (!draft.trim() || busy || locked) return; void run(async () => { await addMemory(draft.trim(), csrf); setDraft(''); }, false, '已加入候选，请在下方确认。'); }}>
       <label htmlFor="new-memory">也可以手动添加重要经历（最多300字）</label>
-      <textarea id="new-memory" value={draft} rows={2} maxLength={300} disabled={!enabled || busy} onChange={e => setDraft(e.target.value)} placeholder="例如：我下周二有一场设计师面试。" />
-      <button type="submit" disabled={!enabled || busy || !draft.trim()}>添加候选</button>
+      <textarea id="new-memory" value={draft} rows={2} maxLength={300} disabled={!enabled || locked || busy} onChange={e => setDraft(e.target.value)} placeholder="例如：我下周二有一场设计师面试。" />
+      <button type="submit" disabled={!enabled || locked || busy || !draft.trim()}>添加候选</button>
     </form>
     {deleting && <div role="alertdialog" aria-label="删除记忆确认" className="memory-delete-confirm">
       <p>{deleting === 'all' ? '清空所有候选和确认记忆？' : '删除这条记忆？'}删除后无法恢复，并会清空短期聊天。</p>
@@ -77,7 +78,7 @@ export function MemoryPane({ csrf, onHistoryCleared, onBusyChange }: { csrf: str
     </div>}
     <div className="memory-list-heading"><h4>我的记忆 · {data.items.length}</h4><button className="quiet danger" disabled={busy || data.items.length === 0} onClick={() => setDeleting('all')}>清空全部记忆</button></div>
     {!data.items.length && <p className="pane-description">还没有记忆。开启后聊聊重要经历，或在上方手动添加。</p>}
-    {data.items.map(item => <MemoryCard key={`${item.id}-${item.version}`} item={item} disabled={busy} canEdit={enabled}
+    {data.items.map(item => <MemoryCard key={`${item.id}-${item.version}`} item={item} disabled={busy} canEdit={enabled && !locked}
       onEdit={(m, fact, confirm, replace, keepBoth) => void run(() => editMemory(m.id, m.version, fact.trim(), confirm, replace, csrf, keepBoth), true, '记忆已更新，旧上下文已清空。')}
       onDelete={setDeleting} />)}
     {!enabled && data.items.length > 0 && <p className="pane-description">记忆关闭时仍可逐条或全部删除；开启后可逐条编辑。</p>}
