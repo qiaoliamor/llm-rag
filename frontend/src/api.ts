@@ -70,3 +70,15 @@ export const saveEmotionSettings=(config:import('./types').EmotionSettings,csrf:
 export const deleteEmotionSettings=(csrf:string)=>request('/v1/emotion/settings',{method:'DELETE',headers:{'X-CSRF-Token':csrf}});
 export const correctEmotion=(label:import('./types').EmotionLabel,preference:import('./types').SupportPreference,csrf:string)=>request('/v1/emotion/assessment',{method:'PATCH',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({label,preference})});
 export const clearEmotion=(csrf:string)=>request('/v1/emotion/assessment',{method:'DELETE',headers:{'X-CSRF-Token':csrf}});
+
+export const getAccount=()=>request<import('./types').GrowthAccount>('/v1/account');
+export const saveProfile=(profile:import('./types').GrowthAccount['profile'],csrf:string)=>request<import('./types').GrowthAccount>('/v1/account/profile',{
+  method:'PATCH',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify(profile),
+});
+export const clearProfile=(csrf:string)=>request<import('./types').GrowthAccount>('/v1/account/profile',{method:'DELETE',headers:{'X-CSRF-Token':csrf}});
+export const demoCredit=(request_id:string,csrf:string)=>request<import('./types').GrowthAccount>('/v1/account/demo-credit',{
+  method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({request_id}),
+});
+export const sendGift=(character:string,gift_id:string,request_id:string,csrf:string)=>request<import('./types').GrowthAccount>(`/v1/characters/${encodeURIComponent(character)}/gifts`,{
+  method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({gift_id,request_id}),
+});

@@ -20,7 +20,10 @@ function connect(data: SessionResponse = session) {
 }
 async function ready() {
   await screen.findByText('● Gemini API · 已配置');
-  return userEvent.setup();
+  const user=userEvent.setup();
+  const choose=screen.queryByRole('button',{name:'和沈砚聊天'});
+  if(choose)await user.click(choose);
+  return user;
 }
 function deferred<T>() {
   let resolve!: (value: T) => void;
@@ -35,7 +38,8 @@ describe('React chat', () => {
     expect(screen.queryByRole('button', { name: '计划与进度' })).not.toBeInTheDocument();
     expect(screen.queryByText(/查看任务/)).not.toBeInTheDocument();
     expect(fetchMock.mock.calls.every(call => call[0] !== '/v1/project')).toBe(true);
-    expect(screen.getByRole('button', { name: '长期记忆' })).toBeVisible();
+    expect(screen.getByRole('button', { name: '个人账户' })).toBeVisible();
+    expect(screen.queryByRole('button', { name: '长期记忆' })).not.toBeInTheDocument();
   });
   it('restores server history and selected provider after page initialization', async () => {
     connect({ ...session, messages: [{ role: 'user', content: '之前的话' }, { role: 'assistant', content: '我还在听。' }] });
@@ -145,12 +149,13 @@ describe('React chat', () => {
     const fetchMock = vi.fn().mockRejectedValue(new TypeError('network failure'));
     vi.stubGlobal('fetch', fetchMock); render(<App />);
     expect(await screen.findByRole('alert')).toHaveTextContent('无法连接本地服务');
-    expect(screen.getByRole('button', { name: /发送/ })).toBeDisabled();
+    expect(screen.getByRole('button', { name: '和沈砚聊天' })).toBeDisabled();
   });
 
   it('preserves mock mode labeling and input length limits', async () => {
     connect({ ...session, provider: 'mock', model: '离线演示' }); render(<App />);
     expect(await screen.findByText('● 离线演示 · 非真实模型回复')).toBeVisible();
+    await userEvent.setup().click(screen.getByRole('button',{name:'和沈砚聊天'}));
     const input = screen.getByRole('textbox');
     expect(input).toHaveAttribute('maxlength', '2000');
     fireEvent.change(input, { target: { value: '   ' } });
