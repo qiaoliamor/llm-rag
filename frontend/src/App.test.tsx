@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import App from './App';
 import { getSession, sendMessage, clearSession } from './api';
-import type { SessionResponse } from './types';
+import type { GrowthAccount, SessionResponse } from './types';
 
 function response(body: unknown, status = 200) {
   return { ok: status >= 200 && status < 300, status, json: async () => body } as Response;
@@ -32,6 +32,23 @@ function deferred<T>() {
 }
 
 describe('React chat', () => {
+  it('celebrates a server-confirmed chat unlock and exposes only the earned explanation', async () => {
+    const before:GrowthAccount={profile:{name:'',email:'',phone:''},coins:100,currency_mode:'demo',starting_coins:100,
+      character:{id:'shen_yan',name:'沈砚',score:29,active_seconds:1740,abilities:{memory:false,weather:false,emotion:false}},
+      thresholds:{memory:30,weather:60,emotion:90},gifts:[],ledger:[]};
+    const fetchMock=connect({...session,account:before});
+    render(<App/>);const user=await ready();
+    expect(screen.queryByRole('button',{name:'长期记忆'})).not.toBeInTheDocument();
+    fetchMock.mockResolvedValueOnce(response({reply:'我在呢。',account:{...before,character:{...before.character,score:30,abilities:{memory:true,weather:false,emotion:false}}}}));
+    fireEvent.change(screen.getByRole('textbox'),{target:{value:'你好'}});
+    await user.click(screen.getByRole('button',{name:/发送/}));
+    expect(await screen.findByRole('status')).toHaveTextContent('长期记忆已解锁');
+    expect(screen.queryByRole('button',{name:'天气关怀'})).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button',{name:'收起解锁提醒'}));
+    await user.click(screen.getByRole('button',{name:'长期记忆'}));
+    expect(screen.getByRole('dialog',{name:'能力说明'})).toHaveTextContent('记住重要经历');
+    expect(fetchMock).toHaveBeenCalledTimes(2); // bootstrap + chat, no automatic consent/API
+  });
   it('keeps developer plans out of player navigation and never requests them', async () => {
     const fetchMock = connect();
     render(<App />); await ready();

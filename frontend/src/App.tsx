@@ -9,6 +9,7 @@ import { WeatherPane } from './components/WeatherPane';
 import { ResetDialog } from './components/ResetDialog';
 import { AccountPane } from './components/AccountPane';
 import { BondProgress } from './components/BondProgress';
+import { UnlockedAbilities, UnlockCelebration } from './components/AbilityExperience';
 import type { GrowthAccount, Message, SessionResponse } from './types';
 
 export default function App() {
@@ -100,10 +101,10 @@ export default function App() {
         {view === 'characters' && !chatOpen && <section className="workspace-pane character-picker" aria-label="角色选择">
           <p className="eyebrow">SOMEONE TO SHARE YOUR DAY WITH</p><h3>从一句你好，慢慢靠近。</h3>
           <p className="pane-description">选择一位聊天对象。相处的时间与小小心意，会慢慢点亮更多陪伴方式。</p>
-          <article className="character-card"><div className="character-art" aria-hidden="true">栖川<br/><span>旧书店的暖灯，一直留着。</span></div><div><span className="eyebrow">THE BOOKSTORE KEEPER</span><h4>{session?.character.name ?? '沈砚'}</h4><p>温和、沉稳，喜欢修补旧书。也愿意听你慢慢说。</p><BondProgress account={account}/><button disabled={!session || disabled} onClick={() => setChatOpen(true)}>和沈砚聊天</button></div></article>
+          <article className="character-card"><div className="character-art" aria-hidden="true">栖川<br/><span>旧书店的暖灯，一直留着。</span></div><div><span className="eyebrow">THE BOOKSTORE KEEPER</span><h4>{session?.character.name ?? '沈砚'}</h4><p>温和、沉稳，喜欢修补旧书。也愿意听你慢慢说。</p><BondProgress account={account}/><UnlockedAbilities account={account}/><button disabled={!session || disabled} onClick={() => setChatOpen(true)}>和沈砚聊天</button></div></article>
           <p className="pane-description">当前开放沈砚。更多角色尚未开放；亲密度按角色分别保存。</p>
         </section>}
-        {view === 'characters' && chatOpen && <div className="chat-growth"><button className="quiet" disabled={disabled} onClick={() => setChatOpen(false)}>返回角色选择</button><BondProgress account={account}/><button className="quiet" disabled={disabled} onClick={() => setView('account')}>送一份心意 / 管理能力</button></div>}
+        {view === 'characters' && chatOpen && <div className="chat-growth"><button className="quiet" disabled={disabled} onClick={() => setChatOpen(false)}>返回角色选择</button><BondProgress account={account}/><UnlockedAbilities account={account}/><button className="quiet" disabled={disabled} onClick={() => setView('account')}>送一份心意 / 个人账户</button></div>}
         {view === 'account' && session && <AccountPane csrf={session.csrf_token} onUpdate={setAccount} onManage={setView} onBusyChange={value => { inFlight.current=value;setMemoryBusy(value); }} />}
         {['memories','weather','emotion'].includes(view) && <div className="privacy-heading"><button className="quiet" disabled={disabled} onClick={() => setView('account')}>返回个人账户</button></div>}
         {view === 'memories' && session && <MemoryPane csrf={session.csrf_token} locked={account ? !account.character.abilities.memory : false}
@@ -120,6 +121,7 @@ export default function App() {
         </div>
       </main>
       <ResetDialog open={resetOpen} busy={resetting} onCancel={() => setResetOpen(false)} onConfirm={() => void reset()} />
+      <UnlockCelebration account={account}/>
     </div>
   );
 }

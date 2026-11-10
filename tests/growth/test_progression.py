@@ -274,3 +274,18 @@ def test_client_reported_time_cannot_award_points(app):
 def test_production_growth_default(monkeypatch):
     monkeypatch.delenv('GROWTH_ENABLED',raising=False)
     assert Settings(_env_file=None).growth_enabled
+
+
+def test_product_unlock_order_is_memory_weather_then_emotion():
+    assert THRESHOLDS=={'memory':30,'weather':60,'emotion':90}
+
+
+def test_weather_is_available_at_60_and_emotion_waits_until_90(app):
+    c,h,_=boot(app);user=uid(app,c)
+    with app.state.memory_store.db.begin() as db:
+        db.get(Bond,(user,'shen_yan')).score=60
+    assert c.get('/v1/weather/locations?q=Tokyo').status_code==200
+    assert c.patch('/v1/emotion/settings',headers=h,json={'enabled':True}).status_code==403
+    with app.state.memory_store.db.begin() as db:
+        db.get(Bond,(user,'shen_yan')).score=90
+    assert c.patch('/v1/emotion/settings',headers=h,json={'enabled':True}).status_code==200

@@ -21,7 +21,7 @@ export function WeatherPane({ csrf, onHistoryCleared, onBusyChange, locked=false
   }
   if (!data) return <section className="workspace-pane"><h3>天气关怀</h3><p role={error ? 'alert' : undefined}>{error || '正在读取天气设置…'}</p></section>;
   return <section className="workspace-pane" aria-label="天气关怀设置">
-    <h3>出门前，也照顾好自己。</h3>{locked && <p className="pane-notice">亲密度90分解锁使用。仍可关闭查询、删除已有城市。</p>}
+    <h3>出门前，也照顾好自己。</h3>{locked && <p className="pane-notice">亲密度60分解锁使用。仍可关闭查询、删除已有城市。</p>}
     <p className="pane-description">天气查询默认关闭，开启后仅在聊天触发时查询。城市搜索会将输入的城市名发送给 Open-Meteo / GeoNames；查询天气仅发送城市坐标与时区，不发送聊天或记忆。不读取 GPS 或 IP 定位。</p>
     <label><input type="checkbox" checked={enabled} disabled={busy || locked} onChange={e => setEnabled(e.target.checked)} /> 允许天气查询</label>
     <p>当前城市：{data.place ? [data.place.name, data.place.admin1, data.place.country].filter(Boolean).join(' / ') : '未设置（可在聊天中提供临时城市）'}</p>

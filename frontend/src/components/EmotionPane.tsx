@@ -15,7 +15,7 @@ export function EmotionPane({csrf,onHistoryCleared,onBusyChange,locked=false}:{c
   useEffect(()=>{let active=true;getEmotion().then(x=>{if(active)load(x);}).catch(e=>{if(active)setError(e.message);});return()=>{active=false;};},[]);
   async function run(operation:()=>Promise<unknown>,message:string){setBusy(true);onBusyChange(true);setError('');setNotice('');try{await operation();onHistoryCleared();load(await getEmotion());setNotice(message);}catch(e){setError(e instanceof Error?e.message:'操作失败，请重试。');}finally{setBusy(false);onBusyChange(false);}}
   if(!data||!config)return <section className="workspace-pane"><h3>情绪关怀</h3><p role={error?'alert':undefined}>{error||'正在读取设置…'}</p></section>;
-  return <section className="workspace-pane" aria-label="情绪关怀设置"><h3>怎么陪你，由你决定。</h3>{locked&&<p className="pane-notice">亲密度60分解锁使用。仍可关闭分析、清空临时推测及删除设置。</p>}
+  return <section className="workspace-pane" aria-label="情绪关怀设置"><h3>怎么陪你，由你决定。</h3>{locked&&<p className="pane-notice">亲密度90分解锁使用。仍可关闭分析、清空临时推测及删除设置。</p>}
     <p className="pane-description">默认关闭。开启后，最近几轮聊天会额外发送给当前模型做情绪估计；不是读心或诊断。推测只在本次对话内短期保留，不写成长期记忆。你的自述和纠正优先，分析失败仍可正常聊天。保存、纠正、清空或删除会清空当前短期聊天，避免旧推测继续影响回应。</p>
     <label><input type="checkbox" checked={config.enabled} disabled={busy||locked} onChange={e=>setConfig({...config,enabled:e.target.checked})}/> 允许情绪分析</label>
     <div className="memory-settings">

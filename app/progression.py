@@ -9,7 +9,7 @@ from .dialogue import CHARACTER, ProviderFailure
 from .memory import Player
 
 Base = declarative_base()
-THRESHOLDS = {'memory':30, 'emotion':60, 'weather':90}
+THRESHOLDS = {'memory':30, 'weather':60, 'emotion':90}
 GIFTS = {
     'bookmark':{'name':'纸页书签', 'price':20, 'points':5, 'description':'把今天读到的那一页，轻轻留住。'},
     'tea':{'name':'一杯热茶', 'price':60, 'points':12, 'description':'忙碌的间隙，也记得歇一会儿。'},

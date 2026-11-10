@@ -7,7 +7,7 @@ import { MemoryPane } from './MemoryPane';
 import type { GrowthAccount } from '../types';
 
 const initial:GrowthAccount={profile:{name:'',email:'',phone:''},coins:100,currency_mode:'demo',starting_coins:100,
- character:{id:'shen_yan',name:'沈砚',score:0,active_seconds:0,abilities:{memory:false,emotion:false,weather:false}},thresholds:{memory:30,emotion:60,weather:90},
+ character:{id:'shen_yan',name:'沈砚',score:0,active_seconds:0,abilities:{memory:false,emotion:false,weather:false}},thresholds:{memory:30,weather:60,emotion:90},
  gifts:[{id:'bookmark',name:'纸页书签',price:20,points:5,description:'一份小心意'},{id:'lamp',name:'暖光小灯',price:120,points:20,description:'一点暖光'}],ledger:[]};
 const response=(data:unknown,status=200)=>new Response(JSON.stringify(data),{status});
 function props(){return {csrf:'csrf',onUpdate:vi.fn(),onManage:vi.fn(),onBusyChange:vi.fn()};}
@@ -88,11 +88,11 @@ it('clears contact information with confirmation and preserves the wallet',async
  expect(fetchMock.mock.calls[1][1].method).toBe('DELETE');
 });
 
-it('shows the next unlock and the full-score consent reminder',()=>{
+it('shows intimacy tiers without previewing abilities',()=>{
  const {rerender}=render(<BondProgress account={{...initial,character:{...initial.character,score:29}}}/>);
- expect(screen.getByText(/再相处 1 分，可解锁长期记忆/)).toBeVisible();
+ expect(screen.getByText(/距离渐熟还有 1 分/)).toBeVisible();
  rerender(<BondProgress account={{...initial,character:{...initial.character,score:100}}}/>);
- expect(screen.getByText(/三项能力均已解锁/)).toBeVisible();
+ expect(screen.getByText(/现在是知心/)).toBeVisible();
  expect(screen.getByRole('progressbar')).toHaveAttribute('value','100');
 });
 
