@@ -94,3 +94,17 @@
 离线命令：`scripts/evaluate_m5.py`、`evaluate_retrieval.py`、`evaluate_fact_support.py`、`evaluate_narrative_calibration.py`、`audit_narrative_references.py`、`check_fact_role_pairs.py`；具体参数先看`--help`，不要给`--live`。默认合成回归和临时PG结果见[测试总表](TEST_HISTORY.md)；结构/哈希/计分通过不等于语义质量通过。
 
 下一步优先落实独立保管者、A/B标注员和裁决员，冻结新默认companion政策及正式集；先完成离线校准再讨论真实调用预算。本轮及文档整理不执行新正式测试。仍待：复杂事实/误拦截独立验证、完整检索/Prompt/输出约束/天气/情绪消融、正式安全评测、情绪宏F1与门槛、自然度/角色感/关怀盲评、真实可用率/p50/p95/token/费用。历史8.003秒timeout/CLI退出1及15漏检/5误拦截/1未决继续保留，不以两例开发复测替代验收。
+
+## 正则与Prompt的职责（本轮）
+
+不将“所有正则”一键替换成Prompt。自然语言含义应迁往多语言结构化理解，程序不能把模型指令当权限或数据真实性保证。本轮完成的是[记忆路由/候选/日期/证据选择](M2_MEMORY.md)的新默认路径；项目全部语言规则迁移尚未完成。
+
+| 类别 | 本轮处理 |
+| --- | --- |
+| 记忆意图、本人/引用/假设、候选、相对日期、检索结果语义适合性 | 新semantic路径用Prompt+严格结构化结果；无错误回退正则。旧memory_routing/describe/extract_candidates/memory_query仅保留legacy回放 |
+| 权限/身份/CSRF/逐条确认/epoch/版本/事务/删除非复活 | 继续硬程序校验，不交给Prompt |
+| ISO日期/数值边界、原文绑定、证据ID/长度预算、固定供应商URL | 保留确定性结构/协议校验；有些使用正则，但不承担理解语义 |
+| 字符向量分词/归一化/撤销指纹 | 保留机械预处理与旧索引版本，不是多语言语义模型 |
+| 回复入口与正史局部检查、天气/情绪词面触发、来源时间/地点规则 | 当前仍存在；后续须按模块版本化迁移，保持普通问候可用、事实和授权不退化，不能本轮宣称全已移除 |
+
+Prompt负责提出语义判断，程序限制引用和执行，玩家确认后才能成为长期记忆。高置信或结构合法不证明理解正确。新政策独立验收须另冻memory_understanding/main/memory/progression/reply_pipeline/config、模型与参数；不修改旧封存/标签来“通过”。本轮仅合成结构/SDK/生命周期验证，没有真实模型或新金标准。

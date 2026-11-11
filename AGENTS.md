@@ -52,3 +52,5 @@
 - 历史事实不因整理文档消失：旧原回复/耗时/失败保留固定Git版本入口；`docs/SCENE_PLACE_GROUNDING.md`被测试逐字读取，不能随意精简/迁移。封存v1/v2及来源哈希绑定内容不得静默改写；有政策变化需新版本并说明理由。公开作者已见集、结构校验、实现者评审不能冒充独立金标准或质量验收；截至2026-11-10，M5尚未整体验收、M6未开始；后续以`docs/PLAN.md`为准。
 
 - 中日语言入口：UI文案在`frontend/src/i18n.ts`/`locales/ja.json`，生成语言在`app/localization.py`；可选`chat.locale`仅允许zh-CN/ja-JP。切换不改身份/正史/授权/记忆原文/地点或UTC额度日，日语UI不代表中文规则已支持日语语义。维护中文模块时同步`docs/ja/`对应页与双语README/TODO；权威操作规则和历史证据保留单份，不能翻译改写封存原文。
+
+- 多语言记忆默认`MEMORY_UNDERSTANDING_MODE=semantic`，理解/日期/候选/证据选择在`app/memory_understanding.py`；`legacy`仅用于显式历史回放，不是失败回退。语义失败不检索/自动提候选，手动保留原文/未知日期。旧回归显式固定legacy，新回归须显式semantic并覆盖真实默认路径。Prompt不能代替权限、原文/证据白名单、逐条确认、日期运算、epoch/版本/事务校验；本轮未完成天气/情绪/回复等全部语言规则迁移。

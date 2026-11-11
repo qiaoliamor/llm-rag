@@ -23,3 +23,5 @@
 例外：[旧场景/地名报告](https://github.com/qiaoliamor/llm-rag/blob/68b08f525fe3c444b3cc2b4992f58c26ea2980a5/docs/SCENE_PLACE_GROUNDING.md)被回归测试直接读取以逐字核对历史合成回复，保留原字节；它是历史证据，不是当前叙事规则。固定封存数据中的旧文档路径按测试索引查找，不为整理文档改写封存材料。
 
 兼容入口：`M3_TEST_REPORT.md`只保留旧Prompt文档的链接与锚点，转向天气综合文档/固定版本原文，不继续维护独立报告；避免改动被来源哈希绑定的`prompts/DESIGN.md`。
+
+本轮中日语义记忆默认路径已实现于任务分支，待PR审阅；功能、配置、风险和数据流见[M2](M2_MEMORY.md)，命令与最终996/75、前端71、临时PG208见[测试记录](TEST_HISTORY.md)，计数重叠不相加。

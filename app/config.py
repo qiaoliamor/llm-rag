@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     openai_model: str = 'gpt-4.1-mini'
     weather_provider: str = Field(default='openmeteo', pattern='^(openmeteo|mock)$')
     api_timeout_seconds: float = Field(default=30, ge=1, le=120)
+    memory_understanding_mode: str = Field(default='semantic', pattern='^(semantic|legacy)$')
+    memory_understanding_timeout_seconds: float = Field(default=4, ge=.1, le=10)
     memory_router_enabled: bool = True
     semantic_review_enabled: bool = True
     dialogue_mode: str = Field(default='companion', pattern='^(companion|audit)$')

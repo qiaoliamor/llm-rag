@@ -7,6 +7,7 @@ from sqlalchemy.orm import declarative_base
 
 from .dialogue import CHARACTER, ProviderFailure
 from .memory import Player
+from .memory_understanding import ExactMemory
 
 Base = declarative_base()
 THRESHOLDS = {'memory':30, 'weather':60, 'emotion':90}
@@ -166,7 +167,10 @@ class Progression:
             account,bond = self.rows(db,uid)
             candidates = []
             for fact in facts:
-                candidate = self.store.candidate(uid, fact, source, epoch, transaction=db)
+                if isinstance(fact, ExactMemory):
+                    candidate = self.store.candidate(uid, fact.fact, source, epoch, transaction=db, metadata=fact.metadata)
+                else:
+                    candidate = self.store.candidate(uid, fact, source, epoch, transaction=db)
                 if candidate and candidate['status']=='candidate': candidates.append(candidate)
             if started_at is not None:
                 self._credit_time(bond, started_at)

@@ -11,7 +11,7 @@ REWRITE='''\n上次输出违反证据或表达边界。重新回答：保留场�
 
 
 async def generate_checked(provider,history,prompt,query,memories,weather,mood,mood_settings,
-                           *,judge=None,review_enabled=True,review_timeout=8,companion=False):
+                           *,judge=None,review_enabled=True,review_timeout=8,companion=False, force_review=False):
     from . import companion as natural
     fallback = natural.FALLBACK if companion else FALLBACK
     evidence=evidence_bundle(history,memories,weather,mood)
@@ -34,7 +34,7 @@ async def generate_checked(provider,history,prompt,query,memories,weather,mood,m
         review=None
         factual_scene=False
         if judge is not None and review_enabled:
-            required = natural.review_required(query,reply,memories,weather,mood,flagged=flagged) if companion else needs_review(reply,evidence=memories,weather=weather,mood=mood,flagged=flagged)
+            required = force_review or natural.review_required(query,reply,memories,weather,mood,flagged=flagged) if companion else (force_review or needs_review(reply,evidence=memories,weather=weather,mood=mood,flagged=flagged))
             if required:
                 remaining=review_timeout-review_spent
                 if remaining<=0:
