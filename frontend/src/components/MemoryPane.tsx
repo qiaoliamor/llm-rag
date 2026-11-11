@@ -56,7 +56,7 @@ export function MemoryPane({ csrf, onHistoryCleared, onBusyChange, locked=false 
   return <section className="workspace-pane" aria-label={t("长期记忆管理")}>
     <h3>{t("让重要的事，被好好记住。")}</h3>
     {locked && <p className="pane-notice">{t("亲密度30分解锁使用。现在仍可查看、删除已有记忆或撤回授权。")}</p>}
-    <p className="pane-description">{t("默认关闭。开启后只提取本轮明确表达的重要信息，先形成候选；你确认后，角色才会跨对话引用。健康或创伤等内容也不会自动确认。")}</p>
+    <p className="pane-description">{t("默认关闭。开启后，会将本轮原文和必要的近期对话发给当前模型，判断是否需要旧记忆并提出候选；手动添加和修正也会发送原文以理解日期。请核对候选及日期，逐条确认后才会跨对话使用；分析失败可手动补充，不会自动确认健康或创伤等内容。")}</p>
     <div className="memory-settings">
       <button disabled={busy || (locked && !enabled)} onClick={() => void run(() => setMemorySettings(!enabled, timezone, csrf), true, enabled ? t("长期记忆已关闭，已有确认记忆保留但不再检索。") : t("长期记忆已开启，候选仍需逐条确认。"))}>{enabled ? t("关闭长期记忆") : t("开启长期记忆")}</button>
       <label>{t("事件时区 ")}<select aria-label={t("事件时区")} value={timezone} disabled={busy} onChange={e => setTimezone(e.target.value)}>

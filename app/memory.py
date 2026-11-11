@@ -386,18 +386,18 @@ class MemoryStore:
         return list(db.scalars(select(Memory).where(Memory.user_id==uid, Memory.character_id==CHARACTER_ID,
             (Memory.expires_at.is_(None)) | (Memory.expires_at>now)).order_by(Memory.updated_at.desc())))
 
-    def list(self, uid):
+    def list(self, uid, *, strict_fact=False):
         with self.db.begin() as db:
             db.execute(sa_delete(Memory).where(Memory.user_id==uid,Memory.status=='candidate',Memory.expires_at<=utcnow()))
             rows = list(db.scalars(select(Memory).where(Memory.user_id==uid,Memory.character_id==CHARACTER_ID).order_by(Memory.updated_at.desc())))
             result=[]
             for m in rows:
                 data=self._public(m)
-                data['conflicts']=[x.id for x in rows if x.id!=m.id and x.status=='confirmed' and x.slot==m.slot and m.slot!='event' and normalize(x.fact)!=normalize(m.fact)]
+                data['conflicts']=[x.id for x in rows if x.id!=m.id and x.status=='confirmed' and x.slot==m.slot and m.slot!='event' and (x.fact!=m.fact if strict_fact else normalize(x.fact)!=normalize(m.fact))]
                 result.append(data)
             return result
 
-    def candidate(self, uid, fact, source, epoch, manual=False, *, transaction=None):
+    def candidate(self, uid, fact, source, epoch, manual=False, *, transaction=None, metadata=None):
         # A completed chat may share its transaction with progression rewards.
         with (nullcontext(transaction) if transaction is not None else self.db.begin()) as db:
             p = self._player(db, uid, True)
@@ -406,10 +406,12 @@ class MemoryStore:
             db.execute(sa_delete(Memory).where(Memory.user_id==uid,Memory.status=='candidate',Memory.expires_at<=utcnow()))
             rows=self._rows(db, uid)
             for m in rows:
-                if normalize(m.fact)==normalize(fact): return self._public(m)
+                if (m.fact==fact if metadata is not None else normalize(m.fact)==normalize(fact)) and (metadata is None or m.event_date==metadata.event_date):
+                    return self._public(m)
             count=db.scalar(select(func.count()).select_from(Memory).where(Memory.user_id==uid))
             if count>=500: raise ProviderFailure('memory_capacity','记忆上限为500条，请先整理。',409)
-            category,slot,event_date=describe(fact,p.timezone)
+            category,slot,event_date = (metadata.category, metadata.slot, metadata.event_date) if metadata is not None else describe(fact,p.timezone)
+            if metadata is not None and slot == 'preference': slot = 'preference:' + normalize(fact)[:100]
             now=utcnow()
             m=Memory(id=str(uuid4()),user_id=uid,character_id=CHARACTER_ID,status='candidate',fact=fact,
                 category=category,slot=slot,event_date=event_date,timezone=p.timezone,source_message_id=source,source_kind='manual' if manual else 'chat',
@@ -418,7 +420,19 @@ class MemoryStore:
             db.add(m); db.flush()
             return self._public(m)
 
-    def mutate(self, uid, mid, version, fact=None, confirm=False, replace=False, delete=False, keep_both=False):
+    def validate_edit(self, uid, mid, version):
+        # Validate ownership/version before sending a correction for model metadata.
+        with self.db() as db:
+            p = self._player(db, uid)
+            m = db.scalar(select(Memory).where(Memory.id==mid, Memory.user_id==uid, Memory.character_id==CHARACTER_ID))
+            if m is None: raise ProviderFailure('not_found','未找到这条记忆。',404)
+            if m.version != version: raise ProviderFailure('version_conflict','记忆已被更新，请刷新列表。',409)
+            if not p.memory_enabled: raise ProviderFailure('memory_disabled','请先开启长期记忆。',409)
+            if m.status == 'candidate' and m.expires_at and m.expires_at <= utcnow():
+                raise ProviderFailure('expired','候选记忆已过期，请重新添加。',409)
+            return m.fact
+
+    def mutate(self, uid, mid, version, fact=None, confirm=False, replace=False, delete=False, keep_both=False, *, metadata=None, strict_fact=False):
         with self.db.begin() as db:
             p=self._player(db,uid,True)
             m=db.scalar(select(Memory).where(Memory.id==mid, Memory.user_id==uid, Memory.character_id==CHARACTER_ID))
@@ -433,21 +447,22 @@ class MemoryStore:
                 self._revoke(db,uid,m.fact)
                 m.fact=fact
                 m.source_kind='corrected'
-                m.category,m.slot,m.event_date=describe(fact,p.timezone)
+                m.category,m.slot,m.event_date = (metadata.category, metadata.slot, metadata.event_date) if metadata is not None else describe(fact,p.timezone)
+                if metadata is not None and m.slot == 'preference': m.slot = 'preference:' + normalize(fact)[:100]
                 m.timezone=p.timezone
                 m.embedding=embed(fact)
                 self._revision(db,m,'correct')
             if confirm or m.status == 'confirmed':
-                conflicts=[x for x in self._rows(db,uid) if x.id!=m.id and x.status=='confirmed' and x.slot==m.slot and m.slot!='event' and normalize(x.fact)!=normalize(m.fact)]
+                conflicts=[x for x in self._rows(db,uid) if x.id!=m.id and x.status=='confirmed' and x.slot==m.slot and m.slot!='event' and (x.fact!=m.fact if strict_fact else normalize(x.fact)!=normalize(m.fact))]
                 if conflicts and not replace and not keep_both: raise ProviderFailure('fact_conflict','发现同类旧记忆，请明确确认替换或作为独立经历保留。',409)
                 if keep_both:
                     m.slot += ':' + m.id
                 for old in conflicts if replace else []:
                     self._revoke(db,uid,old.fact); self._revision(db,old,'superseded'); db.delete(old)
                 m.status='confirmed'
-                upcoming = any(m.slot.startswith('event:'+word) for word in ('面试','考试','手术'))
+                upcoming = any(m.slot.startswith('event:'+word) for word in ('面试','考试','手术','appointment'))
                 source_date=m.created_at.replace(tzinfo=timezone.utc).astimezone(ZoneInfo(m.timezone)).date().isoformat()
-                m.expires_at=datetime.fromisoformat(m.event_date)+timedelta(days=31) if m.event_date and m.event_date>=source_date and upcoming else None
+                m.expires_at=datetime.fromisoformat(m.event_date)+timedelta(days=31) if m.event_date and (m.slot.startswith('event:appointment:') or (m.event_date>=source_date and upcoming)) else None
                 self._revision(db,m,'confirm')
             m.version+=1; m.updated_at=utcnow(); p.epoch+=1
             db.flush()
@@ -459,6 +474,31 @@ class MemoryStore:
             for m in db.scalars(select(Memory).where(Memory.user_id==uid)):
                 self._revoke(db,uid,m.fact); self._revision(db,m,'delete'); db.delete(m)
             p.epoch+=1
+
+    def semantic_candidates(self, uid, query, limit=20, *, target_slots=()):
+        """Scoped numeric/character recall only; no language-dependent fact rules."""
+        with self.db() as db:
+            p = self._player(db, uid)
+            if not p.memory_enabled: return []
+            rows = [m for m in self._rows(db, uid) if m.status=='confirmed' and m.embedding_version==EMBEDDING_VERSION]
+            q, qt = embed(query, expand=False), terms(query)
+            scored = []
+            # Compatibility with persisted legacy slot enums, not input-language matching.
+            prefixes = {'name':('name',),'residence':('city',),'preference':('preference',),
+                        'appointment':('event:appointment','event:面试','event:考试','event:手术'),
+                        'history':('event',),'other':('event',)}
+            for m in rows:
+                cosine = sum(a*b for a,b in zip(q,m.embedding))
+                overlap = len(qt & terms(m.fact)) / max(1,len(qt))
+                typed = any(m.slot == prefix or m.slot.startswith(prefix+':')
+                            for tag in target_slots for prefix in prefixes.get(tag,()))
+                if target_slots and not typed: continue
+                if cosine < .12 and not overlap and not typed: continue
+                age = max(0,(utcnow()-m.updated_at).total_seconds()/86400)
+                score = .55*cosine + .3*overlap + .1*m.importance + .05/(1+age/30) + int(typed)
+                scored.append((score,m))
+            scored.sort(key=lambda item:(item[0],item[1].id),reverse=True)
+            return [self._public(m) for _,m in scored[:min(limit,20)]]
 
     def retrieve(self, uid, query, limit=5):
         with self.db() as db:

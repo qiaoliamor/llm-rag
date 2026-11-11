@@ -12,7 +12,8 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from .config import ROOT, Settings
-from .memory_routing import route_memory, NO_MEMORY_CONTEXT
+from .memory_routing import route_memory, NO_MEMORY_CONTEXT, Route
+from .memory_understanding import understand, select_evidence, ModelMemoryUnderstanding, MemoryMetadata, ExactMemory, MEMORY_CONTEXT_RULES
 from .semantic_review import ModelAnalysisProvider
 from .reply_pipeline import generate_checked
 from . import companion
@@ -120,7 +121,7 @@ class WeatherSettingsInput(BaseModel):
     city_id: int | None = Field(default=None, gt=0)
 
 
-def create_app(settings=None, provider=None, weather_provider=None, emotion_provider=None, memory_router=None, semantic_judge=None):
+def create_app(settings=None, provider=None, weather_provider=None, emotion_provider=None, memory_router=None, semantic_judge=None, memory_understander=None):
     settings = settings or Settings()
     provider = provider or build_provider(settings)
     weather = weather_provider or (MockWeatherProvider() if settings.weather_provider == 'mock' else OpenMeteoProvider())
@@ -129,6 +130,8 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
     auxiliary = analysis_type(settings) if settings.chat_provider != 'mock' else None
     router = memory_router if memory_router is not None else auxiliary
     judge = semantic_judge if semantic_judge is not None else auxiliary
+    semantic_memory = settings.memory_understanding_mode == 'semantic'
+    memory_understander = memory_understander if memory_understander is not None else (ModelMemoryUnderstanding(settings) if settings.chat_provider != 'mock' else None)
     store = MemoryStore(settings.memory_database_url.get_secret_value())
     growth = Progression(store) if settings.growth_enabled else None
     app = FastAPI(docs_url=None, redoc_url=None)
@@ -244,10 +247,28 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
                 session.memory_epoch = snapshot['epoch']
             turn = session.emotion.turn + 1
             history = session.messages[-24:] + [{'role': 'user', 'content': body.message, 'id':f'u{turn}'}]
-            route = await route_memory(body.message, history, enabled=snapshot['memory_enabled'] and abilities['memory'],
-                router=router,timeout=settings.memory_route_timeout_seconds,routing_enabled=settings.memory_router_enabled)
-            verify_epoch(session,snapshot['epoch'])
-            evidence = store.retrieve(session.user_id, route.query) if route.need_memory else []
+            understood = None
+            selection_status = 'not_requested'
+            if semantic_memory:
+                memory_deadline = time.monotonic() + settings.memory_understanding_timeout_seconds
+                understood = await understand(memory_understander, body.message, history,
+                    enabled=snapshot['memory_enabled'] and abilities['memory'], tz=snapshot['timezone'],
+                    timeout=settings.memory_understanding_timeout_seconds)
+                verify_epoch(session,snapshot['epoch'])
+                plan = understood.plan
+                route = Route(bool(plan and plan.need_memory), plan.query if plan else '',
+                    plan.reason if plan else understood.status, 'semantic')
+                evidence = []
+                if route.need_memory:
+                    candidates = store.semantic_candidates(session.user_id, route.query, target_slots=plan.target_slots)
+                    evidence, selection_status = await select_evidence(memory_understander, route.query, history, candidates,
+                        timeout=memory_deadline-time.monotonic())
+                    verify_epoch(session,snapshot['epoch'])
+            else:
+                route = await route_memory(body.message, history, enabled=snapshot['memory_enabled'] and abilities['memory'],
+                    router=router,timeout=settings.memory_route_timeout_seconds,routing_enabled=settings.memory_router_enabled)
+                verify_epoch(session,snapshot['epoch'])
+                evidence = store.retrieve(session.user_id, route.query) if route.need_memory else []
             weather_config = store.weather_settings(session.user_id)
             if not abilities['weather']: weather_config={**weather_config,'enabled':False}
             weather_result, pending = await query_weather(weather, body.message, weather_config, session.pending_weather)
@@ -265,19 +286,21 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
                 prompt = instructions() + weather_prompt(weather_result) + memory_prompt(evidence) + emotion_prompt(mood_result, mood_settings) + grounding_prompt(evidence, body.message)
                 if not route.need_memory:
                     prompt += NO_MEMORY_CONTEXT
+            if semantic_memory and evidence: prompt += MEMORY_CONTEXT_RULES
             prompt += language_prompt(body.locale, previous=session.reply_locale)
             model_history = [{'role':m['role'], 'content':m['content']} for m in history]
             try:
                 async with asyncio.timeout(settings.api_timeout_seconds * 2 + settings.semantic_review_timeout_seconds + 2):
                     reply, guarded, review_status = await generate_checked(language_provider(provider,body.locale),model_history,prompt,body.message,
                         evidence,weather_result,mood_result,mood_settings,judge=judge,
-                        review_enabled=settings.semantic_review_enabled,review_timeout=settings.semantic_review_timeout_seconds,companion=natural)
+                        review_enabled=settings.semantic_review_enabled,review_timeout=settings.semantic_review_timeout_seconds,companion=natural,
+                        force_review=semantic_memory and route.need_memory)
             except TimeoutError:
                 raise ProviderFailure('timeout', '模型响应超时，请稍后重试。', 504) from None
             verify_epoch(session, snapshot['epoch'])
             if review_status.get('status') == 'unavailable' and review_status.get('failure') in REVIEW_TRANSIENT_FAILURES:
                 raise ProviderFailure('review_busy', BUSY_MESSAGE, 503)
-            facts = extract_candidates(body.message) if snapshot['memory_enabled'] and abilities['memory'] else []
+            facts = list(understood.candidates) if understood is not None else (extract_candidates(body.message) if snapshot['memory_enabled'] and abilities['memory'] else [])
             reply = fixed_reply(reply, body.locale)
             candidates = []
             account_result = None
@@ -286,7 +309,7 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
                     facts=facts, source=request.state.request_id, epoch=snapshot['epoch'])
             else:
                 for fact in facts:
-                    candidate = store.candidate(session.user_id, fact, request.state.request_id, snapshot['epoch'])
+                    candidate = store.candidate(session.user_id, fact.fact, request.state.request_id, snapshot['epoch'], metadata=fact.metadata) if isinstance(fact, ExactMemory) else store.candidate(session.user_id, fact, request.state.request_id, snapshot['epoch'])
                     if candidate and candidate['status'] == 'candidate': candidates.append(candidate)
             session.reply_locale = body.locale
             session.emotion.turn = turn
@@ -297,7 +320,8 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
             return {'emotion': mood_result, 'weather': weather_result, 'reply': reply, 'request_id': request.state.request_id, 'guarded': guarded, 'memory_candidates': candidates,
                     **({'account':account_result} if account_result is not None else {}),
                     'retrieved_memory_ids': [m['id'] for m in evidence],
-                    'memory_route':route.public(),'semantic_review':review_status}
+                    'memory_route':route.public(),'semantic_review':review_status,
+                    **({'memory_understanding':{**understood.public(), 'selection':selection_status}} if understood is not None else {})}
 
     @app.delete('/v1/session')
     async def reset(request: Request):
@@ -319,7 +343,17 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
     @app.get('/v1/memories')
     async def memories(request: Request):
         session = get_session(request)
-        return {'items': store.list(session.user_id), 'settings': store.settings(session.user_id)}
+        return {'items': store.list(session.user_id, strict_fact=True) if semantic_memory else store.list(session.user_id), 'settings': store.settings(session.user_id)}
+
+    async def manual_metadata(fact, session, snapshot):
+        if growth: growth.require(session.user_id,'memory')
+        if not snapshot['memory_enabled']:
+            raise ProviderFailure('memory_disabled','请先开启长期记忆。',409)
+        verify_epoch(session,snapshot['epoch'])
+        result = await understand(memory_understander, fact, [], enabled=True, tz=snapshot['timezone'],
+            timeout=settings.memory_understanding_timeout_seconds, operation='manual_metadata')
+        verify_epoch(session,snapshot['epoch'])
+        return result.candidates[0].metadata if result.candidates else MemoryMetadata()
 
     @app.post('/v1/memories')
     async def create_memory(body: MemoryInput, request: Request):
@@ -328,7 +362,8 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
         snapshot = store.settings(session.user_id)
         if not snapshot['memory_enabled']:
             raise ProviderFailure('memory_disabled', '请先开启长期记忆。', 409)
-        candidate = store.candidate(session.user_id, body.fact, request.state.request_id, snapshot['epoch'], manual=True)
+        metadata = await manual_metadata(body.fact, session, snapshot) if semantic_memory else None
+        candidate = store.candidate(session.user_id, body.fact, request.state.request_id, snapshot['epoch'], manual=True, metadata=metadata)
         return {'item': candidate}
 
     @app.patch('/v1/memories/{memory_id}')
@@ -337,7 +372,12 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
         if growth and body.confirm: growth.require(session.user_id,'memory')
         if body.keep_both and body.replace_conflicts:
             raise ProviderFailure('invalid_choice', '替换与独立保留只能选择一种。', 422)
-        item = store.mutate(session.user_id, memory_id, body.version, body.fact, body.confirm, body.replace_conflicts, keep_both=body.keep_both)
+        metadata = None
+        if semantic_memory and body.fact is not None:
+            original = store.validate_edit(session.user_id, memory_id, body.version)
+            if original != body.fact:
+                metadata = await manual_metadata(body.fact, session, store.settings(session.user_id))
+        item = store.mutate(session.user_id, memory_id, body.version, body.fact, body.confirm, body.replace_conflicts, keep_both=body.keep_both, metadata=metadata, strict_fact=semantic_memory)
         invalidate_user_history(session.user_id)
         return {'item': item, 'history_cleared': True}
 
