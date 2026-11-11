@@ -343,7 +343,7 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
     @app.get('/v1/memories')
     async def memories(request: Request):
         session = get_session(request)
-        return {'items': store.list(session.user_id), 'settings': store.settings(session.user_id)}
+        return {'items': store.list(session.user_id, strict_fact=True) if semantic_memory else store.list(session.user_id), 'settings': store.settings(session.user_id)}
 
     async def manual_metadata(fact, session, snapshot):
         if growth: growth.require(session.user_id,'memory')
@@ -377,7 +377,7 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
             original = store.validate_edit(session.user_id, memory_id, body.version)
             if original != body.fact:
                 metadata = await manual_metadata(body.fact, session, store.settings(session.user_id))
-        item = store.mutate(session.user_id, memory_id, body.version, body.fact, body.confirm, body.replace_conflicts, keep_both=body.keep_both, metadata=metadata)
+        item = store.mutate(session.user_id, memory_id, body.version, body.fact, body.confirm, body.replace_conflicts, keep_both=body.keep_both, metadata=metadata, strict_fact=semantic_memory)
         invalidate_user_history(session.user_id)
         return {'item': item, 'history_cleared': True}
 

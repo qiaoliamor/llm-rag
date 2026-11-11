@@ -386,14 +386,14 @@ class MemoryStore:
         return list(db.scalars(select(Memory).where(Memory.user_id==uid, Memory.character_id==CHARACTER_ID,
             (Memory.expires_at.is_(None)) | (Memory.expires_at>now)).order_by(Memory.updated_at.desc())))
 
-    def list(self, uid):
+    def list(self, uid, *, strict_fact=False):
         with self.db.begin() as db:
             db.execute(sa_delete(Memory).where(Memory.user_id==uid,Memory.status=='candidate',Memory.expires_at<=utcnow()))
             rows = list(db.scalars(select(Memory).where(Memory.user_id==uid,Memory.character_id==CHARACTER_ID).order_by(Memory.updated_at.desc())))
             result=[]
             for m in rows:
                 data=self._public(m)
-                data['conflicts']=[x.id for x in rows if x.id!=m.id and x.status=='confirmed' and x.slot==m.slot and m.slot!='event' and normalize(x.fact)!=normalize(m.fact)]
+                data['conflicts']=[x.id for x in rows if x.id!=m.id and x.status=='confirmed' and x.slot==m.slot and m.slot!='event' and (x.fact!=m.fact if strict_fact else normalize(x.fact)!=normalize(m.fact))]
                 result.append(data)
             return result
 
@@ -406,7 +406,7 @@ class MemoryStore:
             db.execute(sa_delete(Memory).where(Memory.user_id==uid,Memory.status=='candidate',Memory.expires_at<=utcnow()))
             rows=self._rows(db, uid)
             for m in rows:
-                if normalize(m.fact)==normalize(fact) and (metadata is None or m.event_date==metadata.event_date):
+                if (m.fact==fact if metadata is not None else normalize(m.fact)==normalize(fact)) and (metadata is None or m.event_date==metadata.event_date):
                     return self._public(m)
             count=db.scalar(select(func.count()).select_from(Memory).where(Memory.user_id==uid))
             if count>=500: raise ProviderFailure('memory_capacity','记忆上限为500条，请先整理。',409)
@@ -432,7 +432,7 @@ class MemoryStore:
                 raise ProviderFailure('expired','候选记忆已过期，请重新添加。',409)
             return m.fact
 
-    def mutate(self, uid, mid, version, fact=None, confirm=False, replace=False, delete=False, keep_both=False, *, metadata=None):
+    def mutate(self, uid, mid, version, fact=None, confirm=False, replace=False, delete=False, keep_both=False, *, metadata=None, strict_fact=False):
         with self.db.begin() as db:
             p=self._player(db,uid,True)
             m=db.scalar(select(Memory).where(Memory.id==mid, Memory.user_id==uid, Memory.character_id==CHARACTER_ID))
@@ -453,7 +453,7 @@ class MemoryStore:
                 m.embedding=embed(fact)
                 self._revision(db,m,'correct')
             if confirm or m.status == 'confirmed':
-                conflicts=[x for x in self._rows(db,uid) if x.id!=m.id and x.status=='confirmed' and x.slot==m.slot and m.slot!='event' and normalize(x.fact)!=normalize(m.fact)]
+                conflicts=[x for x in self._rows(db,uid) if x.id!=m.id and x.status=='confirmed' and x.slot==m.slot and m.slot!='event' and (x.fact!=m.fact if strict_fact else normalize(x.fact)!=normalize(m.fact))]
                 if conflicts and not replace and not keep_both: raise ProviderFailure('fact_conflict','发现同类旧记忆，请明确确认替换或作为独立经历保留。',409)
                 if keep_both:
                     m.slot += ':' + m.id

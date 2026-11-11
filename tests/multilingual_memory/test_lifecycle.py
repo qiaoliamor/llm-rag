@@ -44,6 +44,29 @@ def chat(e,message,locale='ja-JP'):
 def items(e):return e.c.get('/v1/memories').json()['items']
 
 
+def test_distinct_original_names_require_explicit_replacement(env):
+    e=env;enable(e)
+    for text in ('私の名前はA-Bです。','私の名前はABです。'):
+        e.analyst.analyze.return_value=plan(proposal(text,category='profile',slot='name'))
+        response=chat(e,text)
+        assert response.status_code==200
+        candidates=response.json()['memory_candidates']
+        assert len(candidates)==1
+        m=candidates[0]
+        assert m['fact']==text
+        if text=='私の名前はA-Bです。':
+            old_id=m['id']
+            assert e.c.patch('/v1/memories/'+m['id'],headers=e.h,json={'version':m['version'],'confirm':True}).status_code==200
+    assert m['id']!=old_id
+    current=next(x for x in items(e) if x['id']==m['id'])
+    assert current['conflicts']==[old_id]
+    path='/v1/memories/'+m['id']
+    assert e.c.patch(path,headers=e.h,json={'version':m['version'],'confirm':True}).status_code==409
+    assert e.c.patch(path,headers=e.h,json={'version':m['version'],'confirm':True,'replace_conflicts':True}).status_code==200
+    assert [(x['id'],x['fact'],x['status']) for x in items(e)]==[(m['id'],'私の名前はABです。','confirmed')]
+    assert old_id not in [x['id'] for x in e.store.semantic_candidates(e.uid,'名前',target_slots=['name'])]
+
+
 @pytest.mark.parametrize('message,expression,locale',[
     ('明日、合成東京で面接があります。','明日','ja-JP'),
     ('我明天在合成北京市有面试。','明天','zh-CN'),
