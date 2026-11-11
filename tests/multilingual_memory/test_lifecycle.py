@@ -10,7 +10,7 @@ from app.config import Settings
 from app.main import create_app
 from app.memory import MemoryStore
 from app.progression import Bond
-from app.memory_understanding import MemoryMetadata
+from app.memory_understanding import MemoryMetadata, MEMORY_CONTEXT_RULES
 from test_understanding import plan, proposal, date_spec
 
 NOW=datetime(2026,11,11,0,tzinfo=timezone.utc)
@@ -72,6 +72,7 @@ def test_cross_session_confirmation_retrieval_correction_delete_and_no_revival(e
     r=chat(e,query,locale)
     assert r.status_code==200 and r.json()['retrieved_memory_ids']==[m['id']]
     assert message in e.provider.generate.call_args.args[1]
+    assert MEMORY_CONTEXT_RULES in e.provider.generate.call_args.args[1]
     assert 'source_message_id' not in e.provider.generate.call_args.args[1]
     corrected=message.replace(expression,'明後日' if locale=='ja-JP' else '后天')
     new_expression='明後日' if locale=='ja-JP' else '后天'
@@ -294,3 +295,29 @@ def test_semantic_personal_query_requests_review_even_with_no_evidence_and_no_ch
     r=client.post('/v1/chat',headers=h,json={'message':'こんにちは','locale':'ja-JP'})
     assert r.status_code==200 and r.json()['semantic_review']['status']=='skipped'
     judge.review.assert_not_awaited()
+
+
+def test_locked_existing_memory_edit_cannot_call_metadata_model(env):
+    e=env;enable(e)
+    m=e.store.candidate(e.uid,'原文の合成記憶。','seed',e.store.settings(e.uid)['epoch'],manual=True,metadata=MemoryMetadata())
+    e.store.mutate(e.uid,m['id'],m['version'],confirm=True);m=items(e)[0]
+    with e.store.db.begin() as db:db.get(Bond,(e.uid,'shen_yan')).score=29
+    r=e.c.patch('/v1/memories/'+m['id'],headers=e.h,json={'version':m['version'],'fact':'変更した原文。'})
+    assert r.status_code==403 and r.json()['code']=='ability_locked'
+    e.analyst.analyze.assert_not_awaited()
+    assert items(e)[0]['fact']=='原文の合成記憶。'
+    assert e.c.delete('/v1/memories/'+m['id'],headers=e.h,params={'version':m['version']}).status_code==200
+
+
+def test_revoked_before_manual_analysis_never_sends_correction(env,monkeypatch):
+    e=env;enable(e)
+    m=e.store.candidate(e.uid,'原文の合成記憶。','seed',e.store.settings(e.uid)['epoch'],manual=True,metadata=MemoryMetadata())
+    e.store.mutate(e.uid,m['id'],m['version'],confirm=True);m=items(e)[0]
+    validate=e.store.validate_edit
+    def revoke(*args):
+        original=validate(*args);e.store.configure(e.uid,False,'Asia/Tokyo');return original
+    monkeypatch.setattr(e.store,'validate_edit',revoke)
+    r=e.c.patch('/v1/memories/'+m['id'],headers=e.h,json={'version':m['version'],'fact':'変更した原文。'})
+    assert r.status_code==409 and r.json()['code']=='memory_disabled'
+    e.analyst.analyze.assert_not_awaited()
+    assert items(e)[0]['fact']=='原文の合成記憶。'

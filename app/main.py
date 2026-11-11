@@ -13,7 +13,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from .config import ROOT, Settings
 from .memory_routing import route_memory, NO_MEMORY_CONTEXT, Route
-from .memory_understanding import understand, select_evidence, ModelMemoryUnderstanding, MemoryMetadata, ExactMemory
+from .memory_understanding import understand, select_evidence, ModelMemoryUnderstanding, MemoryMetadata, ExactMemory, MEMORY_CONTEXT_RULES
 from .semantic_review import ModelAnalysisProvider
 from .reply_pipeline import generate_checked
 from . import companion
@@ -286,6 +286,7 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
                 prompt = instructions() + weather_prompt(weather_result) + memory_prompt(evidence) + emotion_prompt(mood_result, mood_settings) + grounding_prompt(evidence, body.message)
                 if not route.need_memory:
                     prompt += NO_MEMORY_CONTEXT
+            if semantic_memory and evidence: prompt += MEMORY_CONTEXT_RULES
             prompt += language_prompt(body.locale, previous=session.reply_locale)
             model_history = [{'role':m['role'], 'content':m['content']} for m in history]
             try:
@@ -345,6 +346,10 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
         return {'items': store.list(session.user_id), 'settings': store.settings(session.user_id)}
 
     async def manual_metadata(fact, session, snapshot):
+        if growth: growth.require(session.user_id,'memory')
+        if not snapshot['memory_enabled']:
+            raise ProviderFailure('memory_disabled','请先开启长期记忆。',409)
+        verify_epoch(session,snapshot['epoch'])
         result = await understand(memory_understander, fact, [], enabled=True, tz=snapshot['timezone'],
             timeout=settings.memory_understanding_timeout_seconds, operation='manual_metadata')
         verify_epoch(session,snapshot['epoch'])

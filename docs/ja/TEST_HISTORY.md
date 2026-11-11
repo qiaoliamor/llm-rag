@@ -30,8 +30,8 @@ multilingual-memory-v1を実装し、既定semanticと明示legacy再現を分�
 
 | コマンド | 最終結果 | 範囲 |
 | --- | --- | --- |
-| `.venv/bin/python -m pytest -q` | 996通過／75スキップ、17.73秒 | 新規67ローカル、新規20PG変体は既定スキップ、旧55スキップ |
-| `.venv/bin/python scripts/test_postgres.py --semantic-memory` | 208通過、11.27秒 | 新規一時PGを作成・削除。記憶／成長／意味経路とSQLite対照。全体と重複 |
+| `.venv/bin/python -m pytest -q` | 998通過／77スキップ、15.11秒 | 新規69ローカル、新規22PG変体は既定スキップ、旧55スキップ |
+| `.venv/bin/python scripts/test_postgres.py --semantic-memory` | 212通過、10.90秒 | 新規一時PGを作成・削除。記憶／成長／意味経路とSQLite対照。全体と重複 |
 | `npm test --prefix frontend -- --run` | 71通過、1.83秒 | 許可説明と原文／確認を維持 |
 | `npm run build --prefix frontend` | 型・本番ビルド通過 | 実機／画面／読み上げの受入ではない |
 | 凍結／参照チェック | 公開24候補not_assessed、38例／34出所通過、実API0 | 旧原文、参照、役柄と旧Prompt、v1/v2を変更しない |
@@ -43,3 +43,5 @@ multilingual-memory-v1を実装し、既定semanticと明示legacy再現を分�
 最初の追加テスト収集は装飾子の余分なコロンでSyntaxError／終了2となり、修正後44件が通過しました。開発929/55→990/71→991/72→995/74、PG198→200→206の記録は追加修正前の重複結果として保持します。日跨ぎ、テキストだけの投影、日付範囲、名前／旧slot、返答入口の修正後に最終値を検証し、成功するまで実モデルを再抽選したものではありません。
 
 構造・Mock SDK通過は、実Geminiのschema受理、4秒応答や理解精度を証明しません。意味／日付／選択／費用、独立評価、他の言語ルールは未受入。旧15漏検／5誤阻止／1未決、503、8.003秒timeout／CLI終了1と全未検証項目を保持し、M5未受入・M6未着手です。秘密値、実会話、記憶、評価原本、DBや実行書出しは提出しません。
+
+提出前に手動修正も30点資格・現在許可・epochを解析前に検査する回帰を追加し、閲覧・削除は維持しました。旧「明日／来週」を今の日付で再計算せず、保存event_dateのみ使う中日生成Promptも追加しました。cross_session_confirmation_retrieval_correction_delete_and_no_revivalのPYTEST_ADDOPTS指定で一時PGを定向確認し、4通過／208未選択、1.23秒（整套212と重複）。補強前996/75・PG208、補強後998/77の16.69秒を開発履歴として残し、最終全体は15.11秒です。文書用here-docの一度の文字コード失敗はファイルパッチで修正し、機能/API失敗とは区別します。
