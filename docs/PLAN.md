@@ -2,7 +2,7 @@
 
 [中文](PLAN.md) · [日本語](ja/PLAN.md)
 
-更新：2026-11-10；功能基线PR #28（`68b08f5`），PR #29文档整合经本次squash交付main。细项唯一维护在[TODOLIST](../TODOLIST.md)。
+更新：2026-11-11；PR #29文档整合已合并（`5a62fca`），PR #30日语基础适配经本次squash交付main。细项唯一维护在[TODOLIST](../TODOLIST.md)。
 
 | 阶段 | 当前交付 | 状态/下一步 |
 | --- | --- | --- |

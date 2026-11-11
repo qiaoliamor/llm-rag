@@ -3,6 +3,8 @@ import ja from './locales/ja.json';
 
 export type Locale = 'zh-CN' | 'ja-JP';
 const key = 'persona.ui.locale';
+// Only exact, authored dictionary values are reversible, never player content.
+const sourceCopy = new Map(Object.entries(ja).map(([source, target]) => [target, source]));
 function savedLocale(): Locale {
   try { return localStorage.getItem(key) === 'ja-JP' ? 'ja-JP' : 'zh-CN'; } catch { return 'zh-CN'; }
 }
@@ -22,7 +24,7 @@ export function useLocale() {
 }
 export function translate(language: Locale, source: string, values: readonly unknown[] = []): string {
   const dict: Readonly<Record<string, string>> = ja;
-  const text = language === 'ja-JP' ? dict[source.trim()] ?? source : source;
+  const text = language === 'ja-JP' ? dict[source.trim()] ?? source : sourceCopy.get(source) ?? source;
   return text.replace(/\{(\d+)\}/g, (_, index: string) => String(values[Number(index) - 1] ?? ''));
 }
 // Only authored UI copy is passed here. Never translate chat, memories, names or places implicitly.
@@ -30,7 +32,12 @@ export const t = (source: string, values: readonly unknown[] = []) => translate(
 
 // Error bodies can contain supplier/server text. Japanese UI uses a safe fallback.
 export function errorText(source: string): string {
-  if (locale !== 'ja-JP' || !source) return source;
+  if (!source) return '';
+  if (locale === 'zh-CN') {
+    const original = sourceCopy.get(source);
+    if (original) return original;
+    return /[ぁ-んァ-ヶ]/.test(source) ? '操作失败，请重试。' : source;
+  }
   const dictionary: Readonly<Record<string, string>> = ja;
   if (dictionary[source.trim()]) return t(source);
   if (/[ぁ-んァ-ヶ]/.test(source)) return source;

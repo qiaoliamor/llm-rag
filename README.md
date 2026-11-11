@@ -50,7 +50,7 @@ uv run --frozen python scripts/test_postgres.py
 uv run --frozen python scripts/check_sealed_evaluation.py --validate-content
 ```
 
-PR #28历史基线：917通过/55跳过，独立临时PG233通过（重叠），前端60通过及构建通过；本次文档整理不冒充重跑这些测试。新默认companion和旧audit覆盖口径、历史失败、真实合成观测及未验收项见[测试记录](docs/TEST_HISTORY.md)。真实API测试仅按AGENTS缩量复测旧失败，不在自动检查中加`--live`。
+PR #28历史基线：917通过/55跳过，独立临时PG233通过（重叠），前端60通过及构建通过；上述为历史结果；最新合并审阅929/55、前端71及构建见测试记录。新默认companion和旧audit覆盖口径、历史失败、真实合成观测及未验收项见[测试记录](docs/TEST_HISTORY.md)。真实API测试仅按AGENTS缩量复测旧失败，不在自动检查中加`--live`。
 
 项目采用MIT许可，仅提交原创/授权素材、代码和合成测试资料；不提交`.env`、密钥、数据库、日志、真实对话/记忆、标注评分原件或运行导出。真实账号、支付、完整注销/备份擦除、多实例发布仍未实现。
 

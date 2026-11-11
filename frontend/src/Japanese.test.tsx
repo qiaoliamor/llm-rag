@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
-import { getLocale, setLocale, translate } from './i18n';
+import { getLocale, setLocale, translate, errorText } from './i18n';
 import ja from './locales/ja.json';
 import { UnlockedAbilities, UnlockCelebration } from './components/AbilityExperience';
 import { Composer } from './components/Composer';
@@ -89,6 +89,24 @@ describe('Japanese presentation',()=>{
     rerender(<UnlockCelebration account={{...account,character:{...account.character,score:30,abilities:{memory:true,weather:false,emotion:false}}}}/>);
     expect(screen.getByRole('status')).toHaveTextContent('長期記憶が解放されました');
     fireEvent.click(screen.getByRole('button',{name:'解放のお知らせを閉じる'}));expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  });
+
+  it('updates existing notices when switching back to Chinese without resaving data', async()=>{
+    setLocale('ja-JP');
+    const fetcher=vi.fn().mockResolvedValueOnce(response(session)).mockResolvedValueOnce(response(account)).mockResolvedValueOnce(response(account));
+    vi.stubGlobal('fetch',fetcher);render(<App/>);
+    fireEvent.click(await screen.findByRole('button',{name:'マイアカウント'}));
+    fireEvent.click(await screen.findByRole('button',{name:'プロフィールを保存'}));
+    await screen.findByText('プロフィールを保存しました。');
+    fireEvent.change(screen.getByLabelText('语言 / 言語'),{target:{value:'zh-CN'}});
+    expect(screen.getByRole('status')).toHaveTextContent('个人资料已保存。');
+    expect(fetcher).toHaveBeenCalledTimes(3);
+  });
+
+  it('switches existing known errors back to Chinese and masks unknown Japanese errors',()=>{
+    setLocale('ja-JP');const message=translate('ja-JP','发送失败，请稍后重试。');
+    setLocale('zh-CN');expect(errorText(message)).toBe('发送失败，请稍后重试。');
+    expect(errorText('合成エラーです')).toBe('操作失败，请重试。');
   });
 
   it('handles disabled localStorage and rejects unsupported language choices',()=>{
