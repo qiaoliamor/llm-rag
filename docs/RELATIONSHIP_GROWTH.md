@@ -1,5 +1,7 @@
 # 角色成长、账户与礼物
 
+[中文](RELATIONSHIP_GROWTH.md) · [日本語](ja/RELATIONSHIP_GROWTH.md)
+
 状态：PR #28交付本地演示闭环，不是正式账号/真实支付或M6发布。亲密度是游戏相处进度，不是实际感情测量。
 
 ## 功能与交互

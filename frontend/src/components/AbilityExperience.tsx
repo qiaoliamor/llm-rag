@@ -1,17 +1,18 @@
+import { t } from '../i18n';
 import { useEffect, useRef, useState } from 'react';
 import type { GrowthAccount } from '../types';
 
 type Ability = keyof GrowthAccount['character']['abilities'];
 export const ABILITIES: {key:Ability;label:string;description:(name:string)=>string}[] = [
-  {key:'memory',label:'长期记忆',description:name=>`现在，${name}可以在你开启并确认后，记住重要经历，在以后的聊天里自然接上。`},
-  {key:'weather',label:'天气关怀',description:name=>`现在，${name}可以在你允许后，结合所选城市的天气，在聊天需要时提醒添衣或带伞。`},
-  {key:'emotion',label:'情绪关怀',description:name=>`现在，${name}可以在你允许后，参考最近的对话，用更贴合心情的方式陪你。不确定时会问你，你也可以纠正。`},
+  {key:'memory',label:"长期记忆",description:name=>t("现在，{1}可以在你开启并确认后，记住重要经历，在以后的聊天里自然接上。", [name])},
+  {key:'weather',label:"天气关怀",description:name=>t("现在，{1}可以在你允许后，结合所选城市的天气，在聊天需要时提醒添衣或带伞。", [name])},
+  {key:'emotion',label:"情绪关怀",description:name=>t("现在，{1}可以在你允许后，参考最近的对话，用更贴合心情的方式陪你。不确定时会问你，你也可以纠正。", [name])},
 ];
 
 export function UnlockedAbilities({account}:{account?:GrowthAccount|null}) {
   const [selected,setSelected]=useState<Ability|null>(null);
   const dialog=useRef<HTMLDialogElement>(null);
-  const name=account?.character.name ?? '沈砚';
+  const name=t(account?.character.name ?? '沈砚');
   const available=ABILITIES.filter(item=>account?.character.abilities[item.key]);
   const item=available.find(item=>item.key===selected);
   useEffect(()=>{
@@ -19,11 +20,11 @@ export function UnlockedAbilities({account}:{account?:GrowthAccount|null}) {
     else if(!item&&dialog.current?.open)dialog.current.close();
   },[item]);
   if(!available.length)return null;
-  return <div className="unlocked-abilities" aria-label="已解锁的陪伴方式">
-    <span>现在可以</span>{available.map(item=><button key={item.key} type="button" className="ability-text" onClick={()=>setSelected(item.key)}>{item.label}</button>)}
-    <dialog ref={dialog} aria-label="能力说明" onCancel={event=>{event.preventDefault();setSelected(null);}}>
-      <h3>{item?.label}</h3><p>{item?.description(name)}</p><p>解锁不会自动开启。你可以在个人账户中授权，之后随时关闭、纠正或删除已有资料。</p>
-      <div><button type="button" className="quiet" onClick={()=>setSelected(null)}>知道了</button></div>
+  return <div className="unlocked-abilities" aria-label={t("已解锁的陪伴方式")}>
+    <span>{t("现在可以")}</span>{available.map(item=><button key={item.key} type="button" className="ability-text" onClick={()=>setSelected(item.key)}>{t(item.label)}</button>)}
+    <dialog ref={dialog} aria-label={t("能力说明")} onCancel={event=>{event.preventDefault();setSelected(null);}}>
+      <h3>{item ? t(item.label) : ''}</h3><p>{item?.description(name)}</p><p>{t("解锁不会自动开启。你可以在个人账户中授权，之后随时关闭、纠正或删除已有资料。")}</p>
+      <div><button type="button" className="quiet" onClick={()=>setSelected(null)}>{t("知道了")}</button></div>
     </dialog>
   </div>;
 }
@@ -55,13 +56,13 @@ export function UnlockCelebration({account}:{account:GrowthAccount|null}) {
     return()=>window.clearTimeout(timer);
   },[items,paused]);
   if(!items.length||!account)return null;
-  const name=account.character.name;
-  return <aside className="unlock-celebration" aria-label="新的陪伴方式" onMouseEnter={()=>setPaused(true)} onMouseLeave={()=>setPaused(false)} onFocusCapture={()=>setPaused(true)} onBlurCapture={event=>{if(!event.currentTarget.contains(event.relatedTarget))setPaused(false);}}>
+  const name=t(account.character.name);
+  return <aside className="unlock-celebration" aria-label={t("新的陪伴方式")} onMouseEnter={()=>setPaused(true)} onMouseLeave={()=>setPaused(false)} onFocusCapture={()=>setPaused(true)} onBlurCapture={event=>{if(!event.currentTarget.contains(event.relatedTarget))setPaused(false);}}>
     <div className="unlock-copy" role="status" aria-live="polite" aria-atomic="true">
-      <span className="unlock-spark" aria-hidden="true">✧</span><p className="eyebrow">A LITTLE CLOSER</p><h3>相处，又近了一点。</h3>
-      {ABILITIES.filter(item=>items.includes(item.key)).map(item=><div key={item.key}><strong>{item.label}已解锁</strong><p>{item.description(name)}</p></div>)}
-      <small>之后可点击已解锁的能力文字，再次查看说明。是否开启，仍由你决定。</small>
+      <span className="unlock-spark" aria-hidden="true">✧</span><p className="eyebrow">A LITTLE CLOSER</p><h3>{t("相处，又近了一点。")}</h3>
+      {ABILITIES.filter(item=>items.includes(item.key)).map(item=><div key={item.key}><strong>{t(item.label)}{t("已解锁")}</strong><p>{item.description(name)}</p></div>)}
+      <small>{t("之后可点击已解锁的能力文字，再次查看说明。是否开启，仍由你决定。")}</small>
     </div>
-    <button type="button" className="quiet" aria-label="收起解锁提醒" onClick={()=>{setItems([]);setPaused(false);}}>收起</button>
+    <button type="button" className="quiet" aria-label={t("收起解锁提醒")} onClick={()=>{setItems([]);setPaused(false);}}>{t("收起")}</button>
   </aside>;
 }

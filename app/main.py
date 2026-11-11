@@ -16,6 +16,7 @@ from .memory_routing import route_memory, NO_MEMORY_CONTEXT
 from .semantic_review import ModelAnalysisProvider
 from .reply_pipeline import generate_checked
 from . import companion
+from .localization import language_prompt, language_provider, fixed_reply
 from .progression import Progression
 from typing import Literal
 from .availability import BUSY_MESSAGE, CHAT_TRANSIENT_CODES, REVIEW_TRANSIENT_FAILURES
@@ -28,6 +29,7 @@ from .dialogue import CHARACTER, build_provider, ProviderFailure, instructions
 
 @dataclass
 class Session:
+    reply_locale: str = "zh-CN"
     user_id: str = ""
     memory_epoch: int = -1
     pending_weather: dict | None = None
@@ -39,6 +41,7 @@ class Session:
 
 
 class ChatInput(BaseModel):
+    locale: Literal['zh-CN', 'ja-JP'] = 'zh-CN'
     message: str = Field(min_length=1, max_length=2000)
 
     @field_validator('message')
@@ -262,10 +265,11 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
                 prompt = instructions() + weather_prompt(weather_result) + memory_prompt(evidence) + emotion_prompt(mood_result, mood_settings) + grounding_prompt(evidence, body.message)
                 if not route.need_memory:
                     prompt += NO_MEMORY_CONTEXT
+            prompt += language_prompt(body.locale, previous=session.reply_locale)
             model_history = [{'role':m['role'], 'content':m['content']} for m in history]
             try:
                 async with asyncio.timeout(settings.api_timeout_seconds * 2 + settings.semantic_review_timeout_seconds + 2):
-                    reply, guarded, review_status = await generate_checked(provider,model_history,prompt,body.message,
+                    reply, guarded, review_status = await generate_checked(language_provider(provider,body.locale),model_history,prompt,body.message,
                         evidence,weather_result,mood_result,mood_settings,judge=judge,
                         review_enabled=settings.semantic_review_enabled,review_timeout=settings.semantic_review_timeout_seconds,companion=natural)
             except TimeoutError:
@@ -274,6 +278,7 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
             if review_status.get('status') == 'unavailable' and review_status.get('failure') in REVIEW_TRANSIENT_FAILURES:
                 raise ProviderFailure('review_busy', BUSY_MESSAGE, 503)
             facts = extract_candidates(body.message) if snapshot['memory_enabled'] and abilities['memory'] else []
+            reply = fixed_reply(reply, body.locale)
             candidates = []
             account_result = None
             if growth:
@@ -283,6 +288,7 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
                 for fact in facts:
                     candidate = store.candidate(session.user_id, fact, request.state.request_id, snapshot['epoch'])
                     if candidate and candidate['status'] == 'candidate': candidates.append(candidate)
+            session.reply_locale = body.locale
             session.emotion.turn = turn
             if mood_result['assessment']:
                 if mood_result['status'] not in ('cached','user_override'): session.emotion.remember(mood_result['assessment'],turn)
