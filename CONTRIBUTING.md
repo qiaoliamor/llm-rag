@@ -1,5 +1,7 @@
 # 参与贡献
 
+[中文](CONTRIBUTING.md) · [日本語](CONTRIBUTING.ja.md)
+
 开始任务或执行检查/Git操作前，先阅读 [AGENTS.md](AGENTS.md)。默认命令行验证；任务分支推送后通过PR由管理员squash and merge。
 
 当前为 M1–M4功能闭环已交付、M5质量验证阶段，欢迎围绕功能边界、检索策略、提示工程与评测场景提出 Issue 或 Pull Request。
