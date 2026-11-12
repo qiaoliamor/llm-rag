@@ -58,9 +58,10 @@ def test_locale_query_prompt_and_temporary_place_does_not_save(env,message,value
     assert '2026-11-13' in e.generator.generate.call_args.args[1]
     assert e.c.get('/v1/weather/settings').json()['place'] is None
     assert e.analyst.analyze.call_args.args[0]=={'current_message':message,'pending':None}
-    # Retain the known old presentation guard limitation rather than hiding it
-    # with Chinese tokens in the Japanese fixture. Reply-policy migration is separate.
-    assert r.json()['guarded'] and r.json()['reply'].startswith('这是演示天气。')
+    # Mock has no semantic judge: use bounded tool facts in the requested language.
+    assert r.json()['guarded']
+    prefix='这是演示天气。' if message.startswith('广州') else 'これはデモの天気だよ。'
+    assert r.json()['reply'].startswith(prefix)
 
 
 def test_default_settings_are_semantic_without_environment(monkeypatch,tmp_path):
@@ -184,3 +185,60 @@ def test_failed_generation_never_saves_or_revives_pending(env,previous):
     assert chat(e,'明日の天気は？').status_code==504
     assert next(iter(e.app.state.sessions.values())).pending_weather is None
     assert e.c.get('/v1/session').json()['messages']==before
+
+
+@pytest.mark.parametrize('kind',['forecast','current'])
+def test_reviewed_japanese_weather_preserves_original_reply_without_rewrite(env,kind):
+    from test_presentation import verdict
+    from app.weather_presentation import ANSWER_PROMPT
+    e=env;enable(e)
+    judge=SimpleNamespace(review=AsyncMock(side_effect=lambda reply,history,evidence:verdict(reply)))
+    app=create_app(e.settings,e.generator,e.provider,weather_understander=e.analyst,semantic_judge=judge)
+    c=TestClient(app);c.cookies.update(e.c.cookies)
+    e.app=app;e.c=c;e.h={'x-csrf-token':c.get('/v1/session').json()['csrf_token']}
+    e.analyst.analyze.return_value=plan(city='さいたま市',kind=kind)
+    reply='これはオフラインの合成デモの天気だよ。' if kind=='forecast' else 'これはデモの天気だよ。今は15度くらい。'
+    e.generator.generate.return_value=reply
+    response=chat(e,'さいたま市の天気は？').json()
+    assert response['reply']==reply and not response['guarded']
+    assert response['semantic_review']['status']=='accepted'
+    e.generator.generate.assert_awaited_once();judge.review.assert_awaited_once()
+    assert ANSWER_PROMPT in e.generator.generate.call_args.args[1]
+    assert e.c.get('/v1/session').json()['messages'][-1]['content']==reply
+
+
+@pytest.mark.parametrize('failure',['timeout','invalid_output'])
+def test_weather_judge_failure_no_unsafe_reply_or_new_history(env,failure):
+    e=env;enable(e)
+    judge=SimpleNamespace(review=AsyncMock(side_effect=TimeoutError()) if failure=='timeout' else AsyncMock(return_value={'bad':'synthetic'}))
+    app=create_app(e.settings,e.generator,e.provider,weather_understander=e.analyst,semantic_judge=judge)
+    c=TestClient(app);c.cookies.update(e.c.cookies);e.app=app;e.c=c
+    e.h={'x-csrf-token':c.get('/v1/session').json()['csrf_token']}
+    result=chat(e)
+    if failure=='timeout':
+        assert result.status_code==503
+        assert e.c.get('/v1/session').json()['messages']==[]
+    else:
+        assert result.status_code==200
+        assert result.json()['reply'].startswith('うん、聞いているよ。')
+    assert next(iter(e.app.state.sessions.values())).pending_weather is None
+    judge.review.assert_awaited_once();e.generator.generate.assert_awaited_once()
+
+
+def test_configured_provider_wires_versioned_weather_judge(env,monkeypatch):
+    from test_presentation import verdict
+    from unittest.mock import Mock
+    e=env;enable(e)
+    judge=SimpleNamespace(review=AsyncMock(side_effect=lambda reply,history,evidence:verdict(reply)))
+    factory=Mock(return_value=judge)
+    monkeypatch.setattr('app.weather_presentation.WeatherAnalysisProvider',factory)
+    # Generation, weather understanding, weather HTTP and the review factory are
+    # all injected mocks. Setting the provider name must never reach a live API.
+    settings=e.settings.model_copy(update={'chat_provider':'gemini'})
+    app=create_app(settings,e.generator,e.provider,weather_understander=e.analyst)
+    c=TestClient(app);c.cookies.update(e.c.cookies);e.app=app;e.c=c
+    e.h={'x-csrf-token':c.get('/v1/session').json()['csrf_token']}
+    response=chat(e)
+    assert response.status_code==200 and response.json()['semantic_review']['status']=='accepted'
+    assert response.json()['reply']=='これはオフラインの合成デモの天気だよ。'
+    factory.assert_called_once_with(settings);judge.review.assert_awaited_once()

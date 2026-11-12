@@ -111,3 +111,5 @@
 Prompt负责提出语义判断，程序限制引用和执行，玩家确认后才能成为长期记忆。高置信或结构合法不证明理解正确。新政策独立验收须另冻memory_understanding/main/memory/progression/reply_pipeline/config、模型与参数；不修改旧封存/标签来“通过”。本轮仅合成结构/SDK/生命周期验证，没有真实模型或新金标准。
 
 天气新策略multilingual-weather-v1也须绑定weather_understanding/main/config和模型参数独立冻结。合成的意图标签是预设模型输出，用于验证执行边界，不计入天气precision/recall、日语理解准确率或正式质量验收。
+
+本轮新增回复策略multilingual-weather-care-v1（weather_presentation/main/reply_pipeline及模型须独立冻结）：演示/估计/时态/口吻按语义审核，纯天气归属片段保留程序数字检查，混合来源不能用数字扫描代替事实支持。role_issues在此版本还包括天气展示遗漏；不得将新标签约定静默套用旧封存。合成accept/revise只验证分支、ID/数值约束和语言保持，不是审查精度或独立真值，旧失败与误判计数不关闭。
