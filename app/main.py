@@ -22,6 +22,7 @@ from .progression import Progression
 from typing import Literal
 from .availability import BUSY_MESSAGE, CHAT_TRANSIENT_CODES, REVIEW_TRANSIENT_FAILURES
 from .weather import OpenMeteoProvider, MockWeatherProvider, WeatherError, MESSAGES, query_weather, weather_prompt, validate_city
+from . import weather_understanding as semantic_weather
 from .emotion import EmotionState, EmotionSettingsInput, CorrectionInput, Estimate, ModelEmotionProvider, MockEmotionProvider, assess, emotion_prompt, decorate
 from .grounding import grounding_prompt
 from .memory import MemoryStore, extract_candidates, memory_prompt
@@ -121,10 +122,12 @@ class WeatherSettingsInput(BaseModel):
     city_id: int | None = Field(default=None, gt=0)
 
 
-def create_app(settings=None, provider=None, weather_provider=None, emotion_provider=None, memory_router=None, semantic_judge=None, memory_understander=None):
+def create_app(settings=None, provider=None, weather_provider=None, emotion_provider=None, memory_router=None, semantic_judge=None, memory_understander=None, weather_understander=None):
     settings = settings or Settings()
     provider = provider or build_provider(settings)
-    weather = weather_provider or (MockWeatherProvider() if settings.weather_provider == 'mock' else OpenMeteoProvider())
+    weather_semantic = settings.weather_understanding_mode == 'semantic'
+    weather = weather_provider or (MockWeatherProvider() if settings.weather_provider == 'mock' else (semantic_weather.SemanticOpenMeteoProvider() if weather_semantic else OpenMeteoProvider()))
+    weather_understander = weather_understander if weather_understander is not None else (semantic_weather.ModelWeatherUnderstanding(settings) if settings.chat_provider != 'mock' else None)
     emotion = emotion_provider or (MockEmotionProvider() if settings.chat_provider == 'mock' else ModelEmotionProvider(settings))
     analysis_type = companion.CompanionAnalysisProvider if settings.dialogue_mode == 'companion' else ModelAnalysisProvider
     auxiliary = analysis_type(settings) if settings.chat_provider != 'mock' else None
@@ -271,13 +274,20 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
                 evidence = store.retrieve(session.user_id, route.query) if route.need_memory else []
             weather_config = store.weather_settings(session.user_id)
             if not abilities['weather']: weather_config={**weather_config,'enabled':False}
-            weather_result, pending = await query_weather(weather, body.message, weather_config, session.pending_weather)
+            if weather_semantic:
+                previous_pending = session.pending_weather
+                session.pending_weather = None  # Consume first; a failed turn must not resurrect it.
+                weather_result, pending = await semantic_weather.query_weather(weather, weather_understander, body.message,
+                    weather_config, previous_pending, timeout=settings.weather_understanding_timeout_seconds,
+                    verify=lambda: verify_epoch(session, snapshot['epoch']))
+            else:
+                weather_result, pending = await query_weather(weather, body.message, weather_config, session.pending_weather)
             verify_epoch(session, snapshot['epoch'])
             mood_settings = store.emotion_settings(session.user_id)
             if not abilities['emotion']: mood_settings={**mood_settings,'enabled':False}
             mood_result = await assess(emotion, session.emotion, mood_settings, history)
             verify_epoch(session, snapshot['epoch'])
-            session.pending_weather = pending
+            if not weather_semantic: session.pending_weather = pending
             natural = settings.dialogue_mode == 'companion'
             if natural:
                 prompt = companion.instructions() + companion.memory_context(evidence, body.message)
@@ -312,6 +322,7 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
                     candidate = store.candidate(session.user_id, fact.fact, request.state.request_id, snapshot['epoch'], metadata=fact.metadata) if isinstance(fact, ExactMemory) else store.candidate(session.user_id, fact, request.state.request_id, snapshot['epoch'])
                     if candidate and candidate['status'] == 'candidate': candidates.append(candidate)
             session.reply_locale = body.locale
+            if weather_semantic: session.pending_weather = pending
             session.emotion.turn = turn
             if mood_result['assessment']:
                 if mood_result['status'] not in ('cached','user_override'): session.emotion.remember(mood_result['assessment'],turn)
@@ -416,7 +427,7 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
     async def weather_locations(request: Request, q: str):
         session=get_session(request)
         if growth: growth.require(session.user_id,'weather')
-        validate_city(q)
+        (semantic_weather.validate_city if weather_semantic else validate_city)(q)
         return {'items': [p.model_dump() for p in await weather.search(q.strip())]}
 
     @app.patch('/v1/weather/settings')

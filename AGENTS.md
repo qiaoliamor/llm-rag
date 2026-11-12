@@ -54,3 +54,5 @@
 - 中日语言入口：UI文案在`frontend/src/i18n.ts`/`locales/ja.json`，生成语言在`app/localization.py`；可选`chat.locale`仅允许zh-CN/ja-JP。切换不改身份/正史/授权/记忆原文/地点或UTC额度日，日语UI不代表中文规则已支持日语语义。维护中文模块时同步`docs/ja/`对应页与双语README/TODO；权威操作规则和历史证据保留单份，不能翻译改写封存原文。
 
 - 多语言记忆默认`MEMORY_UNDERSTANDING_MODE=semantic`，理解/日期/候选/证据选择在`app/memory_understanding.py`；`legacy`仅用于显式历史回放，不是失败回退。语义失败不检索/自动提候选，手动保留原文/未知日期。旧回归显式固定legacy，新回归须显式semantic并覆盖真实默认路径。Prompt不能代替权限、原文/证据白名单、逐条确认、日期运算、epoch/版本/事务校验；本轮未完成天气/情绪/回复等全部语言规则迁移。
+
+- 天气意图/城市/日期默认`WEATHER_UNDERSTANDING_MODE=semantic`，入口`app/weather_understanding.py`；60分且独立授权后才发送本轮原文给当前模型，地名/预报提供方只接收城市或坐标/时区。城市/日期必须绑定原文，目的地时区与七天范围由程序计算；pending仅原UTC锚点和日期结构，10分钟有效，取消/闲聊/失败/设置变化即清除。分析后与工具调用边界检查epoch，失败不回退旧正则。历史weather.py/源绑定证据不改；新增天气测试显式semantic/companion/growth=true，临时PG用`--semantic-weather`。这是理解入口迁移，不代表日语回复词面检查、情绪规则或真实模型质量已验收。

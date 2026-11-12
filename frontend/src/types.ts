@@ -29,7 +29,7 @@ export interface ChatResponse {
   guarded: boolean;
   memory_candidates?: MemoryItem[];
   retrieved_memory_ids?: string[];
-  weather?: WeatherEvidenceData | { status: 'disabled' | 'location_required' | 'ambiguous' | 'not_found' | 'date_unsupported' | 'timeout' | 'rate_limit' | 'unavailable' | 'invalid_response' | 'stale' | 'invalid_city'; message: string } | null;
+  weather?: WeatherEvidenceData | { status: 'disabled' | 'location_required' | 'ambiguous' | 'not_found' | 'date_unsupported' | 'timeout' | 'rate_limit' | 'unavailable' | 'invalid_response' | 'stale' | 'invalid_city' | 'understanding_unavailable' | 'clarification_required'; message: string } | null;
 }
 
 export interface MemorySettings {

@@ -23,7 +23,7 @@ export function WeatherPane({ csrf, onHistoryCleared, onBusyChange, locked=false
   if (!data) return <section className="workspace-pane"><h3>{t("天气关怀")}</h3><p role={error ? 'alert' : undefined}>{errorText(error) || t("正在读取天气设置…")}</p></section>;
   return <section className="workspace-pane" aria-label={t("天气关怀设置")}>
     <h3>{t("出门前，也照顾好自己。")}</h3>{locked && <p className="pane-notice">{t("亲密度60分解锁使用。仍可关闭查询、删除已有城市。")}</p>}
-    <p className="pane-description">{t("天气查询默认关闭，开启后仅在聊天触发时查询。城市搜索会将输入的城市名发送给 Open-Meteo / GeoNames；查询天气仅发送城市坐标与时区，不发送聊天或记忆。不读取 GPS 或 IP 定位。")}</p>
+    <p className="pane-description">{t("天气查询默认关闭。解锁并开启后，本轮聊天原文会发送给当前对话模型，理解天气意图、城市和日期；不会读取长期记忆。城市搜索仅向 Open-Meteo / GeoNames 发送城市名，天气查询只发送坐标与时区，不发送完整聊天。不读取 GPS 或 IP 定位。")}</p>
     <label><input type="checkbox" checked={enabled} disabled={busy || locked} onChange={e => setEnabled(e.target.checked)} />{t(" 允许天气查询")}</label>
     <p>{t("当前城市：")}{data.place ? [data.place.name, data.place.admin1, data.place.country].filter(Boolean).join(' / ') : t("未设置（可在聊天中提供临时城市）")}</p>
     <form className="memory-add" onSubmit={e => { e.preventDefault(); if (locked) return; void run(async () => { const result = await searchWeatherCities(city.trim()); setPlaces(result.items); setSelected(null); if (!result.items.length) setNotice(t("未找到城市，请补充国家/地区或换个名称。")); }); }}>

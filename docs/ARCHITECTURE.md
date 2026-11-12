@@ -2,6 +2,8 @@
 
 [中文](ARCHITECTURE.md) · [日本語](ja/ARCHITECTURE.md)
 
+天气新增`weather_understanding.py`：60分资格+授权→本轮原文结构化计划→原文/字段校验→城市搜索（唯一匹配）或缺省本人已选城市→按目的地时区计算七天范围→已有forecast与必要字段投影。模型不产生天气数据/坐标/ID；epoch在理解和工具边界复查。旧weather.py数据供应商/缓存/数值保护保留，legacy语言规则只明确回放；详见[天气](WEATHER.md)。
+
 更新：2026-11-10；功能基线PR #28。模块需求、设计和测试统一由[文档入口](README.md)导航。
 
 ## 技术与职责
