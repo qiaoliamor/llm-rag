@@ -2,6 +2,8 @@
 
 [中文](../ARCHITECTURE.md) · [日本語](ARCHITECTURE.md)
 
+既定天気semanticはweather_presentation.pyで生成Prompt追加→版付きWeatherAnalysisProvider審査→構造／証拠ID検査→純天気片段の数字検査→共通1回書き直し／locale回復へ進みます。中文単語は要求せず事実／表現を意味で分離。judgeなし／審査オフはweather_safe_fallback、非okも審査するため実呼出／遅延は別途検証が必要です。旧weather.py／companion／semantic_reviewと明示legacyは歴史再現用です。
+
 天気はweather_understanding.pyで60点＋許可→本輪原文の構造化計画→原文／型検査→一意都市検索または本人選択都市→目的地時区の7日範囲→既存forecastと必要項目投影へ進みます。モデルは天気値・座標・IDを生成せず、理解／ツール境界でepochを確認します。旧weather.pyのデータ・数値／キャッシュ保護は維持し、言語legacyは明示再現のみ。[天気](WEATHER.md)を参照。
 
 ## 実装の分担

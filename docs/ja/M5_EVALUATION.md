@@ -75,3 +75,5 @@ M5は未受入、M6は未着手です。今回、日本語UI／基本対話を�
 構造・高信頼は意味の正しさの保証ではありません。新memory_understanding/main/memory/progression/reply_pipeline/configとモデルを別途固定し、旧封存／参照を変更せず独立評価が必要です。今回の合成SDK／ライフサイクル検証はモデル品質や新金標準を意味しません。
 
 2026-11-12：天気意図／都市／日付もweather_understandingの中日semanticへ移行しました。旧weather.pyは明示legacy、数値・時効・提示保護は維持。新政策multilingual-weather-v1はmain/config・モデルと独立固定が必要で、合成の事前設定出力をprecision／recallや日本語理解精度として数えません。気持ち／残る返答ルールは引き続き未完了です。
+
+返答政策multilingual-weather-care-v1もweather_presentation/main/reply_pipelineとモデルを別途固定。demo／推定／時態／口調を意味で審査し、純天気の数値検査を維持、混合資料は意味を確認します。本版role_issuesは天気の表示欠落も含むため、旧封存へ黙って新ラベル規約を適用しません。合成accept/reviseは分岐／数値／ID／言語検証で、独立精度ではありません。旧失敗・誤判定は保留します。
