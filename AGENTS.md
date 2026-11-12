@@ -58,3 +58,5 @@
 - 天气意图/城市/日期默认`WEATHER_UNDERSTANDING_MODE=semantic`，入口`app/weather_understanding.py`；60分且独立授权后才发送本轮原文给当前模型，地名/预报提供方只接收城市或坐标/时区。城市/日期必须绑定原文，目的地时区与七天范围由程序计算；pending仅原UTC锚点和日期结构，10分钟有效，取消/闲聊/失败/设置变化即清除。分析后与工具调用边界检查epoch，失败不回退旧正则。历史weather.py/源绑定证据不改；新增天气测试显式semantic/companion/growth=true，临时PG用`--semantic-weather`。这是理解入口迁移，不代表日语回复词面检查、情绪规则或真实模型质量已验收。
 
 - 默认semantic天气回复用`app/weather_presentation.py`的回答/审查/重写Prompt，语言由请求locale传入；旧中文关键词展示检查只留legacy。天气审查证据增加程序计算的demo和reply_locale；本版role_issues也含天气展示遗漏/主体语言错误，事实与表达不能互相抵消。程序只对纯天气归属片段比较数字/单位，玩家分数、引语和混合句须语义区分，不能遍历全回复把全部百分比当湿度。无judge/关闭review用当前语言的weather_safe_fallback，不将mock或结构测试当真实语义验收。新策略独立冻结，旧Prompt/封存不改。
+
+- 情绪自述/触发默认`EMOTION_UNDERSTANDING_MODE=semantic`，入口`app/emotion_understanding.py`；90分且独立授权后每轮做语义入口判断，完整估计仍由程序interval/window/cooldown/threshold调度，两步共用默认6秒、无重试，失败估计占冷却。模型解释自述须原文非空/唯一绑定，source=model+basis=self_report，不能伪标玩家确认；source=user仅页面手动纠正。新否认/变化不能复活旧推测，失败不注入旧模型结果，手动纠正优先/可查看；本轮陪伴偏好不持久化。旧emotion.py/Prompt只明示legacy，新增套件显式semantic/companion/growth=true，PG用`--semantic-emotion`。结构/ID合法不是理解真值，旧情绪输出局部检查/兜底仍有语言边界。

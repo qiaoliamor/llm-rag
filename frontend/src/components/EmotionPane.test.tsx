@@ -11,7 +11,8 @@ it('starts disabled and describes extra model processing',async()=>{
  const fetch=vi.fn().mockResolvedValue(response({settings:config,assessment:null}));vi.stubGlobal('fetch',fetch);render(<EmotionPane {...props()}/>);
  expect(await screen.findByRole('checkbox',{name:'允许情绪分析'})).not.toBeChecked();
  expect(screen.getByRole('button',{name:'以我说的为准'})).toBeDisabled();
- expect(screen.getByText(/最近几轮聊天会额外发送/)).toBeVisible();expect(fetch).toHaveBeenCalledTimes(1);
+ expect(screen.getByText(/每轮会把本轮原文/)).toBeVisible();
+ expect(screen.getByText(/完整估计默认每3轮/)).toBeVisible();expect(fetch).toHaveBeenCalledTimes(1);
 });
 it('saves consent, interval and preference with CSRF',async()=>{
  const fetch=vi.fn().mockResolvedValueOnce(response({settings:config,assessment:null})).mockResolvedValueOnce(response({})).mockResolvedValueOnce(response({settings:{...config,enabled:true,interval:4,preference:'listen'},assessment:null}));
