@@ -4,7 +4,9 @@
 
 状态：触发、城市澄清、天气上下文与自然关怀已实现；W01/W02实现修复已交付，不代表正式语义/语气验收通过。
 
-## 中日语义理解（2026-11-12，任务分支）
+## 中日语义理解（2026-11-12，PR #32）
+
+PR #32经本次CLI审阅后squash交付main；仅完成理解入口，已知日语天气展示检查可触发中文回退，详见测试记录，不记为已修复。
 
 默认`WEATHER_UNDERSTANDING_MODE=semantic`，理解入口为`app/weather_understanding.py`，策略`multilingual-weather-v1`。`legacy`仅显式回放旧中文规则，不是失败回退；原`app/weather.py`及其历史审计证据保持不变。
 

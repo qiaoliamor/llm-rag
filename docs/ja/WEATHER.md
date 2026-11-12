@@ -2,7 +2,9 @@
 
 [中文](../WEATHER.md) · [日本語](WEATHER.md)
 
-## 中日意味理解（2026-11-12、作業分岐）
+## 中日意味理解（2026-11-12、PR #32）
+
+PR #32は本回CLIレビュー後squashでmainへ提供します。理解入口の実装であり、日本語表示チェックによる中国語フォールバックは既知の未修正制約としてテスト記録に保持します。
 
 既定`WEATHER_UNDERSTANDING_MODE=semantic`、入口app/weather_understanding.py、政策multilingual-weather-v1です。legacyは旧中国語経路の明示再現のみで、失敗代替ではありません。旧weather.pyと出所監査は変更しません。
 

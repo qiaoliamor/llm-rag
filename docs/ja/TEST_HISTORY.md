@@ -57,7 +57,7 @@ multilingual-memory-v1を実装し、既定semanticと明示legacy再現を分�
 
 追加検査：封存24候補はnot_assessed、38例／34出所の離線監査と変更Python構文・Markdown参照先・秘密値境界が通過。役柄／旧判定Prompt／封存は不変です。検査にシステムPythonを使った際のdotenv不足は失敗として保持し、プロジェクト.venvで再実行して通過しました。実API／機能失敗とは区別します。
 
-## 2026-11-12 · 中日天気意味理解（作業分岐）
+## 2026-11-12 · 中日天気意味理解（PR #32）
 
 multilingual-weather-v1をweather_understanding/mainへ実装、既定semantic、旧回帰は明示legacy、新回帰はsemantic/companion/growth=trueです。意図／都市／日付だけを移し、旧weather.pyや出所結合Prompt／旧テスト・封存は不変です。
 
@@ -77,3 +77,14 @@ multilingual-weather-v1をweather_understanding/mainへ実装、既定semantic�
 最後にpendingの確定境界を補強しました。旧pendingを先に消費し、生成・記憶／成長の原子確定が成功した時だけ新pendingを保存します。生成504時の新規／既存pending非復活・履歴非追加をローカル2／PG2件で追加し、最終1077/92とPG220を実行。以前の1075/90・16.66秒とPG216は変更前履歴として保持し、累計しません。
 
 実Gemini schema／4秒応答、中日意図・都市級判断・否定・引用・日付・確認の精度、独立資料／評審、消融・安全・遅延／費用は未受入。高信頼・文字合法性は意味の正しさを保証しません。B01/B02/B03、旧15漏検／5誤阻止／1未決、503、8.003秒timeout／CLI終了1を保持。M5未受入、M6未着手、秘密値／実会話／採点原本は提出しません。
+
+### PR #32マージレビュー（2026-11-12）
+
+構造・原文・日付／目的地時区、解析前の資格／許可、ツール境界epoch、pendingの成功確定／失敗非復活、設定CRUD／キャッシュ／削除・隔離を確認し、新しいマージ阻害問題は見つかりませんでした。機能コードは変更せず、本回squashでmainへ提供、同期・テスト済みツリー照合後に分岐を整理します。mainに追加更新はなくrebase不要、外部CI／評審記録はなくローカルCLI検証です。
+
+- `.venv/bin/python -m pytest -q`：1077通過／92スキップ、17.55秒。旧legacyと新semanticの範囲を混同しません。
+- `.venv/bin/python scripts/test_postgres.py --semantic-weather`：220通過、6.68秒。ランダム一時庫を作成／削除、全体と重複。
+- `npm test --prefix frontend -- --run`：71通過、1.80秒。`npm run build --prefix frontend`型／本番ビルド通過。
+- 封存24公開候補not_assessed、38例／34出所の監査通過、実API0。日中文書参照・構文・提出差分と秘密値／実行データ境界を確認。
+
+日本語天気が旧表示チェックで中国語へ戻る既知制約は未修正・未受入として保持します。開発中の失敗、503／8.003秒timeout、封存v1/v2と全未検証項目も保持。実モデル原応答／遅延／費用は未採取、M5未受入・M6未着手です。
