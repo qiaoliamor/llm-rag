@@ -18,7 +18,9 @@ WeatherPlanはaction（none/decline/query/clarify）、confidence、city、kind�
 
 理解は既定4秒・再試行0、understanding_unavailable／clarification_requiredを中日表示。既存数値・単位・鮮度・固定URL・キャッシュとW01/W02は維持し、全返答チェック／気持ちの移行完了とはしません。実モデルの意味精度、母語口調・返答検査と独立受入は未検証です。[記録](TEST_HISTORY.md)へ失敗も保持します。
 
-## 中日天気返答の修正（2026-11-12、作業分岐）
+## 中日天気返答の修正（2026-11-12、PR #33）
+
+PR #33は本回CLIレビュー後squashでmainへ提供します。合成フロー修正を実Gemini／独立品質受入とはせず、元失敗と残る制約を保持します。
 
 app/weather_presentation.pyの`multilingual-weather-care-v1`を既定weather semantic経路へ接続します。旧weather.py、companion／semantic_reviewの凍結Promptは変えず、明示legacyは過去再現を維持します。
 

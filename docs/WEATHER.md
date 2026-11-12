@@ -24,7 +24,9 @@ PR #32已交付理解入口。当时的日语展示检查误拦截/中文回退�
 
 理解超时默认4秒、无自动重试，新增状态`understanding_unavailable`/`clarification_required`已本地化。原有工具数值/单位/时效校验、固定URL、缓存/限流及W01/W02保持。本轮迁移的是**意图/地点/日期**，未迁移全部回复词面检查或情绪规则；日语回复审查/回退口吻与真实理解质量仍未验收。合成/PG命令、原失败和未验证项见[测试记录](TEST_HISTORY.md)。
 
-## 中日天气回复修复（2026-11-12，任务分支）
+## 中日天气回复修复（2026-11-12，PR #33）
+
+PR #33经本次CLI审阅squash交付main；模拟流程修复不等于真实Gemini/独立质量验收，原失败与剩余边界保留。
 
 新策略`multilingual-weather-care-v1`位于`app/weather_presentation.py`。在默认weather semantic路径接入回答、审查和重写Prompt，显式请求语言传入reply_pipeline；旧weather.py、companion/semantic_review旧Prompt和封存证据不改，显式legacy仍可复现旧行为。语义理解的授权/地点/日期和工具供应商校验保持。
 

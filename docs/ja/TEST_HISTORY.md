@@ -89,7 +89,7 @@ multilingual-weather-v1をweather_understanding/mainへ実装、既定semantic�
 
 日本語天気が旧表示チェックで中国語へ戻る既知制約は未修正・未受入として保持します。開発中の失敗、503／8.003秒timeout、封存v1/v2と全未検証項目も保持。実モデル原応答／遅延／費用は未採取、M5未受入・M6未着手です。
 
-## 2026-11-12 · 中日天気返答修正（作業分岐）
+## 2026-11-12 · 中日天気返答修正（PR #33）
 
 上記未修正はPR #32時点の履歴として残します。今回の既定semanticはweather_presentation.pyのmultilingual-weather-care-v1を採用。回答／審査Prompt・locale回復と限界は[天気](WEATHER.md)へ。旧weather.py、companion／semantic_reviewのPrompt、旧出所結合テストと封存v1/v2は変更せず、legacyでは旧失敗を再現できます。
 
@@ -105,3 +105,14 @@ multilingual-weather-v1をweather_understanding/mainへ実装、既定semantic�
 失敗保持：初回17失敗／104通過／14スキップ（1.51秒）はfixtureの情緒status不足で、disabledを補って121/14（1.00秒）。初回PGはDB非稼働による接続拒否・終了1、初回Docker起動後も準備未完了で失敗、起動後に一時庫のみで通過しました。全体1124/96（15.62秒）→1126/96（16.69秒）、PG272/6.37秒→273/7.18秒→275/6.60秒を経て、混合資料・既定工場・reply_locale補強後に最終結果を実行。重複を足さず、実APIを再抽選した結果ではありません。定向45通過/0.61秒、天気128/19・1.17秒も全体と重複。
 
 実Gemini新Prompt/schema、日本語自然さ・demo／推定欠落・帰属（漢数字／混合文）の誤判定、非ok審査の遅延／費用、独立資料／双標・盲評・消融・安全、気持ち／残る返答は未受入。数値構文や高信頼は意味の正しさの保証ではなく、新role_issues規約を旧封存へ適用しません。B01/B02/B03、旧503／8.003秒timeout／CLI終了1と全履歴を保持。M5未受入、M6未着手、秘密値／実会話／採点原本は提出しません。
+
+### PR #33マージレビュー（2026-11-12）
+
+回答／審査Promptの言語・事実、demo／locale証拠、純天気数値と混合資料、共通1回書き直し・同言語回復、審査失敗と許可／epoch取消を確認し、新しいマージ阻害問題は見つかりませんでした。機能コードは変更せず、main更新なしでrebase不要。外部CI／評審記録はなくローカルCLI検証です。本回squashでmainへ提供、同期・ツリー照合後に分岐を整理します。
+
+- `.venv/bin/python -m pytest -q`：1127通過／97スキップ、17.39秒。旧legacy／新semanticの範囲は維持。
+- `.venv/bin/python scripts/test_postgres.py --semantic-weather`：275通過、7.32秒。ランダム一時庫作成／削除、全体と重複。
+- `npm test --prefix frontend -- --run`：71通過、1.71秒。`npm run build --prefix frontend`型／本番ビルド通過。
+- 封存24公開候補not_assessed、38例／34出所の離線監査通過、実API0。構文・日中Markdown参照・差分と秘密値／実行データ境界を確認。
+
+PR #32の旧中文回帰、初回17件のfixture失敗と環境起動失敗、全履歴を保持。既定フロー修正を実Gemini品質受入とはせず、帰属／混合文／漢数字、独立資料／評審、実遅延／費用等は未検証のままです。実モデル原応答／推論時間／tokenは未採取、M5未受入・M6未着手です。
