@@ -2,6 +2,8 @@
 
 [中文](../ARCHITECTURE.md) · [日本語](ARCHITECTURE.md)
 
+天気はweather_understanding.pyで60点＋許可→本輪原文の構造化計画→原文／型検査→一意都市検索または本人選択都市→目的地時区の7日範囲→既存forecastと必要項目投影へ進みます。モデルは天気値・座標・IDを生成せず、理解／ツール境界でepochを確認します。旧weather.pyのデータ・数値／キャッシュ保護は維持し、言語legacyは明示再現のみ。[天気](WEATHER.md)を参照。
+
 ## 実装の分担
 
 | 層 | 実装と入口 |

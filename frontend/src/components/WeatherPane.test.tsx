@@ -14,6 +14,7 @@ it('shows default opt-out and never searches on load', async () => {
   expect(await screen.findByRole('checkbox', { name: '允许天气查询' })).not.toBeChecked();
   expect(fetch).toHaveBeenCalledTimes(1);
   expect(screen.getByText(/不读取 GPS 或 IP/)).toBeVisible();
+  expect(screen.getByText(/本轮聊天原文会发送给当前对话模型/)).toBeVisible();
 });
 
 it('searches, requires choosing a city and saves opt-in with CSRF', async () => {

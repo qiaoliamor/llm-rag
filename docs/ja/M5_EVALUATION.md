@@ -73,3 +73,5 @@ M5は未受入、M6は未着手です。今回、日本語UI／基本対話を�
 本人権限、CSRF、個別確定、epoch、version、原子取引、削除非復活はプログラムが守ります。ISOや数値、原文／証拠ID、予算、固定URL、文字ベクトル／指紋も決定的な検査として残します。返答入口・正史・天気／気持ち・出所／地名の旧言語ルールは今回すべて除去したわけではなく、普通の挨拶と事実／許可を壊さず次段階で版管理します。
 
 構造・高信頼は意味の正しさの保証ではありません。新memory_understanding/main/memory/progression/reply_pipeline/configとモデルを別途固定し、旧封存／参照を変更せず独立評価が必要です。今回の合成SDK／ライフサイクル検証はモデル品質や新金標準を意味しません。
+
+2026-11-12：天気意図／都市／日付もweather_understandingの中日semanticへ移行しました。旧weather.pyは明示legacy、数値・時効・提示保護は維持。新政策multilingual-weather-v1はmain/config・モデルと独立固定が必要で、合成の事前設定出力をprecision／recallや日本語理解精度として数えません。気持ち／残る返答ルールは引き続き未完了です。

@@ -6,6 +6,8 @@
 
 M1–M4功能闭环已实现，M5仍在质量验证，M6未开始。亲密度30/60/90依次解锁记忆/天气/情绪资格，仍需各自授权；钱包只是演示币，没有真实支付或正式账号体系。
 
+中日共用记忆与天气意图/城市/日期的结构化语义入口，程序保留权限和数据校验；真实模型的多语言理解质量仍待独立验证，见[天气设计](docs/WEATHER.md)。
+
 - [文档入口：每个模块的功能、设计、实现与测试](docs/README.md)
 - [当前任务清单](TODOLIST.md) · [阶段计划](docs/PLAN.md) · [测试及历史原文](docs/TEST_HISTORY.md)
 - 开发前阅读 [AGENTS.md](AGENTS.md)，贡献规则见 [CONTRIBUTING.md](CONTRIBUTING.md)。
