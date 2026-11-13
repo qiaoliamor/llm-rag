@@ -2,6 +2,8 @@
 
 [中文](../ARCHITECTURE.md) · [日本語](ARCHITECTURE.md)
 
+情緒既定emotion_presentation.pyは組合せEmotionAnalysisProviderでcompanion/audit・必要な天気Promptへ非診断／希望／言語規則を追加。emotion_currentと制御emotion_policyを分離し、後者の事実引用は禁止。reply_pipelineは共通1回書き直し／予算とlocale回復、普通waitingに追加審査を強制しません。天気併用も正しい数字＋listenを維持。各legacy／旧Promptは歴史再現用、失敗／拒否時の追加審査が実費用・遅延へ与える影響は未測定。
+
 情緒既定emotion_understanding.pyは90点＋許可→毎回EmotionDecision→原文検査→申告解釈／手動訂正優先、またはプログラムが間隔／冷却でSemanticEstimateを決定→user ID／閾値→必要項目文脈へ。両段階は既定6秒共有、モデルに権限／輪次変更は不可。epoch検査と成功後会話内保存、旧emotion.pyは明示legacy、DB設定CRUDは不変。
 
 既定天気semanticはweather_presentation.pyで生成Prompt追加→版付きWeatherAnalysisProvider審査→構造／証拠ID検査→純天気片段の数字検査→共通1回書き直し／locale回復へ進みます。中文単語は要求せず事実／表現を意味で分離。judgeなし／審査オフはweather_safe_fallback、非okも審査するため実呼出／遅延は別途検証が必要です。旧weather.py／companion／semantic_reviewと明示legacyは歴史再現用です。

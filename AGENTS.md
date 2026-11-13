@@ -60,3 +60,5 @@
 - 默认semantic天气回复用`app/weather_presentation.py`的回答/审查/重写Prompt，语言由请求locale传入；旧中文关键词展示检查只留legacy。天气审查证据增加程序计算的demo和reply_locale；本版role_issues也含天气展示遗漏/主体语言错误，事实与表达不能互相抵消。程序只对纯天气归属片段比较数字/单位，玩家分数、引语和混合句须语义区分，不能遍历全回复把全部百分比当湿度。无judge/关闭review用当前语言的weather_safe_fallback，不将mock或结构测试当真实语义验收。新策略独立冻结，旧Prompt/封存不改。
 
 - 情绪自述/触发默认`EMOTION_UNDERSTANDING_MODE=semantic`，入口`app/emotion_understanding.py`；90分且独立授权后每轮做语义入口判断，完整估计仍由程序interval/window/cooldown/threshold调度，两步共用默认6秒、无重试，失败估计占冷却。模型解释自述须原文非空/唯一绑定，source=model+basis=self_report，不能伪标玩家确认；source=user仅页面手动纠正。新否认/变化不能复活旧推测，失败不注入旧模型结果，手动纠正优先/可查看；本轮陪伴偏好不持久化。旧emotion.py/Prompt只明示legacy，新增套件显式semantic/companion/growth=true，PG用`--semantic-emotion`。结构/ID合法不是理解真值，旧情绪输出局部检查/兜底仍有语言边界。
+
+- 默认情绪回复用`app/emotion_presentation.py`组合回答/审查Prompt和locale安全兜底，语义区分引用/否定/归因与读心/诊断，不再把中文词当通行条件。emotion_current只投影必要参考，emotion_policy仅语言/偏好/状态，程序拒绝将其当事实证据；off时不送旧参考。有效参考/失败或拒绝状态审查，普通waiting无参考不为情绪强制额外审查；共享一次重写/原预算，无judge或关review用安全短句。天气+倾听兜底保留天气事实、不强加建议。旧正则只明示legacy；语义误判、真实口吻/成本仍须独立验收，勿把合成accept当准确率。
