@@ -4,7 +4,9 @@
 
 状态：PR #8交付独立授权、分析、纠正与偏好闭环；情绪真实准确率、F1和置信度校准未验收。
 
-## 中日语义自述与触发（2026-11-12，任务分支）
+## 中日语义自述与触发（2026-11-12，PR #34）
+
+2026-11-13 PR #34经本次CLI审阅squash交付main；功能流程和合成契约通过不等于真实情绪识别/独立质量验收，历史失败与未验证项保留。
 
 默认`EMOTION_UNDERSTANDING_MODE=semantic`，入口`app/emotion_understanding.py`、策略`multilingual-emotion-v1`；旧emotion.py的自述/触发/Mock规则只在显式legacy回放，不用于失败回退。旧Prompt、源绑定测试/封存不改。以下旧实现说明仍供历史查阅，当前语义路径以本节为准。
 

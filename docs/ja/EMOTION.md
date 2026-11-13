@@ -2,7 +2,9 @@
 
 [中文](../EMOTION.md) · [日本語](EMOTION.md)
 
-## 中日自己申告・トリガー意味理解（2026-11-12、作業分岐）
+## 中日自己申告・トリガー意味理解（2026-11-12、PR #34）
+
+2026-11-13、PR #34は本回CLIレビュー後squashでmainへ提供します。合成フロー／構造通過を実情緒理解・独立品質受入とはせず、旧失敗と未検証項目を保持します。
 
 既定EMOTION_UNDERSTANDING_MODE=semantic、入口app/emotion_understanding.py、政策multilingual-emotion-v1です。旧emotion.pyは明示legacy再現のみ、失敗時の代替ではなく、旧Prompt／出所資料と封存は維持します。
 

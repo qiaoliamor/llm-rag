@@ -117,7 +117,7 @@ multilingual-weather-v1をweather_understanding/mainへ実装、既定semantic�
 
 PR #32の旧中文回帰、初回17件のfixture失敗と環境起動失敗、全履歴を保持。既定フロー修正を実Gemini品質受入とはせず、帰属／混合文／漢数字、独立資料／評審、実遅延／費用等は未検証のままです。実モデル原応答／推論時間／tokenは未採取、M5未受入・M6未着手です。
 
-## 2026-11-12 · 中日情緒自己申告／信号意味移行（作業分岐）
+## 2026-11-12 · 中日情緒自己申告／信号意味移行（PR #34）
 
 multilingual-emotion-v1をemotion_understanding/mainへ接続、既定semantic、旧回帰は明示legacy、新回帰はsemantic/companion/growth=trueです。申告／否定／変化／陪伴要求をモデルへ移し、許可・調度・冷却・閾値・原文／ID・epochはコードが維持。旧emotion.py／Prompt・出所結合テスト／封存は変更しません。[仕様](EMOTION.md)へ。
 
@@ -137,3 +137,14 @@ multilingual-emotion-v1をemotion_understanding/mainへ接続、既定semantic�
 出所の最終確認で1失敗／44未選（0.11秒）を再現。本輪のモデル解釈listenがsource=userの返却副本strategyを書き換えていたため、手動assessmentは全体そのまま、本輪希望は別support_preferenceだけで文脈へ渡すよう修正しました。仮の強度も回答に注入しません。補強前1184/108・16.14秒、PG172/6.01秒、前端71/1.70秒は保持、補強後に表の最終検査。日本語UI推敲後71/1.48秒とビルド通過。構文・文書参照・差分／提出と秘密値／実行データ境界も確認しました。
 
 実中日主語／否定／引用／皮肉／トリガー精度、schema、入口0.8／結果閾値の信頼性、共有6秒での可用率／費用、独立多ラベル資料／双標・F1／校正／口調は未受入。解釈申告をsource=userと偽らず、API intensity=.5は互換仮値で回答文脈には送りません。旧情緒の局所返答チェック／回復文は全言語移行ではなく、構造・IDは意味真値の保証ではありません。旧503／8.003秒timeout／CLI終了1、B01/B02/B03と全失敗を保持。M5未受入・M6未着手、秘密値／実会話／採点原本／DBは提出しません。
+
+### PR #34マージレビュー（2026-11-13）
+
+意味入口と調度の分担、90点／許可、原文／user ID、手動出所と本輪希望の分離、閾値／冷却／共有予算、一時状態／失敗／epoch取消を確認し、新しいマージ阻害問題は見つかりませんでした。機能コードは変更せず、main更新なしでrebase不要。外部CI／評審記録はなくローカルCLI検証。本回squash、同期・ツリー照合後分岐を整理します。
+
+- `.venv/bin/python -m pytest -q`：1184通過／108スキップ、17.39秒。legacy／semanticの範囲は維持。
+- `.venv/bin/python scripts/test_postgres.py --semantic-emotion`：初回DB未起動で接続拒否・終了1、Dockerと既存dbサービス起動後、一時ランダム庫作成／削除で172通過、5.89秒。全体と重複。
+- `npm test --prefix frontend -- --run`：71通過、1.81秒。`npm run build --prefix frontend`型／本番ビルド通過。
+- 封存24公開候補not_assessed、38例／34出所監査通過、実API0。日中文書参照・構文・提出差分と秘密値／実行データ境界を確認。
+
+今回の環境起動失敗と旧SDK／空白／予算／出所回帰の失敗、503／8.003秒timeout／CLI終了1を保持。実Gemini主語／否定／引用／皮肉／信号精度、独立F1／校正／口調、費用／遅延と残る情緒返答チェックは未受入です。実モデル原応答／推論時間／tokenは未採取、実API0、M5未受入・M6未着手です。
