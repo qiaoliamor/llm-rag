@@ -25,3 +25,5 @@
 兼容入口：`M3_TEST_REPORT.md`只保留旧Prompt文档的链接与锚点，转向天气综合文档/固定版本原文，不继续维护独立报告；避免改动被来源哈希绑定的`prompts/DESIGN.md`。
 
 中日语义记忆已随PR #31交付，见[M2](M2_MEMORY.md)；本轮天气意图/城市/日期的共用语义入口见[M3](WEATHER.md)，命令和计数只在[测试记录](TEST_HISTORY.md)维护。实现不等于独立质量验收。
+
+本轮日语口吻/记忆Prompt v2、候选召回开发评测和母语盲评准备在任务分支完成；实际评分仍待评审。[日语适配](JAPANESE_LOCALIZATION.md)为操作入口，[M2](M2_MEMORY.md)说明记忆边界。

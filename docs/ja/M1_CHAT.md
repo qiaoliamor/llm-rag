@@ -17,3 +17,5 @@ app/dialogue.py、companion.py、reply_pipeline.py、localization.pyとfrontend/
 PR #26時点では22個の明示companion回帰、全体886通過／26スキップ。旧auditを含む全数を新既定経路の検証と数えません。PR #27の中国語合成2入力は各1回、1.124秒／5.625秒で返答しました。独立ブラインド評価、男友らしさ、一般的可用性の証拠ではありません。原文は[履歴](TEST_HISTORY.md)に共有します。
 
 今回の日本語はMock／固定fixture検証のみで、実モデルの自然さや母語話者の評価は未実施です。旧503、timeout、未検証項目を保留し、M6には進みません。
+
+日語口調はshen-yan-ja-care-v2へ。旧Promptを保持し、常体／呼称省略／傾聴と雑談の設計、12編集校準文・母語人評待ちは[日本語対応](JAPANESE_LOCALIZATION.md)へ。実モデル前後比較なし、自然さ向上は未実証です。

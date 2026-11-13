@@ -30,8 +30,8 @@ try:
              ['tests/test_memory.py','tests/growth/test_progression.py','tests/multilingual_facts'] if args.semantic_reply else
              ['tests/test_emotion.py','tests/growth/test_progression.py','tests/multilingual_emotion'] if args.semantic_emotion else
              ['tests/test_weather.py','tests/growth/test_progression.py','tests/multilingual_weather'] if args.semantic_weather else
-             ['tests/test_memory.py','tests/growth/test_progression.py','tests/multilingual_memory'] if args.semantic_memory else
-             ['tests/test_memory.py','tests/test_weather.py','tests/test_emotion.py','tests/growth/test_progression.py','tests/multilingual_memory','tests/multilingual_weather','tests/multilingual_emotion','tests/multilingual_facts'])
+             ['tests/test_memory.py','tests/growth/test_progression.py','tests/multilingual_memory','tests/japanese_evaluation'] if args.semantic_memory else
+             ['tests/test_memory.py','tests/test_weather.py','tests/test_emotion.py','tests/growth/test_progression.py','tests/multilingual_memory','tests/multilingual_weather','tests/multilingual_emotion','tests/multilingual_facts','tests/japanese_evaluation'])
     result=subprocess.run([sys.executable,'-m','pytest','-q',*paths],cwd=root,env=child)
 finally:
     connection.execute(sql.SQL('DROP DATABASE IF EXISTS {} WITH (FORCE)').format(sql.Identifier(name)))
