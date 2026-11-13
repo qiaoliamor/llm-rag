@@ -18,7 +18,7 @@ EmotionDecisionのuse_emotion/confidence/report/shift/request_analysis/preferenc
 
 回答文脈には必要ラベル／信頼度／出所／希望だけを渡し、原文引用・証拠ID／時刻は渡しません。申告のAPI intensity=.5は互換用仮値で回答には送りません。入口0.8とUI結果閾値は別、閾値未満はunknown。PR #34当時の旧情緒返答制約は履歴として保持し、現在の修正は次節です。実schema・主語／否定／皮肉精度、F1／校正／口調／費用は未受入、合成を実理解評価とはしません。
 
-## 中日情緒返答と回復文（2026-11-13、作業分岐）
+## 中日情緒返答と回復文（2026-11-13、PR #35）
 
 既定emotion semanticにemotion_presentation.py、multilingual-emotion-care-v1を追加。旧emotion.py・companion/semantic_reviewのPrompt／封存は変えず、明示legacyは再現用です。新経路は中文の「你其实/你一定」文字一致を情緒判断に使いません。
 

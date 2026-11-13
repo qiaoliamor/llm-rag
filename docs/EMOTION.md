@@ -24,7 +24,7 @@
 
 程序生成`self_report/model/basis=self_report`，证据仅当前user ID；上下文不带原文引用、ID、observed_at。自述的API intensity=.5仅兼容占位，不传给回答模型当测量；confidence是理解置信而非心理概率。入口置信门槛0.8和UI结果阈值独立，低于结果阈值则unknown。投影只给必要标签/来源/置信/本轮偏好，追加中日“可纠正、非诊断、不读心”的Prompt。PR #34时的旧情绪回复语言边界是历史状态，本轮修复见下节；真实schema/识别/否认/讽刺/信号准确率、F1/校准/口吻/费用仍未验收。
 
-## 中日情绪回复与兜底（2026-11-13，任务分支）
+## 中日情绪回复与兜底（2026-11-13，PR #35）
 
 默认emotion semantic路径新增`app/emotion_presentation.py`、策略`multilingual-emotion-care-v1`，不修改旧emotion.py、companion/semantic_review旧Prompt或封存。显式legacy仍回放中文局部检查；新路径不再用中文“你其实/你一定”等词面正则判断情绪含义。
 
