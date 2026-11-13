@@ -50,3 +50,20 @@ PR #30時点の「自動記憶未適応」は歴史状態。記憶は[M2](M2_MEM
 情緒返答はmultilingual-emotion-care-v1へ。引用・否定は中文文字列だけで拒まず、診断・読心・得点放送・傾聴無視を意味審査します。裁判なし／失敗時はlocale回復文を使い、参考なしwaitingでは追加審査を強制しません。言語・希望・状態は心情の根拠にはなりません。[M4](EMOTION.md)参照、実品質は未受入です。
 
 本回、正史／出所時刻／地名の中日共通Promptと自由応答審査を追加。旧中文詞面／選択入口はlegacyのみ、完全信頼挨拶短句だけ有界で直接返し、部分文字列では通しません。権限／確認／証拠／epoch／天気数値は維持。この領域のコード移行と実意味品質・費用の受入は別、[M5](M5_EVALUATION.md)へ。
+
+## 日本語口調v2・母語盲評の準備（2026-11-13、作業分岐）
+
+shen-yan-ja-care-v2はlocalization.pyで旧JAPANESE_PROMPT_V1を保持し、穏やかな常体／必要なら僕、主語と呼称の省略、定型的な感謝・慰め・質問の連発回避を追加。傾聴時に助言を押し付けず、親密さ／独占／報告を要求せず、雑談を心理相談の型にしません。灯りや本の仕草は自然に、正史・原名・日付・天気demo／推定・非診断は維持。中文へ切り替えても旧記憶原文を翻訳しません。
+
+**母語独立人評は未実施。** ユーザーは評審不在のため先に資料を準備と回答。公開care_calibration_v1.jsonの12返答は作者が手で書いた6分野の校準文で、Gemini出力／新旧PromptのA/Bではありません。evaluate_japanese.pyでランダムID／順序の2包、空の採点欄、日語ガイド／役柄参考草稿をリポジトリ外へ生成。familyや作者ラベルは非公開、原文を変更しません。参考の日本語自体も母語確認待ちです。
+
+```sh
+.venv/bin/python scripts/evaluate_japanese.py --prepare-annotation /tmp/ja-review-session
+.venv/bin/python scripts/score_annotations.py --japanese \
+  --mapping /tmp/ja-review-session/custodian_mapping.json \
+  --rater-a /tmp/ja-review-session/rater_a.json \
+  --rater-b /tmp/ja-review-session/rater_b.json \
+  --output /tmp/ja-review-summary.json --require-acceptance
+```
+
+保管者は各評審に各自の包とガイドだけ渡し、mappingと原採点は私有。実装・調整に関与しない母語話者2名が相談せず独立採点し、第三者が分歧を裁決します。事実／人物／応答、自然さ・人物らしさ・配慮1〜5、Unicode断片と証拠を記録。非該当の配慮には理由を付けます。完全coverage／ID／役柄／凍結結合を検査し、一致率／κ・分歧を算出、本文／コメント／評審IDは報告に出しません。自己申告は母語性／独立性の認証ではなく、公開少数の校準は常にnot_assessed、--require-acceptanceは終了3。空白は未採点として拒否し、0点に置き換えません。実採点・裁決・正式規模・モデル効果は未受入です。[記憶](M2_MEMORY.md)と[テスト](TEST_HISTORY.md)へ。実API0、旧封存／失敗維持、M6未着手。

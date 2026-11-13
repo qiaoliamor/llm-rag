@@ -59,3 +59,24 @@ PR #29文档整理已合并（`5a62fca`），PR #30基础日语适配经本次sq
 本轮情绪回复采用multilingual-emotion-care-v1，引用/否定不再由中文字符串直接拒绝；诊断、读心、分数播报及忽略倾听由语义审查处理。无裁判或失败时按locale安全回退；普通waiting无参考不额外强制审查。语言、偏好、状态是控制信息，不能证明心情。详见[M4](EMOTION.md)，真实质量仍未验收。
 
 本轮新增角色正史／来源时间／地点回复的共用语义Prompt和统一自由回复审查，旧中文词面与选择入口只legacy回放；完整可信问候短句有界直返，不按子串放行。权限/确认/证据/epoch及天气数字校验保留。原先“其余回复规则待迁移”中这部分代码已适配，真实语义与成本仍待独立验收；见[M5](M5_EVALUATION.md)。
+
+## 日语角色口吻 v2 与母语盲评准备（2026-11-13，任务分支）
+
+`app/localization.py`的`shen-yan-ja-care-v2`保留旧JAPANESE_PROMPT_V1，在其后补充：自然常体为主、必要时「僕」、省略反复称呼；通常1–3句但具体问题可展开；不每轮套感谢/安慰/反问，不强迫亲密、报备或排他依赖；倾听时不急给方案，普通闲聊不套心理咨询；保留书店氛围但不每轮转回书店。原名/日期/正史、天气demo/估计与非诊断规则不因自然度而放松。中文语言入口不追加日语口吻，语言切换不改原文。
+
+**母语独立人评尚未进行。** 用户确认暂时没有评审，本轮只准备材料。`evaluations/japanese/care_calibration_v1.json`含12条作者编写的日语回复，覆盖六类；不是旧/新Prompt真实生成的A/B，也不是Gemini输出。`app/japanese_evaluation.py`随机化任务ID/顺序，输出两份原文一致、评分全空的包；不导出案例family或作者标签。附日语评分指南与角色参考草稿，后者也待母语复核。公开、作者已见且样本少，不能作为独立正式集。
+
+```sh
+# 不读取.env/玩家库，不调用API；输出必须在仓库外且不存在
+.venv/bin/python scripts/evaluate_japanese.py --prepare-annotation /tmp/ja-review-session
+# 真实评审分别填写自己的包后，由保管者导入；mapping与评分原件不提交
+.venv/bin/python scripts/score_annotations.py --japanese \
+  --mapping /tmp/ja-review-session/custodian_mapping.json \
+  --rater-a /tmp/ja-review-session/rater_a.json \
+  --rater-b /tmp/ja-review-session/rater_b.json \
+  --output /tmp/ja-review-summary.json --require-acceptance
+```
+
+保管者只向各评审交付对应包和日语指南，mapping留私有；两位未参与实现/调优的日语母语评审先独立打分，再由第三人处理分歧，不先讨论答案。字段覆盖事实/角色、是否回应、自然度/角色感/关怀1–5分、Unicode完整片段及证据；非适用关怀须说明。原始字句不能为了好评分而改写。程序拒绝覆盖/证据/任务/角色/绑定漂移，输出一致率/κ与分歧，不输出原文、评论或评审ID；母语/独立性的自述不等于认证，公开校准始终not_assessed，要求验收时退出3，空白包导入失败而非零分。真实标注/裁决/盲评、正式规模与模型新Prompt效果均待完成。
+
+同轮记忆v2解释与实际候选召回开发评测见[M2](M2_MEMORY.md)，命令、失败和结果统一见[测试记录](TEST_HISTORY.md)。无真实API调用，旧封存v1/v2与所有未验收项保留，M6未开始。
