@@ -107,7 +107,7 @@
 | 字符向量分词/归一化/撤销指纹 | 保留机械预处理与旧索引版本，不是多语言语义模型 |
 | 天气意图/城市/日期（2026-11-12） | 新weather_understanding默认semantic，模型判断+原文/城市结构/当地七天范围/epoch校验；旧weather.py仅明确legacy回放，天气数据校验/展示保护继续保留 |
 | 情绪自述/触发（本轮） | emotion_understanding默认semantic，模型判断/原文及user ID校验，调度/冷却/阈值/epoch由程序执行；旧emotion.py仅明确legacy，不将模型解释伪标手动确认 |
-| 回复入口与正史局部检查、情绪回复局部检查、来源时间/地点规则 | 当前仍存在；后续须按模块版本化迁移，保持普通问候可用、事实和授权不退化，不能本轮宣称全已移除 |
+| 回复入口与正史局部检查、来源时间/地点规则 | 当前仍存在；后续须按模块版本化迁移，保持普通问候可用、事实和授权不退化，不能本轮宣称全已移除 |
 
 Prompt负责提出语义判断，程序限制引用和执行，玩家确认后才能成为长期记忆。高置信或结构合法不证明理解正确。新政策独立验收须另冻memory_understanding/main/memory/progression/reply_pipeline/config、模型与参数；不修改旧封存/标签来“通过”。本轮仅合成结构/SDK/生命周期验证，没有真实模型或新金标准。
 
@@ -116,3 +116,5 @@ Prompt负责提出语义判断，程序限制引用和执行，玩家确认后�
 本轮新增回复策略multilingual-weather-care-v1（weather_presentation/main/reply_pipeline及模型须独立冻结）：演示/估计/时态/口吻按语义审核，纯天气归属片段保留程序数字检查，混合来源不能用数字扫描代替事实支持。role_issues在此版本还包括天气展示遗漏；不得将新标签约定静默套用旧封存。合成accept/revise只验证分支、ID/数值约束和语言保持，不是审查精度或独立真值，旧失败与误判计数不关闭。
 
 情绪策略multilingual-emotion-v1也须另冻emotion_understanding/main/config、模型参数和中日参考。合成decision/estimate证明调度/校验/失败/来源路径，不是主体、否认、讽刺识别准确率或F1/校准结论。每轮入口调用与按需完整估计的总调用成本、共享6秒可用率须实测，不能由纯Mock通过推断。
+
+情绪回复新策略multilingual-emotion-care-v1：默认semantic用回答/审查Prompt判断引用、否定、归因和非诊断边界，legacy局部规则只供回放。须另冻结emotion_presentation/main/reply_pipeline、模型参数和双语参考；role_issues也含主体语言/偏好/分数表达，emotion_policy不能充当心情证据（程序拒绝引用）。合成预置裁决只验证流程，不证明实际误判率、自然度或事实准确率；普通waiting无参考不强制审查，失败状态审查可能增加调用成本。旧封存及未验收项不变。

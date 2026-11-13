@@ -149,3 +149,79 @@ def test_default_semantic_mode_and_no_legacy_entry(monkeypatch,tmp_path):
     c.patch('/v1/emotion/settings',headers=h,json={**DEFAULTS,'enabled':True})
     assert c.post('/v1/chat',headers=h,json={'message':'こんにちは','locale':'ja-JP'}).json()['emotion']['status']=='waiting'
     p.decide.assert_awaited_once();legacy.assert_not_awaited()
+
+
+def with_judge(x,judge):
+    app=create_app(x.settings,x.generator,emotion_understander=x.analyst,semantic_judge=judge)
+    c=TestClient(app);c.cookies.update(x.c.cookies)
+    x.app=app;x.c=c;x.h={'x-csrf-token':c.get('/v1/session').json()['csrf_token']}
+
+
+def test_reviewed_japanese_quote_is_returned_without_legacy_rewrite(env):
+    from test_emotion_presentation import verdict
+    from app.emotion_presentation import ANSWER_PROMPT
+    x=env;enable(x,preference='listen');x.analyst.decide.return_value=plan(report('悲しい',['sadness']))
+    text='「你其实」と決めつけず、話を聞かせて。'
+    x.generator.generate.return_value=text
+    judge=SimpleNamespace(review=AsyncMock(return_value=verdict(text,kind='nonfactual')));with_judge(x,judge)
+    r=chat(x,'悲しい').json()
+    assert r['reply']==text and not r['guarded'] and r['semantic_review']['status']=='accepted'
+    assert ANSWER_PROMPT in x.generator.generate.call_args.args[1]
+    x.generator.generate.assert_awaited_once();judge.review.assert_awaited_once()
+    assert x.c.get('/v1/session').json()['messages'][-1]['content']==text
+
+
+def test_repeated_diagnostic_reply_falls_back_japanese_with_listen_preference(env):
+    from test_emotion_presentation import verdict
+    from app.emotion_presentation import fallback
+    x=env;enable(x,preference='listen');x.analyst.decide.return_value=plan(report('悲しい',['sadness']))
+    text='君はうつ病だよ。';x.generator.generate.return_value=text
+    judge=SimpleNamespace(review=AsyncMock(return_value=verdict(text,'revise')));with_judge(x,judge)
+    r=chat(x,'悲しい').json()
+    assert r['reply']==fallback(r['emotion'],{**DEFAULTS,'preference':'listen'},'ja-JP') and r['guarded']
+    assert x.generator.generate.await_count==2 and judge.review.await_count==2
+
+
+def test_no_judge_reply_uses_safe_japanese_without_diagnostic_claims(env):
+    x=env;enable(x,preference='listen');x.analyst.decide.return_value=plan(report('悲しい',['sadness']))
+    x.generator.generate.return_value='君は絶対うつ病だ。'
+    r=chat(x,'悲しい').json()
+    assert r['semantic_review']['status']=='emotion_safe_fallback' and r['reply'].startswith('うん、聞いているよ。')
+    assert 'うつ病' not in r['reply']
+
+
+@pytest.mark.parametrize('failure',['timeout','invalid'])
+def test_care_review_failure_preserves_safe_language_and_state_rules(env,failure):
+    x=env;enable(x);x.analyst.decide.return_value=plan(report('悲しい',['sadness']))
+    judge=SimpleNamespace(review=AsyncMock(side_effect=TimeoutError()) if failure=='timeout' else AsyncMock(return_value={'bad':'synthetic'}))
+    with_judge(x,judge);r=chat(x,'悲しい')
+    if failure=='timeout':
+        assert r.status_code==503 and x.c.get('/v1/session').json()['messages']==[]
+        assert x.c.get('/v1/emotion').json()['assessment'] is None
+    else:assert r.status_code==200 and r.json()['reply'].startswith('うん、聞いているよ。')
+    x.generator.generate.assert_awaited_once();judge.review.assert_awaited_once()
+
+
+def test_revoke_during_review_invalidates_old_reply(env):
+    from test_emotion_presentation import verdict
+    x=env;enable(x);x.analyst.decide.return_value=plan(report('悲しい',['sadness']))
+    async def revoke(reply,history,evidence):
+        x.store.configure_emotion(x.uid,{**DEFAULTS,'enabled':False})
+        return verdict(reply,kind='nonfactual')
+    judge=SimpleNamespace(review=AsyncMock(side_effect=revoke));with_judge(x,judge)
+    assert chat(x,'悲しい').status_code==409
+    assert x.c.get('/v1/session').json()['messages']==[]
+    assert x.c.get('/v1/emotion').json()['assessment'] is None
+
+
+def test_real_provider_name_uses_composed_care_judge_factory(env,monkeypatch):
+    from unittest.mock import Mock
+    from test_emotion_presentation import verdict
+    x=env;enable(x);x.analyst.decide.return_value=plan(report('悲しい',['sadness']))
+    judge=SimpleNamespace(review=AsyncMock(side_effect=lambda reply,history,evidence:verdict(reply,kind='nonfactual')))
+    factory=Mock(return_value=judge);monkeypatch.setattr('app.emotion_presentation.EmotionAnalysisProvider',factory)
+    settings=x.settings.model_copy(update={'chat_provider':'gemini'})
+    app=create_app(settings,x.generator,emotion_understander=x.analyst)
+    c=TestClient(app);c.cookies.update(x.c.cookies);x.app=app;x.c=c;x.h={'x-csrf-token':c.get('/v1/session').json()['csrf_token']}
+    assert chat(x,'悲しい').json()['semantic_review']['status']=='accepted'
+    factory.assert_called_once_with(settings);judge.review.assert_awaited_once()

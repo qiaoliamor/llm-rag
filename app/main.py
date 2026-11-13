@@ -25,6 +25,7 @@ from .weather import OpenMeteoProvider, MockWeatherProvider, WeatherError, MESSA
 from . import weather_understanding as semantic_weather
 from . import weather_presentation as weather_voice
 from . import emotion_understanding as semantic_emotion
+from . import emotion_presentation as emotion_voice
 from .emotion import EmotionState, EmotionSettingsInput, CorrectionInput, Estimate, ModelEmotionProvider, MockEmotionProvider, assess, emotion_prompt, decorate
 from .grounding import grounding_prompt
 from .memory import MemoryStore, extract_candidates, memory_prompt
@@ -133,7 +134,7 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
     emotion = emotion_provider or (MockEmotionProvider() if settings.chat_provider == 'mock' else ModelEmotionProvider(settings))
     emotion_semantic = settings.emotion_understanding_mode=='semantic'
     emotion_understander = emotion_understander if emotion_understander is not None else (semantic_emotion.ModelEmotionUnderstanding(settings) if settings.chat_provider!='mock' else None)
-    analysis_type = weather_voice.WeatherAnalysisProvider if weather_semantic else (companion.CompanionAnalysisProvider if settings.dialogue_mode == 'companion' else ModelAnalysisProvider)
+    analysis_type = emotion_voice.EmotionAnalysisProvider if emotion_semantic else (weather_voice.WeatherAnalysisProvider if weather_semantic else (companion.CompanionAnalysisProvider if settings.dialogue_mode == 'companion' else ModelAnalysisProvider))
     auxiliary = analysis_type(settings) if settings.chat_provider != 'mock' else None
     router = memory_router if memory_router is not None else auxiliary
     judge = semantic_judge if semantic_judge is not None else auxiliary
@@ -307,6 +308,7 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
                     prompt += NO_MEMORY_CONTEXT
             if semantic_memory and evidence: prompt += MEMORY_CONTEXT_RULES
             if weather_semantic and weather_result: prompt += weather_voice.ANSWER_PROMPT
+            if emotion_semantic and mood_settings['enabled']:prompt+=emotion_voice.ANSWER_PROMPT
             prompt += language_prompt(body.locale, previous=session.reply_locale)
             model_history = [{'role':m['role'], 'content':m['content']} for m in history]
             try:
@@ -314,7 +316,7 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
                     reply, guarded, review_status = await generate_checked(language_provider(provider,body.locale),model_history,prompt,body.message,
                         evidence,weather_result,mood_result,mood_settings,judge=judge,
                         review_enabled=settings.semantic_review_enabled,review_timeout=settings.semantic_review_timeout_seconds,companion=natural,
-                        force_review=semantic_memory and route.need_memory,locale=body.locale,multilingual_weather=weather_semantic)
+                        force_review=semantic_memory and route.need_memory,locale=body.locale,multilingual_weather=weather_semantic,multilingual_emotion=emotion_semantic)
             except TimeoutError:
                 raise ProviderFailure('timeout', '模型响应超时，请稍后重试。', 504) from None
             verify_epoch(session, snapshot['epoch'])

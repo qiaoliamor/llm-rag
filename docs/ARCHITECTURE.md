@@ -2,6 +2,8 @@
 
 [中文](ARCHITECTURE.md) · [日本語](ja/ARCHITECTURE.md)
 
+默认情绪回复新增emotion_presentation.py：组合EmotionAnalysisProvider复用companion/audit和可用天气Prompt，再追加情绪非诊断/偏好/语言规则。参考emotion_current与控制emotion_policy分离；后者不得作事实证据。reply_pipeline共享一次重写/总预算，按locale回退；普通waiting不额外强制审查。天气+情绪兜底保留工具事实、尊重listen；旧每模块legacy和原Prompt留作回放。失败/拒绝轮可能新增审查调用，实际延迟/费用未测。
+
 情绪默认`emotion_understanding.py`：90分+授权→每轮严格EmotionDecision→当前原文绑定→自述解释/旧手动纠正优先，或程序按间隔/冷却决定SemanticEstimate→窗口user ID/阈值校验→必要字段上下文。两阶段共用6秒默认预算，模型不控制轮次/权限；新结果成功提交后只留会话，模型边界核对epoch。旧emotion.py仅显式legacy，数据库设置CRUD不变。
 
 默认天气语义模式的回复新增`weather_presentation.py`：生成Prompt扩展→WeatherAnalysisProvider的版本化审查Prompt→完整结构/证据ID验证→纯天气归属片段的数字/单位检查→共享一次重写或当前locale回退。模型按语义区分表达与事实，不要求中文词。无judge/关闭review走weather_safe_fallback；天气结果非ok也核查，可能增加审查调用/延迟，真实成本未验证。旧weather.py/companion/semantic_review策略及显式legacy留作历史对照。
