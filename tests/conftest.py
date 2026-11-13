@@ -8,6 +8,7 @@ _test_database = tempfile.TemporaryDirectory(prefix='persona-tests-')
 os.environ['MEMORY_UNDERSTANDING_MODE'] = 'legacy'  # Pin historical contracts; semantic suites opt in explicitly.
 os.environ['WEATHER_UNDERSTANDING_MODE'] = 'legacy'  # Explicit historical weather replay, never a runtime fallback.
 os.environ['EMOTION_UNDERSTANDING_MODE'] = 'legacy'  # Pin old emotion rules; new suites explicitly use semantic.
+os.environ['REPLY_UNDERSTANDING_MODE'] = 'legacy'  # Explicit historical fact guards; new suites select semantic.
 os.environ['DIALOGUE_MODE'] = 'audit'
 os.environ['GROWTH_ENABLED'] = 'false'  # Historical capability suites; growth has explicit tests.
 os.environ['MEMORY_DATABASE_URL'] = 'sqlite:///' + _test_database.name + '/bootstrap.sqlite3'

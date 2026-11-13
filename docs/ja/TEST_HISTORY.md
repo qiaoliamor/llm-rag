@@ -175,3 +175,28 @@ control_policy回帰は先1失敗／39未選（0.11秒）：制御情報を気�
 - 前端71通過（1.96秒）、型／ビルド通過。封存24公開候補not_assessed／model_calls=0、差分・文書参照・秘密値と旧出所境界を確認。
 
 本回squashでmainへ提供後、同期・受測ツリー照合・分岐削除を実施。実API0、実応答／推論時間／token未採取。実意味精度・診断帰属・複雑否定・自然さ／盲評・schema／費用は未受入。封存v1/v2、旧失敗と全未検証項目を保持し、M5未受入・M6未着手です。
+
+## 2026-11-13 · 正史・記憶出所時刻・地名返答（作業分岐）
+
+multilingual-fact-care-v1／既定REPLY_UNDERSTANDING_MODE=semantic。設計は[M5](M5_EVALUATION.md)、原合成文は[同日の中文記録](../TEST_HISTORY.md)に保存。旧人物／出所／地名／場面関数・Prompt・封存v1/v2は不変。根conftestでreply legacyを固定し、従来の多言語各套件も旧返信経路を維持。新套件のみsemantic/companion/growth=trueと環境指定なしの実既定入口を明示し、全数を本番経路としません。
+
+| コマンド | 最終結果 |
+| --- | --- |
+| `.venv/bin/python -m pytest -q` | 1305通過／129スキップ、18.65秒。旧1231/115＋60単体／14 SQLite、新14 PGは通常スキップ |
+| `.venv/bin/python scripts/test_postgres.py --semantic-reply` | 209通過、9.26秒。新規一時PGを作成／削除、記憶／成長／返信とSQLite対照、全体と重複 |
+| `.venv/bin/python -m pytest -q tests/multilingual_facts` | 71通過／12スキップ、1.16秒（状態計数修正前、最終全体は新ローカル74回帰を含む） |
+| `npm test --prefix frontend -- --run` | 71通過、1.80秒。フロント変更なし |
+| `npm run build --prefix frontend` | 型／ビルド通過 |
+| 封存内容・離線audit | 公開24候補not_assessed／model_calls=0、38例／34出所／api_calls=0 |
+
+引用否定の中文年齢誤阻止と日本語年齢／職業・さっき教えてくれたの漏検を旧関数で保留し、新たな事前設定accept/reviseで一次返却／書換えを検証。相続・幼少期・失憶、時刻・完全地名／代名詞／無根拠距離、来店の言換え／最新退店・混合文・自然な雰囲気を含みます。SDKのcompanion/audit×天気×情緒計8組合せ、制御ID／外部ID・coverage・低確信・非法・timeout、judgeなし／review無効、最大1回書換え、信頼短句の完全一致（追加／引用／異言語は不可）、メモリ／force_review優先を確認。
+
+候補の確認前非検索→確認→別会話の住所想起→訂正→削除／再起動・非復活、CSRF／帰属／version／撤回409・503非保存も合成で確認。表／ベクトル算法／画面を変えず、それらの新移行／UI CRUDは対象外です。
+
+失敗保留：新app再開時CookieのみコピーしGET /v1/sessionを忘れたfixtureで1失敗／58通過／11skip（1.16秒）、修正後62/11（0.98秒）。初単体48通過（0.55秒）、追加64/11（0.97秒）→65/12（1.18秒）。信頼短句追加後、従来のjudgeなしfixtureが信頼短句に一致し期待status不一致、1失敗／70通過／12skip（1.03秒）。本当に未確認の年齢文へfixtureを直し最終71/12。途中全体1293/126・20.08秒→1296/127・18.80秒、PG194・9.39秒→198・9.22秒を保留。追加境界の後に最終表、累計しません。
+
+実Gemini／天気／決済API0回、実原応答／推論時間／token／費用は未採取。模擬裁判は意味精度でなく、高確信acceptも誤り得ます。複雑否定／引用／別名／在店・自然さ／独立盲評・実schema、自由文審査増加の実可用性／遅延／費用は未受入。旧15漏検／5誤阻止／1未決、503／8.003秒timeout／CLI終了1、B01/B02/B03・封存v1/v2と全失敗を保持、M5未受入・M6未着手です。
+
+収束時の赤緑回帰：`...test_fact_presentation.py -k rewrite_to_trusted`で1失敗／59未選（0.09秒）。誤応答を書き換えた先が信頼短句だとguarded=false／calls=0へリセットし、成長側で未修正ターンと扱い得る不具合。直返を初回生成だけに制限し、書換えの審査・計数を維持後1通過／59未選（0.24秒）。修正前全体1302/127・18.24秒、PG204・8.81秒を保持。修正後1303/127・18.12秒、PG205・8.73秒が最終。実APIは0です。
+
+組合せ収束：`...test_fact_flow.py -k legacy_place_extraction`先1失敗／1通過／2skip／24未選（0.50秒）。reply semantic+auditの回答Promptに旧grounding_promptの中文地名抽出が残存。両対話モードで新原文投影へ統一し、旧抽出はreply legacyだけ、相対日付は保存event_dateのみと補足。修正後2通過／2skip／24未選（0.71秒）。最終全体1305/129・18.65秒、PG209・9.26秒で上段1303/127・PG205の最新値を更新し、過去失敗は消しません。構文／リンク／秘密値と封存を確認。

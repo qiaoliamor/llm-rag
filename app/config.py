@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     memory_understanding_mode: str = Field(default='semantic', pattern='^(semantic|legacy)$')
     memory_understanding_timeout_seconds: float = Field(default=4, ge=.1, le=10)
     memory_router_enabled: bool = True
+    reply_understanding_mode: str = Field(default='semantic', pattern='^(semantic|legacy)$')
     semantic_review_enabled: bool = True
     dialogue_mode: str = Field(default='companion', pattern='^(companion|audit)$')
     growth_enabled: bool = True

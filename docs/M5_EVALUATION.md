@@ -6,7 +6,7 @@
 
 ## 当前实现与结构化裁判
 
-按需记忆见[M2](M2_MEMORY.md)，自然聊天见[M1](M1_CHAT.md)。线上角色/天气/情绪局部检查后，必要时用`app/semantic_review.py`及`companion.py`核对重要事实与角色口吻，`reply_pipeline.py`统一处理重写。规则和模型均不能理解所有事实；优先围绕实际失败修改Prompt，不继续为每句话堆正则。
+按需记忆见[M2](M2_MEMORY.md)，自然聊天见[M1](M1_CHAT.md)。默认回复semantic统一审查自由回复，legacy才在旧局部检查后选择性使用`app/semantic_review.py`及`companion.py`核对重要事实与角色口吻，`reply_pipeline.py`统一处理重写。规则和模型均不能理解所有事实；优先围绕实际失败修改Prompt，不继续为每句话堆正则。
 
 裁判输入包括：本轮待检查回复、按顺序编号的units、用户上下文、固定正史、scene_profile、相关确认记忆、有效天气和情绪参考；助手历史只供虚构场景连续性，不证明玩家事实。所有材料都是数据，不能作为新系统指令。
 
@@ -107,7 +107,7 @@
 | 字符向量分词/归一化/撤销指纹 | 保留机械预处理与旧索引版本，不是多语言语义模型 |
 | 天气意图/城市/日期（2026-11-12） | 新weather_understanding默认semantic，模型判断+原文/城市结构/当地七天范围/epoch校验；旧weather.py仅明确legacy回放，天气数据校验/展示保护继续保留 |
 | 情绪自述/触发（本轮） | emotion_understanding默认semantic，模型判断/原文及user ID校验，调度/冷却/阈值/epoch由程序执行；旧emotion.py仅明确legacy，不将模型解释伪标手动确认 |
-| 回复入口与正史局部检查、来源时间/地点规则 | 当前仍存在；后续须按模块版本化迁移，保持普通问候可用、事实和授权不退化，不能本轮宣称全已移除 |
+| 回复入口与正史、来源时间/地点 | 本轮默认reply semantic改用中日Prompt与统一审查；完整可信短句可跳过。旧词面函数及选择入口只供legacy，不是失败回退；未声称所有模块已无正则 |
 
 Prompt负责提出语义判断，程序限制引用和执行，玩家确认后才能成为长期记忆。高置信或结构合法不证明理解正确。新政策独立验收须另冻memory_understanding/main/memory/progression/reply_pipeline/config、模型与参数；不修改旧封存/标签来“通过”。本轮仅合成结构/SDK/生命周期验证，没有真实模型或新金标准。
 
@@ -118,3 +118,22 @@ Prompt负责提出语义判断，程序限制引用和执行，玩家确认后�
 情绪策略multilingual-emotion-v1也须另冻emotion_understanding/main/config、模型参数和中日参考。合成decision/estimate证明调度/校验/失败/来源路径，不是主体、否认、讽刺识别准确率或F1/校准结论。每轮入口调用与按需完整估计的总调用成本、共享6秒可用率须实测，不能由纯Mock通过推断。
 
 情绪回复新策略multilingual-emotion-care-v1：默认semantic用回答/审查Prompt判断引用、否定、归因和非诊断边界，legacy局部规则只供回放。须另冻结emotion_presentation/main/reply_pipeline、模型参数和双语参考；role_issues也含主体语言/偏好/分数表达，emotion_policy不能充当心情证据（程序拒绝引用）。合成预置裁决只验证流程，不证明实际误判率、自然度或事实准确率；普通waiting无参考不强制审查，失败状态审查可能增加调用成本。旧封存及未验收项不变。
+
+## 中日人物、来源时间与地点回复
+
+2026-11-13，任务分支策略`multilingual-fact-care-v1`，默认`REPLY_UNDERSTANDING_MODE=semantic`（与companion/audit独立）。入口`app/fact_presentation.py`，由main组合回答Prompt、确认记忆原文及locale；FactAnalysisProvider组合companion/audit、当前天气/情绪规则与事实审查规则。只替换IndexedReview的系统Prompt，其余记忆路由schema不变。
+
+| 语义任务 | 回答与审查约束 |
+| --- | --- |
+| 正史/身份 | 沈砚/沈硯为同一角色，C01–C04支持28岁、栖川旧书店、自行开店而非继承；不补亲属/童年/职业变化。引用并否定错误年龄与角色自行宣称不同，不用中文数字/职业正则决定真伪。 |
+| 来源时间 | memory_*只证明fact；event_date不是讲述时间，创建/确认/检索也不是。current=true由程序标记，仅本轮本人直接陈述可支持准确的“刚才/今教えてくれた”。旧本人原话证明说过内容，不证明何日；助手历史、引语/问题预设不自证玩家事实。最新纠正用于当前状态，不否认存在的旧话。 |
+| 地点与在场 | 证据完整原名或代词，不猜译名/简称/官方别名、交通距离或GPS。明确讨论并否定简称不等于采用。未来邀请/到店计划/旧到访不证明目前在场；本人离开或纠正优先，助手台词和角色卡“访客”不能证明玩家在场。 |
+| 虚构许可 | 保留安静、书页、灯光、普通动作，不逐个审计背景读者；混合句中正确半句不支持交易/消息/到店/共同过去等重要命题。事实和role_issues独立，不把所有问题都缩成“不知道自家店况”。 |
+
+**调用与失败设计**：新路径不运行旧`conflicts/source_time_conflicts/protected_places/place_conflicts/scene_conflicts`，也不走中文review_required选择器。自由回复统一进入已有审查，不额外开语义选择调用。仅首次生成完整等于当前语言`TRUSTED_TEMPLATES`的8条短句之一、且无force_review/确认记忆/天气/有效情绪时可跳过（如“你好。”、“こんにちは。”）。这是一小份事先审阅的成品文本，不是对任意句子的关键词分类；加一句、引号包裹、异语言短句均不获豁免。普通情绪waiting不额外增加情绪审查，但回复政策仍照常适用。
+
+沿用完整单元覆盖、严格结构/证据白名单/低置信与共享8秒默认审查预算，最多2次生成和2次审查（一次重写），不另开循环。reply_policy仅reply_locale，程序拒绝将它当事实证据；控制信息不能补年龄/地点/时间。无judge或关闭review时，非可信短句用同locale自然安全兜底（reply_safe_fallback），有天气/情绪则沿用对应组合安全输出；不把未核对自由文本当可信，不失败回退legacy。非法结构/证据不完整给安全短句；timeout/429/503仍走温和繁忙、草稿恢复且不保存失败轮。epoch、归属/CSRF、版本、确认、原子提交、日期计算、天气数字校验不变。
+
+只用合成预置判定和MockTransport验证协议。例：旧函数会误拦`「我30岁」という設定にはしないよ。`，却可能漏过`僕は30歳の医師だよ。`；新流程按脚本accept/revise验证一次返回/受限重写，不把脚本判定称真实日语准确率。完整命令、失败和覆盖见[测试记录](TEST_HISTORY.md)。须将fact_presentation/main/reply_pipeline/config、模型/参数和双语参考独立冻结；旧封存、旧Prompt与原审计15漏检/5误拦截/1未决不改。
+
+**仍未验收**：真实Gemini对新schema/Prompt的兼容、日语/中文否定和复杂释义/别名/到店状态、正史漏检/引用误拦截、自然度及主观盲评。去掉词面硬拦截后，错误的高置信accept可能漏过人物矛盾；ID合法不等于语义支持。自由回复更常审查，实际超时/可用率/费用可能增加，普通问候也只有完整可信成品短句才保证免审查；不可从合成通过推断质量或成本。真实API0，M5未整体验收，M6未开始。
