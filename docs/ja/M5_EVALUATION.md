@@ -84,7 +84,7 @@ M5は未受入、M6は未着手です。今回、日本語UI／基本対話を�
 
 ## 中日人物・記憶出所・場所の返答
 
-2026-11-13、作業分岐のmultilingual-fact-care-v1。既定REPLY_UNDERSTANDING_MODE=semantic（companion/auditとは別軸）。fact_presentation.py/main/reply_pipeline/configで回答・審査・書換えを接続し、FactAnalysisProviderはIndexedReviewのみ新Promptへ置換。既定の天気／情緒Promptも合成し、記憶の別schemaは維持します。
+2026-11-13、PR #36のmultilingual-fact-care-v1。既定REPLY_UNDERSTANDING_MODE=semantic（companion/auditとは別軸）。fact_presentation.py/main/reply_pipeline/configで回答・審査・書換えを接続し、FactAnalysisProviderはIndexedReviewのみ新Promptへ置換。既定の天気／情緒Promptも合成し、記憶の別schemaは維持します。
 
 | 対象 | 意味上の規約 |
 | --- | --- |

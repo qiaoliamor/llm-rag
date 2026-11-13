@@ -200,3 +200,14 @@ multilingual-fact-care-v1／既定REPLY_UNDERSTANDING_MODE=semantic。設計は[
 収束時の赤緑回帰：`...test_fact_presentation.py -k rewrite_to_trusted`で1失敗／59未選（0.09秒）。誤応答を書き換えた先が信頼短句だとguarded=false／calls=0へリセットし、成長側で未修正ターンと扱い得る不具合。直返を初回生成だけに制限し、書換えの審査・計数を維持後1通過／59未選（0.24秒）。修正前全体1302/127・18.24秒、PG204・8.81秒を保持。修正後1303/127・18.12秒、PG205・8.73秒が最終。実APIは0です。
 
 組合せ収束：`...test_fact_flow.py -k legacy_place_extraction`先1失敗／1通過／2skip／24未選（0.50秒）。reply semantic+auditの回答Promptに旧grounding_promptの中文地名抽出が残存。両対話モードで新原文投影へ統一し、旧抽出はreply legacyだけ、相対日付は保存event_dateのみと補足。修正後2通過／2skip／24未選（0.71秒）。最終全体1305/129・18.65秒、PG209・9.26秒で上段1303/127・PG205の最新値を更新し、過去失敗は消しません。構文／リンク／秘密値と封存を確認。
+
+### PR #36マージレビュー（2026-11-13）
+
+正史／引用否定／出来事日と話した時刻の区別、地名原文／別名・来店状態、companion/auditで旧抽出非使用、初回完全一致の信頼短句と書換え計数、根拠／制御分離・共通予算・撤回・記憶確認／編集／削除非復活を確認し、新規ブロッカーなし。機能コード変更なし、main更新なし、rebase不要。外部CI記録なし、CLI合成結果です。
+
+- `.venv/bin/python -m pytest -q`：1305通過／129スキップ、20.99秒。legacy/semantic範囲を区別。
+- `.venv/bin/python scripts/test_postgres.py --semantic-reply`：209通過、9.95秒。一時DB作成／削除、全体と重複。
+- 前端71通過（1.97秒）、型／ビルド通過。封存24公開候補not_assessed／model_calls=0、離線38例／34出所／api_calls=0。
+- 初回の自作監査サマリーで整数へlenを呼びTypeError／終了1。整数／リスト対応の出力へ直し成功、監査／ケースは未変更。差分・文書参照・秘密値と旧出所の境界を確認。
+
+本回squash後main同期・受測ツリー照合・分岐削除。実API0、実原応答／推論時間／token／費用は未採取。封存v1/v2・全開発失敗・状態計数／audit抽出の赤緑記録・旧503／8.003秒timeout／CLI終了1を維持。実意味精度・複雑否定／引用／別名／在場、自然さ／独立盲評・schemaと審査増加の可用性／費用は未受入、M5未受入・M6未着手です。

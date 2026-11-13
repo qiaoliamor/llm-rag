@@ -121,7 +121,7 @@ Prompt负责提出语义判断，程序限制引用和执行，玩家确认后�
 
 ## 中日人物、来源时间与地点回复
 
-2026-11-13，任务分支策略`multilingual-fact-care-v1`，默认`REPLY_UNDERSTANDING_MODE=semantic`（与companion/audit独立）。入口`app/fact_presentation.py`，由main组合回答Prompt、确认记忆原文及locale；FactAnalysisProvider组合companion/audit、当前天气/情绪规则与事实审查规则。只替换IndexedReview的系统Prompt，其余记忆路由schema不变。
+2026-11-13，PR #36交付策略`multilingual-fact-care-v1`，默认`REPLY_UNDERSTANDING_MODE=semantic`（与companion/audit独立）。入口`app/fact_presentation.py`，由main组合回答Prompt、确认记忆原文及locale；FactAnalysisProvider组合companion/audit、当前天气/情绪规则与事实审查规则。只替换IndexedReview的系统Prompt，其余记忆路由schema不变。
 
 | 语义任务 | 回答与审查约束 |
 | --- | --- |
