@@ -17,7 +17,7 @@ export function EmotionPane({csrf,onHistoryCleared,onBusyChange,locked=false}:{c
   async function run(operation:()=>Promise<unknown>,message:string){setBusy(true);onBusyChange(true);setError('');setNotice('');try{await operation();onHistoryCleared();load(await getEmotion());setNotice(message);}catch(e){setError(e instanceof Error?e.message:t("操作失败，请重试。"));}finally{setBusy(false);onBusyChange(false);}}
   if(!data||!config)return <section className="workspace-pane"><h3>{t("情绪关怀")}</h3><p role={error?'alert':undefined}>{errorText(error)||t("正在读取设置…")}</p></section>;
   return <section className="workspace-pane" aria-label={t("情绪关怀设置")}><h3>{t("怎么陪你，由你决定。")}</h3>{locked&&<p className="pane-notice">{t("亲密度90分解锁使用。仍可关闭分析、清空临时推测及删除设置。")}</p>}
-    <p className="pane-description">{t("默认关闭。开启后，最近几轮聊天会额外发送给当前模型做情绪估计；不是读心或诊断。推测只在本次对话内短期保留，不写成长期记忆。你的自述和纠正优先，分析失败仍可正常聊天。保存、纠正、清空或删除会清空当前短期聊天，避免旧推测继续影响回应。")}</p>
+    <p className="pane-description">{t("默认关闭。解锁并开启后，每轮会把本轮原文、有限近期聊天和当前参考标签发送给当前模型，理解自述及是否需要分析；完整估计仍受间隔与冷却控制，两步共用6秒默认预算。不是读心或诊断，模型理解的自述也可能出错，可手动纠正。参考仅短期保留，不写入长期记忆；失败仍可聊天。保存、纠正、清空或删除会清空短期聊天及相关参考。")}</p>
     <label><input type="checkbox" checked={config.enabled} disabled={busy||locked} onChange={e=>setConfig({...config,enabled:e.target.checked})}/>{t(" 允许情绪分析")}</label>
     <div className="memory-settings">
       <label>{t("每几轮分析 ")}<input aria-label={t("每几轮分析")} type="number" min={1} max={10} disabled={busy} value={config.interval} onChange={e=>setConfig({...config,interval:Number(e.target.value)})}/></label>
@@ -35,6 +35,6 @@ export function EmotionPane({csrf,onHistoryCleared,onBusyChange,locked=false}:{c
     <div className="memory-actions"><button disabled={busy||locked||!data.settings.enabled} onClick={()=>void run(()=>correctEmotion(label,preference,csrf),t("已以你的纠正为准，旧对话和推测已清除。"))}>{t("以我说的为准")}</button><button className="quiet" disabled={busy} onClick={()=>void run(()=>clearEmotion(csrf),t("临时推测与短期聊天已清空。"))}>{t("清空临时推测")}</button><button className="quiet danger" disabled={busy} onClick={()=>setDeleting(true)}>{t("删除情绪设置")}</button></div>
     {deleting&&<div role="alertdialog" aria-label={t("删除情绪设置确认")}><p>{t("删除偏好与设置，关闭分析并清空短期聊天和推测？")}</p><button disabled={busy} onClick={()=>void run(async()=>{await deleteEmotionSettings(csrf);setDeleting(false);},t("设置已删除，分析已关闭。"))}>{t("确认删除")}</button><button className="quiet" disabled={busy} onClick={()=>setDeleting(false)}>{t("取消")}</button></div>}
     {error&&<p role="alert" className="pane-error">{errorText(error)}</p>}{notice&&<p role="status" className="pane-notice">{t(notice)}</p>}
-    <p className="pane-description">{t("明确自述或手动纠正会直接以你说的为准；强烈表达可能提前分析，其余默认每3轮分析最近6轮，冷却2轮。关闭后仍保留普通对话与自然关心；设置变更会撤销在途旧回复。")}</p>
+    <p className="pane-description">{t("中日自述、否认和提前触发由模型理解，只有页面手动纠正标为你的确认。完整估计默认每3轮、最近6轮、冷却2轮；提前触发也不能绕过冷却。本轮明确陪伴偏好不自动修改已保存设置。关闭后仍可普通聊天，设置变更会撤销在途旧回复。")}</p>
   </section>;
 }

@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     weather_provider: str = Field(default='openmeteo', pattern='^(openmeteo|mock)$')
     weather_understanding_mode: str = Field(default='semantic', pattern='^(semantic|legacy)$')
     weather_understanding_timeout_seconds: float = Field(default=4, ge=.1, le=10)
+    emotion_understanding_mode: str = Field(default='semantic', pattern='^(semantic|legacy)$')
+    emotion_understanding_timeout_seconds: float = Field(default=6, ge=.1, le=10)
     api_timeout_seconds: float = Field(default=30, ge=1, le=120)
     memory_understanding_mode: str = Field(default='semantic', pattern='^(semantic|legacy)$')
     memory_understanding_timeout_seconds: float = Field(default=4, ge=.1, le=10)

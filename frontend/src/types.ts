@@ -95,7 +95,7 @@ export interface WeatherEvidenceData {
 export type EmotionLabel='unknown'|'neutral'|'joy'|'sadness'|'anxiety'|'anger'|'tired';
 export type SupportPreference='ask'|'listen'|'encourage'|'practical';
 export interface EmotionSettings { enabled:boolean; interval:number; window:number; cooldown:number; threshold:number; preference:SupportPreference; }
-export interface EmotionAssessment { labels:EmotionLabel[]; intensity:number; confidence:number; evidence_message_ids:string[]; response_strategy:SupportPreference; source:'user'|'model'; turn:number; observed_at:string; }
+export interface EmotionAssessment { labels:EmotionLabel[]; intensity:number; confidence:number; evidence_message_ids:string[]; response_strategy:SupportPreference; source:'user'|'model'; basis?:'self_report'; turn:number; observed_at:string; }
 export interface EmotionData { settings:EmotionSettings; assessment:EmotionAssessment|null; }
 
 export interface GrowthAccount {

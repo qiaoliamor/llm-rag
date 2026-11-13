@@ -24,6 +24,7 @@ from .availability import BUSY_MESSAGE, CHAT_TRANSIENT_CODES, REVIEW_TRANSIENT_F
 from .weather import OpenMeteoProvider, MockWeatherProvider, WeatherError, MESSAGES, query_weather, weather_prompt, validate_city
 from . import weather_understanding as semantic_weather
 from . import weather_presentation as weather_voice
+from . import emotion_understanding as semantic_emotion
 from .emotion import EmotionState, EmotionSettingsInput, CorrectionInput, Estimate, ModelEmotionProvider, MockEmotionProvider, assess, emotion_prompt, decorate
 from .grounding import grounding_prompt
 from .memory import MemoryStore, extract_candidates, memory_prompt
@@ -123,13 +124,15 @@ class WeatherSettingsInput(BaseModel):
     city_id: int | None = Field(default=None, gt=0)
 
 
-def create_app(settings=None, provider=None, weather_provider=None, emotion_provider=None, memory_router=None, semantic_judge=None, memory_understander=None, weather_understander=None):
+def create_app(settings=None, provider=None, weather_provider=None, emotion_provider=None, memory_router=None, semantic_judge=None, memory_understander=None, weather_understander=None, emotion_understander=None):
     settings = settings or Settings()
     provider = provider or build_provider(settings)
     weather_semantic = settings.weather_understanding_mode == 'semantic'
     weather = weather_provider or (MockWeatherProvider() if settings.weather_provider == 'mock' else (semantic_weather.SemanticOpenMeteoProvider() if weather_semantic else OpenMeteoProvider()))
     weather_understander = weather_understander if weather_understander is not None else (semantic_weather.ModelWeatherUnderstanding(settings) if settings.chat_provider != 'mock' else None)
     emotion = emotion_provider or (MockEmotionProvider() if settings.chat_provider == 'mock' else ModelEmotionProvider(settings))
+    emotion_semantic = settings.emotion_understanding_mode=='semantic'
+    emotion_understander = emotion_understander if emotion_understander is not None else (semantic_emotion.ModelEmotionUnderstanding(settings) if settings.chat_provider!='mock' else None)
     analysis_type = weather_voice.WeatherAnalysisProvider if weather_semantic else (companion.CompanionAnalysisProvider if settings.dialogue_mode == 'companion' else ModelAnalysisProvider)
     auxiliary = analysis_type(settings) if settings.chat_provider != 'mock' else None
     router = memory_router if memory_router is not None else auxiliary
@@ -286,15 +289,20 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
             verify_epoch(session, snapshot['epoch'])
             mood_settings = store.emotion_settings(session.user_id)
             if not abilities['emotion']: mood_settings={**mood_settings,'enabled':False}
-            mood_result = await assess(emotion, session.emotion, mood_settings, history)
+            if emotion_semantic:
+                mood_result = await semantic_emotion.assess(emotion_understander,session.emotion,mood_settings,history,
+                    timeout=settings.emotion_understanding_timeout_seconds,verify=lambda:verify_epoch(session,snapshot['epoch']))
+                mood_settings = semantic_emotion.effective_settings(mood_result,mood_settings)
+            else:
+                mood_result = await assess(emotion, session.emotion, mood_settings, history)
             verify_epoch(session, snapshot['epoch'])
             if not weather_semantic: session.pending_weather = pending
             natural = settings.dialogue_mode == 'companion'
             if natural:
                 prompt = companion.instructions() + companion.memory_context(evidence, body.message)
-                prompt += weather_prompt(weather_result) + emotion_prompt(mood_result, mood_settings)
+                prompt += weather_prompt(weather_result) + (semantic_emotion.emotion_prompt(mood_result,mood_settings) if emotion_semantic else emotion_prompt(mood_result, mood_settings))
             else:
-                prompt = instructions() + weather_prompt(weather_result) + memory_prompt(evidence) + emotion_prompt(mood_result, mood_settings) + grounding_prompt(evidence, body.message)
+                prompt = instructions() + weather_prompt(weather_result) + memory_prompt(evidence) + (semantic_emotion.emotion_prompt(mood_result,mood_settings) if emotion_semantic else emotion_prompt(mood_result, mood_settings)) + grounding_prompt(evidence, body.message)
                 if not route.need_memory:
                     prompt += NO_MEMORY_CONTEXT
             if semantic_memory and evidence: prompt += MEMORY_CONTEXT_RULES
@@ -328,7 +336,9 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
             session.emotion.turn = turn
             if mood_result['assessment']:
                 if mood_result['status'] not in ('cached','user_override'): session.emotion.remember(mood_result['assessment'],turn)
-            else: session.emotion.assessment = None
+            elif not (emotion_semantic and mood_result['status'] in ('uncertain','unavailable')
+                      and session.emotion.current() and session.emotion.current()['source']=='user'):
+                session.emotion.assessment = None
             session.messages = (history + [{'role': 'assistant', 'content': reply, **({'weather': weather_result} if weather_result and weather_result['status'] == 'ok' else {})}])[-24:]
             return {'emotion': mood_result, 'weather': weather_result, 'reply': reply, 'request_id': request.state.request_id, 'guarded': guarded, 'memory_candidates': candidates,
                     **({'account':account_result} if account_result is not None else {}),
