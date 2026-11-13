@@ -40,3 +40,5 @@ PR #29の文書整理は5a62fcaへsquash済みです。PR #30の基本日本語�
 ## 多言語記憶理解
 
 memory_understanding.pyが資格／許可後、DBを読む前に中日共通の構造化計画を作ります。必要な場合だけ最大20件を数値検索し、意味選択した5件／1200文字を生成へ渡します。共有4秒・分析最大2回で再試行しません。手動追加／修正も原文のメタデータをモデル解析し、失敗なら原文と日付不明を維持します。表／ベクトル版を変えず、既存の候補／ポイント取引へExactMemoryを渡します。[M2](M2_MEMORY.md)が仕様入口です。
+
+人物／出所／場所はfact_presentation.py。REPLY_UNDERSTANDING_MODE=semanticでFactAnalysisProviderが現天気／情緒Promptを合成し、旧局所検査と中文選択器を迂回。自由文は共通審査、他の照合要件のない完全可信定型短句だけ省略。選択モデル追加なし。reply_policyは証拠にならず、構造／coverage／権限／epoch／天気数値はコードに残します。実品質と審査増加費用は未受入、[M5](M5_EVALUATION.md)へ。
