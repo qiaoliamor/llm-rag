@@ -27,4 +27,4 @@ PR #29–#35はレビュー後squashでmainへ提供。中日情緒返答チェ�
 
 本回の人物／記憶出所／場所返答の意味対応はPR #36レビュー後squashでmainへ提供。[M5](M5_EVALUATION.md)に設計、[テスト](TEST_HISTORY.md)に結果と失敗を集約します。
 
-今回の日語口調／記憶v2・候補開発評価・母語盲評準備は作業分岐で実装。実採点は評審待ち。[日本語対応](JAPANESE_LOCALIZATION.md)と[M2](M2_MEMORY.md)へ。
+今回の日語口調／記憶v2・候補開発評価・母語盲評準備はPR #37レビュー後mainへ提供。実採点は評審待ち。[日本語対応](JAPANESE_LOCALIZATION.md)と[M2](M2_MEMORY.md)へ。
