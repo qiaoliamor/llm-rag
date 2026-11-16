@@ -33,4 +33,4 @@ PR #29–#35はレビュー後squashでmainへ提供。中日情緒返答チェ�
 
 PR #39レビューで日語回答v3／日中口調審査v2を提供。[日語対応](JAPANESE_LOCALIZATION.md)と[テスト](TEST_HISTORY.md)へ。母語独立盲評は未実施、言語横断未命中と歴史未検証を保持。
 
-現在の作業は日問日／中問中の記憶query・選択Prompt v3と別の同言語開発回放です。旧横断未命中は対象外観測として保存。[M2](M2_MEMORY.md)／[履歴](TEST_HISTORY.md)へ。Gemini実測と独立母語盲評は未完了。
+PR #40レビュー後squashで、日問日／中問中の記憶query・選択Prompt v3と別の同言語開発回放を提供。旧横断未命中は対象外観測として保存。[M2](M2_MEMORY.md)／[履歴](TEST_HISTORY.md)へ。Gemini実測と独立母語盲評は未完了。
