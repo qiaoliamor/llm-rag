@@ -2,7 +2,7 @@
 
 [中文](../JAPANESE_LOCALIZATION.md) · [日本語](JAPANESE_LOCALIZATION.md)
 
-2026-11-16。PR #29–#37はレビュー後squashでmainへ提供、情緒返答対応は実装済み、今回もM5内の言語対応です。M6には進まず、実APIは0回です。
+2026-11-16。PR #29–#38はレビュー後squashでmainへ提供、情緒返答対応は実装済み、今回もM5内の言語対応です。M6には進まず、実APIは0回です。
 
 ## 今回の実装
 
@@ -68,4 +68,4 @@ shen-yan-ja-care-v2はlocalization.pyで旧JAPANESE_PROMPT_V1を保持し、穏�
 
 保管者は各評審に各自の包とガイドだけ渡し、mappingと原採点は私有。実装・調整に関与しない母語話者2名が相談せず独立採点し、第三者が分歧を裁決します。事実／人物／応答、自然さ・人物らしさ・配慮1〜5、Unicode断片と証拠を記録。非該当の配慮には理由を付けます。完全coverage／ID／役柄／凍結結合を検査し、一致率／κ・分歧を算出、本文／コメント／評審IDは報告に出しません。自己申告は母語性／独立性の認証ではなく、公開少数の校準は常にnot_assessed、--require-acceptanceは終了3。空白は未採点として拒否し、0点に置き換えません。実採点・裁決・正式規模・モデル効果は未受入です。[記憶](M2_MEMORY.md)と[テスト](TEST_HISTORY.md)へ。実API0、旧封存／失敗維持、M6未着手。
 
-作業分岐で日語記憶の四層回放を追加。実chat APIの候補→選択→実Prompt→最終応答を観測し、人手脚本／故障と実品質を区別。無答・主体・訂正・日中の欠落を保持。`evaluate_japanese.py --memory-layers`、[M2](M2_MEMORY.md)参照。実API／新母語採点なし、旧盲評包と結合を変更しません。
+PR #38レビュー後mainへ日語記憶の四層回放を提供。実chat APIの候補→選択→実Prompt→最終応答を観測し、人手脚本／故障と実品質を区別。無答・主体・訂正・日中の欠落を保持。`evaluate_japanese.py --memory-layers`、[M2](M2_MEMORY.md)参照。実API／新母語採点なし、旧盲評包と結合を変更しません。
