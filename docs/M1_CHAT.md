@@ -47,3 +47,5 @@ PR #27真实Gemini旧失败类型各生成一次，共2次，零裁判/重试：
 已实现中文/日本語切换、可选locale生成语言、日语演示/固定回退及IME回归。旧聊天和确认记忆原文不自动翻译；未实际调用Gemini测日语口吻，不能沿用旧中文两例推断日语自然度。实现与后续见[日语设计](JAPANESE_LOCALIZATION.md)，结果统一在[测试记录](TEST_HISTORY.md)。
 
 日语角色口吻更新为shen-yan-ja-care-v2，旧Prompt保留；常体/称呼省略/倾听与自然闲聊的设计、12条编辑校准材料和待独立母语人评状态见[日语适配](JAPANESE_LOCALIZATION.md)。本轮没有真实模型前后对照，不宣称已提升自然度。
+
+日语回答口吻现为shen-yan-ja-care-v3，中日审查v2；原Prompt保留，细节见[日语适配](JAPANESE_LOCALIZATION.md)。不新增正则/模型调用，不将合成回复当自然度验收。
