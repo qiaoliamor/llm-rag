@@ -13,7 +13,7 @@ from fastapi.testclient import TestClient
 from app.config import Settings
 from app.main import create_app
 from app.progression import Bond
-from app.localization import JAPANESE_PROMPT, JAPANESE_PROMPT_V1, JAPANESE_STYLE_VERSION
+from app.localization import JAPANESE_PROMPT, JAPANESE_PROMPT_V1, JAPANESE_PROMPT_V2, JAPANESE_STYLE_VERSION
 from app.memory_understanding import (ModelMemoryUnderstanding, MemoryPlan, PLAN_PROMPT, PLAN_PROMPT_V1,
     POLICY_VERSION, understand)
 
@@ -48,6 +48,26 @@ def test_real_sdk_payload_preserves_v1_and_adds_japanese_v2_without_live_calls()
     assert isinstance(asyncio.run(run()),MemoryPlan) and len(calls)==1
     assert JAPANESE_PROMPT.startswith(JAPANESE_PROMPT_V1) and JAPANESE_STYLE_VERSION in JAPANESE_PROMPT
     assert POLICY_VERSION=='multilingual-memory-ja-v2'
+
+
+@pytest.mark.parametrize('locale,message,reply',[
+    ('ja-JP','こんにちは','こんにちは。今日はのんびりしているよ。'),
+    ('zh-CN','你好','你好，今天过得怎么样？'),
+    ('ja-JP','店はどんな感じ？','静かだよ。時々、ページをめくる音がする。'),
+    ('zh-CN','店里怎么样？','店里挺安静的，偶尔有翻书的沙沙声。'),
+])
+def test_v3_default_chat_payload_and_scripted_response_do_not_require_memory(env,locale,message,reply):
+    """Contract replay only: the provider/judge supply authored responses, not predictions."""
+    x=env
+    x.provider.generate.return_value=reply
+    r=x.c.post('/v1/chat',headers=x.h,json={'message':message,'locale':locale})
+    assert r.status_code==200 and r.json()['reply']==reply
+    prompt=x.provider.generate.call_args.args[1]
+    assert (JAPANESE_PROMPT in prompt)==(locale=='ja-JP')
+    assert JAPANESE_PROMPT.startswith(JAPANESE_PROMPT_V2)
+    assert JAPANESE_STYLE_VERSION=='shen-yan-ja-care-v3'
+    assert r.json()['retrieved_memory_ids']==[]
+    x.analyst.select.assert_not_awaited()
 
 
 @pytest.mark.parametrize('text,subject,actuality,accepted_count',[

@@ -96,6 +96,31 @@ def test_semantic_review_can_accept_recent_assertion_invitation_atmosphere_or_ne
     assert next(x for x in bundle if x['id']=='user_0')['current'] is True
 
 
+@pytest.mark.parametrize('bad,good,locale',[
+    ('具体的な店内状況は確認できません。','静かだよ。時々、ページをめくる音がする。','ja-JP'),
+    ('具体近况我还不能确定。','店里挺安静的，偶尔能听到翻书声。','zh-CN'),
+])
+def test_scripted_style_issue_rewrites_without_inventing_a_fact_issue(bad,good,locale):
+    # Author labels exercise role_issues independently of facts; not an LLM style test.
+    judge=SimpleNamespace(review=AsyncMock(side_effect=[judgment(bad,role=True),judgment(good)]))
+    (reply,guarded,status),g=run([bad,good],judge,locale=locale)
+    assert reply==good and guarded and status['calls']==2
+    assert 'role_mismatch' in g.generate.call_args.args[1]
+
+
+@pytest.mark.parametrize('locale,text',[
+    ('ja-JP','その本の在庫は、まだ確認していないんだ。'),
+    ('zh-CN','那本书的库存我还没确认。'),
+    ('ja-JP','うん。今日はゆっくりしよう。'),
+    ('zh-CN','嗯，今天就慢慢聊吧。'),
+])
+def test_scripted_uncertainty_or_short_chat_is_not_overridden_by_local_regex(locale,text):
+    judge=SimpleNamespace(review=AsyncMock(return_value=judgment(text)))
+    (reply,guarded,status),g=run([text],judge,locale=locale)
+    assert reply==text and not guarded and status['calls']==1
+    g.generate.assert_awaited_once()
+
+
 @pytest.mark.parametrize('locale',['ja-JP','zh-CN'])
 @pytest.mark.parametrize('enabled',[True,False])
 def test_missing_judge_or_review_off_returns_nonfactual_localized_safe_reply(locale,enabled):
@@ -133,15 +158,18 @@ def test_repeated_bad_reply_uses_language_fallback_and_two_call_limit(locale):
 @pytest.mark.parametrize('mode',['companion','audit'])
 @pytest.mark.parametrize('weather_mode',['semantic','legacy'])
 @pytest.mark.parametrize('emotion_mode',['semantic','legacy'])
-def test_sdk_composition_and_control_policy_only_mock_transport(mode,weather_mode,emotion_mode):
+@pytest.mark.parametrize('locale',['zh-CN','ja-JP'])
+def test_sdk_composition_and_control_policy_only_mock_transport(mode,weather_mode,emotion_mode,locale):
     calls=[]
     def handler(request):
         body=json.loads(request.content);calls.append(body)
         prompt=body['messages'][0]['content'];data=json.loads(body['messages'][1]['content'])
         assert f.REVIEW_PROMPT_EXTRA in prompt
+        assert f.REVIEW_PROMPT_EXTRA.startswith(f.REVIEW_PROMPT_EXTRA_V1)
+        assert f.POLICY_VERSION in prompt
         assert (f.WEATHER_REVIEW in prompt)==(weather_mode=='semantic')
         assert (f.EMOTION_REVIEW in prompt)==(emotion_mode=='semantic')
-        assert next(x['data'] for x in data['evidence'] if x['id']=='reply_policy')['reply_locale']=='ja-JP'
+        assert next(x['data'] for x in data['evidence'] if x['id']=='reply_policy')['reply_locale']==locale
         result={'confidence':.95,'role_issues':[],'units':[{'id':u['id'],'kind':'nonfactual','verdict':'not_applicable','evidence_ids':[]} for u in data['units']]}
         return httpx.Response(200,json={'id':'synthetic','object':'chat.completion','created':0,'model':'synthetic','choices':[
             {'index':0,'finish_reason':'stop','message':{'role':'assistant','content':json.dumps(result)}}]})
@@ -150,7 +178,7 @@ def test_sdk_composition_and_control_policy_only_mock_transport(mode,weather_mod
             settings=Settings(_env_file=None,chat_provider='gemini',gemini_api_key='synthetic-not-a-key',dialogue_mode=mode,
                 weather_understanding_mode=weather_mode,emotion_understanding_mode=emotion_mode,reply_understanding_mode='semantic')
             evidence=evidence_bundle([{'role':'user','content':'合成会話'}],MEMORIES,None,None)
-            evidence.append({'id':'reply_policy','kind':'reply_policy','data':{'reply_locale':'ja-JP'}})
+            evidence.append({'id':'reply_policy','kind':'reply_policy','data':{'reply_locale':locale}})
             return await review_reply(f.FactAnalysisProvider(settings,client),'こんにちは。',[],evidence)
     assert asyncio.run(check()).status=='accept' and len(calls)==1
 

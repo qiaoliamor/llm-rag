@@ -421,3 +421,22 @@ CLI的父进程不导入默认网页app；子进程main导入前禁dotenv并固�
 - 文档引用/语法/JSON/差异与暂存敏感内容检查通过；线上逻辑/Prompt、原盲评材料和绑定、原开发集、封存v1/v2及源绑定资料未改。无新增表/索引/UI，适用确认/纠正/隔离/持久化/删除/撤回/失败由合成回归覆盖。
 
 按本次PR #38 squash交付main、快进同步并核对受测任务分支文件树后清理分支。真实模型/天气/支付API0，未显示/上传密钥，未读取真实对话/记忆或评分原件；脚本输出不是实际模型/人评成绩。母语独立盲评/真实选择与生成审查/独立参考/复杂语义/可用率与成本继续未验收。保留跨语言缺口、全部故障、上下文同ID改正文评分器缺陷红绿回归与弃用警告记录、旧15漏检/5误拦截/1未决、503/8.003秒timeout/CLI退出1及全部历史失败/未验证项。M5未整体验收，M6未开始。
+
+## 日语回答v3与中日口吻审查v2（2026-11-16，任务分支）
+
+只调整Prompt及盲评指南/离线回归；无前端或持久化结构变动，无新增语义正则。V1/V2回答和v1审查原文保留。API原回复/真实模型耗时不适用：本轮模型调用0，不调用Gemini/Open-Meteo，不重采样；没有母语评审/评分原件。
+
+| 本轮命令 | 结果及耗时 | 适用边界 |
+| --- | --- | --- |
+| `.venv/bin/python -m pytest -q tests/japanese_evaluation tests/japanese_layers tests/multilingual_facts tests/multilingual_memory` | 230通过/54跳过，5.73秒 | SDK MockTransport、默认semantic/companion/growth路径、原文/确认/纠正/删除/授权/重写/失败等合成回归 |
+| `.venv/bin/python -m pytest -q` | 1391通过/146跳过，23.25秒 | 含旧legacy/audit覆盖，不能全称默认路径 |
+| `.venv/bin/python scripts/test_postgres.py --semantic-memory` | 303通过，16.71秒 | 创建并删除独立临时PG；与全量重叠，不相加 |
+| `.venv/bin/python scripts/evaluate_japanese.py` | 12查询；原问题1/9、人工查询8/9、查询+类型9/9；无答案误候选分别1/3、1/3、3/3 | 实际字符候选召回，人工oracle非模型预测，未改善历史缺口 |
+| `.venv/bin/python scripts/evaluate_japanese.py --memory-layers` | 8基准/31回放；基准完整7/8，1跨语言未命中；投影不一致0；故障注入5不支持回复仍保留 | 200×27、504×1、503×1、409×2；均预置故障，不是本轮真实服务失败 |
+| 新目录调用`app.japanese_evaluation.prepare` | 两份12题空包、当前binding及空评分逐项校验通过 | 仓库外新临时目录，旧包不动；非新模型盲评结果 |
+| `scripts/check_sealed_evaluation.py`、`scripts/audit_narrative_references.py` | 通过；24公开候选not_assessed、38例/34源 | 封存v1/v2、历史原文与审计保留 |
+| 差异检查/本地Markdown链接、Python/JSON语法、秘密值与私有导出检查 | 通过 | 未提交.env/密钥/数据库/真实对话/评分原件；未改前端，本轮不重复其测试/构建 |
+
+新增合成口吻回归例：`具体的な店内状況は確認できません。`→`静かだよ。時々、ページをめくる音がする。`；中文`具体近况我还不能确定。`→`店里挺安静的，偶尔能听到翻书声。`。这些是作者预置原句/改写和role_issues，不是模型前后实测；另保留库存未知、简短闲聊可接受的反例，不能据此说裁判实际理解正确。正常/非法结构、权限、失败/撤回与CRUD沿用受影响完整套件；无新数据接口，新增CRUD不适用。本轮自动化没有新增失败，历史失败/未知和跨语言缺口不消除。
+
+新版空包更换了Prompt/指南源码哈希；旧12条编辑数据与旧绑定不改，旧评分不可导入新版mapping。两位独立母语评审、真实标注/裁决、真实模型语义与自然度/成本仍未验证；M5未验收，M6未开始。
