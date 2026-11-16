@@ -1,0 +1,670 @@
+{
+  "version": "ja-memory-layers-author-dev-v1",
+  "source": "synthetic_author_exposed",
+  "cases": [
+    {
+      "id": "no-answer",
+      "group": "no_answer",
+      "locale": "ja-JP",
+      "message": "飼っている犬の名前は？",
+      "retrieval_query": "猫 犬 名前",
+      "target_slots": [],
+      "need_memory": true,
+      "documents": [
+        {
+          "id": "cat",
+          "fact": "飼っている猫の名前は合成ミル。",
+          "slot": "event"
+        }
+      ],
+      "relevant": [],
+      "wrong_evidence": "cat",
+      "responses": [
+        {
+          "id": "grounded",
+          "text": "名前のこと、もう少し聞かせて。",
+          "claims": [
+            {
+              "text": "名前のこと、もう少し聞かせて。",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        },
+        {
+          "id": "bad",
+          "text": "犬の名前は合成ミルだったね。",
+          "claims": [
+            {
+              "text": "犬の名前は合成ミルだったね。",
+              "support": "unsupported",
+              "required_sources": []
+            }
+          ]
+        },
+        {
+          "id": "safe",
+          "text": "もう少し、あなたの言葉で聞かせて。",
+          "claims": [
+            {
+              "text": "もう少し、あなたの言葉で聞かせて。",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "id": "reference"
+        },
+        {
+          "id": "wrong-known-accept",
+          "selection": "wrong_known",
+          "generation": "bad",
+          "review": "false_accept",
+          "retrieval": "force"
+        },
+        {
+          "id": "wrong-known-rewrite",
+          "selection": "wrong_known",
+          "generation": "bad",
+          "review": "reject_bad",
+          "retrieval": "force"
+        }
+      ]
+    },
+    {
+      "id": "subject-sister",
+      "group": "subject",
+      "locale": "ja-JP",
+      "message": "妹の面接先、覚えてる？",
+      "retrieval_query": "面接 合成社",
+      "target_slots": [],
+      "need_memory": true,
+      "documents": [
+        {
+          "id": "own",
+          "fact": "私は合成葵社の面接を受けました。",
+          "slot": "event"
+        },
+        {
+          "id": "sister",
+          "fact": "妹は合成桔梗社の面接を受けました。",
+          "slot": "event"
+        }
+      ],
+      "relevant": [
+        "sister"
+      ],
+      "wrong_evidence": "own",
+      "responses": [
+        {
+          "id": "grounded",
+          "text": "妹さんが受けたのは合成桔梗社だったね。",
+          "claims": [
+            {
+              "text": "妹さんが受けたのは合成桔梗社だったね。",
+              "support": "supported",
+              "required_sources": [
+                "memory_sister"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bad",
+          "text": "妹さんは合成葵社を受けたんだね。",
+          "claims": [
+            {
+              "text": "妹さんは合成葵社を受けたんだね。",
+              "support": "unsupported",
+              "required_sources": []
+            }
+          ]
+        },
+        {
+          "id": "safe",
+          "text": "もう少し、あなたの言葉で聞かせて。",
+          "claims": [
+            {
+              "text": "もう少し、あなたの言葉で聞かせて。",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "id": "reference"
+        },
+        {
+          "id": "wrong-known-accept",
+          "selection": "wrong_known",
+          "generation": "bad",
+          "review": "false_accept",
+          "retrieval": "force"
+        },
+        {
+          "id": "wrong-known-rewrite",
+          "selection": "wrong_known",
+          "generation": "bad",
+          "review": "reject_bad",
+          "retrieval": "force"
+        }
+      ]
+    },
+    {
+      "id": "current-correction",
+      "group": "correction",
+      "locale": "ja-JP",
+      "message": "前は合成旧町だったけど、今は合成新町に住んでる。今の住まいはどこ？",
+      "retrieval_query": "合成旧町 住んで",
+      "target_slots": [],
+      "need_memory": false,
+      "documents": [
+        {
+          "id": "old",
+          "fact": "合成旧町に住んでいます。",
+          "slot": "city"
+        }
+      ],
+      "relevant": [],
+      "wrong_evidence": "old",
+      "responses": [
+        {
+          "id": "grounded",
+          "text": "今は合成新町なんだね。",
+          "claims": [
+            {
+              "text": "今は合成新町なんだね。",
+              "support": "supported",
+              "required_sources": [
+                "user_current"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bad",
+          "text": "今も合成旧町に住んでいるね。",
+          "claims": [
+            {
+              "text": "今も合成旧町に住んでいるね。",
+              "support": "unsupported",
+              "required_sources": []
+            }
+          ]
+        },
+        {
+          "id": "safe",
+          "text": "もう少し、あなたの言葉で聞かせて。",
+          "claims": [
+            {
+              "text": "もう少し、あなたの言葉で聞かせて。",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "id": "reference"
+        },
+        {
+          "id": "wrong-known-accept",
+          "selection": "wrong_known",
+          "generation": "bad",
+          "review": "false_accept",
+          "retrieval": "force"
+        },
+        {
+          "id": "wrong-known-rewrite",
+          "selection": "wrong_known",
+          "generation": "bad",
+          "review": "reject_bad",
+          "retrieval": "force"
+        }
+      ]
+    },
+    {
+      "id": "persisted-correction",
+      "group": "correction",
+      "locale": "ja-JP",
+      "message": "今の住所を覚えてる？",
+      "retrieval_query": "合成 住んで",
+      "target_slots": [
+        "residence"
+      ],
+      "need_memory": true,
+      "documents": [
+        {
+          "id": "new",
+          "fact": "合成新市に住んでいます。",
+          "slot": "city"
+        },
+        {
+          "id": "old",
+          "fact": "合成旧市に住んでいます。",
+          "slot": "city",
+          "status": "superseded"
+        },
+        {
+          "id": "pending",
+          "fact": "合成候補市に住んでいます。",
+          "slot": "city",
+          "status": "candidate"
+        },
+        {
+          "id": "deleted",
+          "fact": "合成削除市に住んでいます。",
+          "slot": "city",
+          "deleted": true
+        },
+        {
+          "id": "foreign",
+          "fact": "合成他人市に住んでいます。",
+          "slot": "city",
+          "owner": "other"
+        },
+        {
+          "id": "other-role",
+          "fact": "合成他役市に住んでいます。",
+          "slot": "city",
+          "character": "other"
+        }
+      ],
+      "relevant": [
+        "new"
+      ],
+      "wrong_evidence": null,
+      "responses": [
+        {
+          "id": "grounded",
+          "text": "合成新市だと覚えているよ。",
+          "claims": [
+            {
+              "text": "合成新市だと覚えているよ。",
+              "support": "supported",
+              "required_sources": [
+                "memory_new"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bad",
+          "text": "合成旧市だったね。",
+          "claims": [
+            {
+              "text": "合成旧市だったね。",
+              "support": "unsupported",
+              "required_sources": []
+            }
+          ]
+        },
+        {
+          "id": "safe",
+          "text": "もう少し、あなたの言葉で聞かせて。",
+          "claims": [
+            {
+              "text": "もう少し、あなたの言葉で聞かせて。",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "id": "reference"
+        },
+        {
+          "id": "old-id-after-correction",
+          "selection": "outside_id",
+          "generation": "safe"
+        }
+      ]
+    },
+    {
+      "id": "ja-query-zh-memory",
+      "group": "cross_language",
+      "locale": "ja-JP",
+      "message": "うちの猫の名前は？",
+      "retrieval_query": "猫 名字",
+      "target_slots": [],
+      "need_memory": true,
+      "documents": [
+        {
+          "id": "cat-cn",
+          "fact": "我养的猫叫合成米粒。",
+          "slot": "event"
+        }
+      ],
+      "relevant": [
+        "cat-cn"
+      ],
+      "wrong_evidence": null,
+      "responses": [
+        {
+          "id": "grounded",
+          "text": "合成米粒だったね。",
+          "claims": [
+            {
+              "text": "合成米粒だったね。",
+              "support": "supported",
+              "required_sources": [
+                "memory_cat-cn"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bad",
+          "text": "合成小麦だったね。",
+          "claims": [
+            {
+              "text": "合成小麦だったね。",
+              "support": "unsupported",
+              "required_sources": []
+            }
+          ]
+        },
+        {
+          "id": "safe",
+          "text": "もう少し、あなたの言葉で聞かせて。",
+          "claims": [
+            {
+              "text": "もう少し、あなたの言葉で聞かせて。",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "id": "reference"
+        }
+      ]
+    },
+    {
+      "id": "zh-query-ja-memory",
+      "group": "cross_language",
+      "locale": "zh-CN",
+      "message": "我喜欢喝什么？",
+      "retrieval_query": "紅茶 コーヒー 好き",
+      "target_slots": [
+        "preference"
+      ],
+      "need_memory": true,
+      "documents": [
+        {
+          "id": "tea",
+          "fact": "コーヒーより紅茶が好きです。",
+          "slot": "preference:tea"
+        }
+      ],
+      "relevant": [
+        "tea"
+      ],
+      "wrong_evidence": null,
+      "responses": [
+        {
+          "id": "grounded",
+          "text": "你更喜欢红茶。",
+          "claims": [
+            {
+              "text": "你更喜欢红茶。",
+              "support": "supported",
+              "required_sources": [
+                "memory_tea"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bad",
+          "text": "你最喜欢咖啡。",
+          "claims": [
+            {
+              "text": "你最喜欢咖啡。",
+              "support": "unsupported",
+              "required_sources": []
+            }
+          ]
+        },
+        {
+          "id": "safe",
+          "text": "你愿意再多说一点吗？",
+          "claims": [
+            {
+              "text": "你愿意再多说一点吗？",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "id": "reference"
+        }
+      ]
+    },
+    {
+      "id": "childhood-vs-current",
+      "group": "subject",
+      "locale": "ja-JP",
+      "message": "子どもの頃に住んでいた町は？",
+      "retrieval_query": "住んで 町",
+      "target_slots": [],
+      "need_memory": true,
+      "documents": [
+        {
+          "id": "childhood",
+          "fact": "子どもの頃は合成港町に住んでいました。",
+          "slot": "event"
+        },
+        {
+          "id": "current",
+          "fact": "今は合成桜町に住んでいます。",
+          "slot": "city"
+        }
+      ],
+      "relevant": [
+        "childhood"
+      ],
+      "wrong_evidence": "current",
+      "responses": [
+        {
+          "id": "grounded",
+          "text": "子どもの頃は合成港町だったね。",
+          "claims": [
+            {
+              "text": "子どもの頃は合成港町だったね。",
+              "support": "supported",
+              "required_sources": [
+                "memory_childhood"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bad",
+          "text": "子どもの頃は合成桜町だったね。",
+          "claims": [
+            {
+              "text": "子どもの頃は合成桜町だったね。",
+              "support": "unsupported",
+              "required_sources": []
+            }
+          ]
+        },
+        {
+          "id": "safe",
+          "text": "もう少し、あなたの言葉で聞かせて。",
+          "claims": [
+            {
+              "text": "もう少し、あなたの言葉で聞かせて。",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "id": "reference"
+        },
+        {
+          "id": "wrong-known-accept",
+          "selection": "wrong_known",
+          "generation": "bad",
+          "review": "false_accept",
+          "retrieval": "force"
+        },
+        {
+          "id": "wrong-known-rewrite",
+          "selection": "wrong_known",
+          "generation": "bad",
+          "review": "reject_bad",
+          "retrieval": "force"
+        }
+      ]
+    },
+    {
+      "id": "source-time",
+      "group": "source_time",
+      "locale": "ja-JP",
+      "message": "名前を覚えてる？",
+      "retrieval_query": "名前",
+      "target_slots": [
+        "name"
+      ],
+      "need_memory": true,
+      "documents": [
+        {
+          "id": "name",
+          "fact": "名前は合成葵です。",
+          "slot": "name",
+          "event_date": "2026-11-16"
+        }
+      ],
+      "relevant": [
+        "name"
+      ],
+      "wrong_evidence": null,
+      "responses": [
+        {
+          "id": "grounded",
+          "text": "合成葵という名前は覚えているよ。",
+          "claims": [
+            {
+              "text": "合成葵という名前は覚えているよ。",
+              "support": "supported",
+              "required_sources": [
+                "memory_name"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bad",
+          "text": "さっき合成葵と教えてくれたね。",
+          "claims": [
+            {
+              "text": "さっき合成葵と教えてくれたね。",
+              "support": "unsupported",
+              "required_sources": []
+            }
+          ]
+        },
+        {
+          "id": "safe",
+          "text": "もう少し、あなたの言葉で聞かせて。",
+          "claims": [
+            {
+              "text": "もう少し、あなたの言葉で聞かせて。",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "id": "reference"
+        },
+        {
+          "id": "selector-outside_id",
+          "selection": "outside_id",
+          "generation": "safe"
+        },
+        {
+          "id": "selector-duplicate",
+          "selection": "duplicate",
+          "generation": "safe"
+        },
+        {
+          "id": "selector-malformed",
+          "selection": "malformed",
+          "generation": "safe"
+        },
+        {
+          "id": "selector-low_confidence",
+          "selection": "low_confidence",
+          "generation": "safe"
+        },
+        {
+          "id": "selector-timeout",
+          "selection": "timeout",
+          "generation": "safe"
+        },
+        {
+          "id": "selector-empty",
+          "selection": "empty",
+          "generation": "safe"
+        },
+        {
+          "id": "generation-timeout",
+          "generation": "timeout"
+        },
+        {
+          "id": "review-timeout",
+          "review": "timeout"
+        },
+        {
+          "id": "memory-off",
+          "access": "disabled",
+          "generation": "safe"
+        },
+        {
+          "id": "memory-locked",
+          "access": "locked",
+          "generation": "safe"
+        },
+        {
+          "id": "revoke-in-flight",
+          "during_select": "revoke"
+        },
+        {
+          "id": "delete-in-flight",
+          "during_select": "delete"
+        },
+        {
+          "id": "unsupported-time-accept",
+          "generation": "bad",
+          "review": "false_accept"
+        },
+        {
+          "id": "unsupported-time-rewrite",
+          "generation": "bad",
+          "review": "reject_bad"
+        }
+      ]
+    }
+  ]
+}

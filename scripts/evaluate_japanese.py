@@ -10,8 +10,14 @@ from app.japanese_evaluation import evaluate_recall, prepare, binding
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--prepare-annotation',type=Path)
+    parser.add_argument('--memory-layers',action='store_true',help='Replay four memory layers with scripted models in an isolated worker')
     args=parser.parse_args()
+    if args.memory_layers and args.prepare_annotation:parser.error('Layer replay and annotation preparation are separate commands')
     try:
+        if args.memory_layers:
+            from app.japanese_memory_layers import evaluate
+            print(json.dumps(evaluate(),ensure_ascii=False,indent=2))
+            return 0
         report=evaluate_recall()
         report['binding']=binding()
         if args.prepare_annotation:report['annotation']=prepare(args.prepare_annotation)
