@@ -24,6 +24,7 @@ def write_report(path,report):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--japanese',action='store_true',help='Use the public Japanese editorial calibration packet, never formal acceptance')
     parser.add_argument('--mapping',type=Path,required=True)
     parser.add_argument('--rater-a',type=Path,required=True)
     parser.add_argument('--rater-b',type=Path)
@@ -32,7 +33,11 @@ def main():
     args=parser.parse_args()
     try:
         paths=[args.rater_a]+([args.rater_b] if args.rater_b else [])
-        report=score_files(args.mapping,paths)
+        if args.japanese:
+            from app.japanese_evaluation import score_files as score_japanese
+            report=score_japanese(args.mapping,paths)
+        else:
+            report=score_files(args.mapping,paths)
         write_report(args.output,report)
         print(json.dumps({'tasks':report['tasks'],'submissions':report['submissions'],
                           'disagreements':report['disagreement_count'],

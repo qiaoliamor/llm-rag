@@ -1,0 +1,199 @@
+{
+  "version": "ja-memory-author-dev-v1",
+  "source": "synthetic_author_exposed",
+  "documents": [
+    {
+      "id": "j1",
+      "fact": "名前は合成葵です。",
+      "slot": "name"
+    },
+    {
+      "id": "j2",
+      "fact": "合成桜ヶ丘市に住んでいます。",
+      "slot": "city"
+    },
+    {
+      "id": "j3",
+      "fact": "コーヒーより紅茶が好きです。",
+      "slot": "preference:tea"
+    },
+    {
+      "id": "j4",
+      "fact": "合成青梧社の編集職の面接があります。",
+      "slot": "event:appointment:interview"
+    },
+    {
+      "id": "j5",
+      "fact": "子どもの頃は合成港町に住んでいました。",
+      "slot": "event"
+    },
+    {
+      "id": "j6",
+      "fact": "我养的猫叫合成米粒。",
+      "slot": "event"
+    },
+    {
+      "id": "j7",
+      "fact": "妹の名前は合成凛です。",
+      "slot": "event"
+    },
+    {
+      "id": "j8",
+      "fact": "私の名前は合成別人です。",
+      "slot": "name",
+      "owner": "other"
+    },
+    {
+      "id": "j9",
+      "fact": "合成旧町に住んでいます。",
+      "slot": "city",
+      "status": "candidate"
+    },
+    {
+      "id": "j10",
+      "fact": "合成削除町に住んでいます。",
+      "slot": "city",
+      "deleted": true
+    },
+    {
+      "id": "j11",
+      "fact": "合成期限社の面接があります。",
+      "slot": "event:appointment:expired",
+      "expired": true
+    },
+    {
+      "id": "j12",
+      "fact": "合成他役町に住んでいます。",
+      "slot": "city",
+      "character": "other"
+    }
+  ],
+  "queries": [
+    {
+      "id": "name-kana",
+      "message": "なまえ、覚えてる？",
+      "authored_query": "名前 名字",
+      "target_slots": [
+        "name"
+      ],
+      "relevant": [
+        "j1"
+      ]
+    },
+    {
+      "id": "name-paraphrase",
+      "message": "どう呼べばいいか覚えてる？",
+      "authored_query": "名前 名字",
+      "target_slots": [
+        "name"
+      ],
+      "relevant": [
+        "j1"
+      ]
+    },
+    {
+      "id": "residence",
+      "message": "住まいはどこだった？",
+      "authored_query": "住んで 住址",
+      "target_slots": [
+        "residence"
+      ],
+      "relevant": [
+        "j2"
+      ]
+    },
+    {
+      "id": "preference",
+      "message": "飲み物の好み、覚えてる？",
+      "authored_query": "紅茶 コーヒー 好き",
+      "target_slots": [
+        "preference"
+      ],
+      "relevant": [
+        "j3"
+      ]
+    },
+    {
+      "id": "interview",
+      "message": "選考のことで話したの、覚えてる？",
+      "authored_query": "面接 面试",
+      "target_slots": [
+        "appointment"
+      ],
+      "relevant": [
+        "j4"
+      ]
+    },
+    {
+      "id": "childhood",
+      "message": "小さい頃にいた町って？",
+      "authored_query": "子どもの頃 住んで",
+      "target_slots": [
+        "history"
+      ],
+      "relevant": [
+        "j5"
+      ]
+    },
+    {
+      "id": "cross-language",
+      "message": "うちの猫の名前は？",
+      "authored_query": "猫 名字 名前",
+      "target_slots": [
+        "history"
+      ],
+      "relevant": [
+        "j6"
+      ]
+    },
+    {
+      "id": "sister-subject",
+      "message": "妹の名前、覚えてる？",
+      "authored_query": "妹 名前",
+      "target_slots": [
+        "history"
+      ],
+      "relevant": [
+        "j7"
+      ]
+    },
+    {
+      "id": "chinese-query",
+      "message": "我住的地方叫什么？",
+      "authored_query": "住址 住んで",
+      "target_slots": [
+        "residence"
+      ],
+      "relevant": [
+        "j2"
+      ]
+    },
+    {
+      "id": "no-answer-dog",
+      "message": "飼っている犬の名前は？",
+      "authored_query": "犬 名前",
+      "target_slots": [
+        "history"
+      ],
+      "relevant": []
+    },
+    {
+      "id": "no-answer-school",
+      "message": "出身高校は？",
+      "authored_query": "高校 学校",
+      "target_slots": [
+        "history"
+      ],
+      "relevant": []
+    },
+    {
+      "id": "no-answer-birthday",
+      "message": "誕生日を覚えてる？",
+      "authored_query": "誕生日",
+      "target_slots": [
+        "other"
+      ],
+      "relevant": []
+    }
+  ]
+}
