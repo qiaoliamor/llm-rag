@@ -19,6 +19,7 @@ from .sealed_evaluation import ROOT, Record
 from .japanese_evaluation import RecallDocument
 
 DATASET=ROOT/'evaluations/japanese/memory_layers_v1.json'
+SAME_LANGUAGE_DATASET=ROOT/'evaluations/japanese/same_language_memory_v1.json'
 SOURCES=('app/main.py','app/memory.py','app/memory_understanding.py','app/fact_presentation.py',
          'app/reply_pipeline.py','app/localization.py','app/japanese_memory_layers.py')
 
@@ -87,7 +88,7 @@ class Case(Record):
 
 
 class Suite(Record):
-    version: Literal['ja-memory-layers-author-dev-v1']
+    version: Literal['ja-memory-layers-author-dev-v1','same-language-memory-author-dev-v1']
     source: Literal['synthetic_author_exposed']
     cases: list[Case]=Field(min_length=1)
 
@@ -273,7 +274,9 @@ def evaluate(path=DATASET):
         rows=json.loads(result.stdout)
     expected={(c.id,p.id) for c in suite.cases for p in c.probes}
     if len(rows)!=len(expected) or {(r['case'],r['probe']) for r in rows}!=expected:raise ValueError('incomplete replay')
-    return {'mode':'ja-memory-layers-scripted-dev-v1','model_calls':0,'assessment':'not_assessed',
+    return {'mode':'same-language-memory-scripted-dev-v1' if suite.version=='same-language-memory-author-dev-v1' else 'ja-memory-layers-scripted-dev-v1',
+        'scope':'same_language' if suite.version=='same-language-memory-author-dev-v1' else 'historical_mixed_language',
+        'model_calls':0,'assessment':'not_assessed',
         'dataset_sha256':hashlib.sha256(Path(path).read_bytes()).hexdigest(),
         'source_sha256':{p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in SOURCES},
         'configuration':{'dialogue_mode':'companion','growth_enabled':True,'memory':'semantic','weather':'semantic','emotion':'semantic','reply':'semantic'},

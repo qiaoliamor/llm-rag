@@ -154,6 +154,43 @@ def test_actual_structured_sdk_contract_uses_fixed_prompt_and_mock_transport():
     assert '没有答案' in SELECT_PROMPT
 
 
+@pytest.mark.parametrize('message,query',[
+    ('妹妹面试的公司还记得吗？','妹妹 面试'),
+    ('妹の面接先、覚えてる？','妹 面接'),
+])
+def test_v3_plan_and_selection_prompts_use_real_sdk_with_scripted_same_language_results(message,query):
+    from app.memory_understanding import PLAN_PROMPT_V2, SELECT_PROMPT_V1, POLICY_VERSION
+    requests=[]
+    def handler(request):
+        body=json.loads(request.content);requests.append(body)
+        prompt=body['messages'][0]['content'];data=json.loads(body['messages'][1]['content'])
+        if len(requests)==1:
+            assert prompt==PLAN_PROMPT and PLAN_PROMPT.startswith(PLAN_PROMPT_V2)
+            assert data['current_message']==message
+            value=plan(need=True,query=query)
+        else:
+            assert prompt==SELECT_PROMPT and SELECT_PROMPT.startswith(SELECT_PROMPT_V1)
+            assert data['query']==query and data['recent_dialogue'][-1]['content']==message
+            assert [m['id'] for m in data['candidates']]==['own','sister']
+            value={'ids':['sister'],'confidence':.95}
+        assert POLICY_VERSION in prompt and body['response_format']['type']=='json_schema'
+        return httpx.Response(200,json={'id':'synthetic','object':'chat.completion','created':0,'model':'synthetic',
+            'choices':[{'index':0,'finish_reason':'stop','message':{'role':'assistant','content':json.dumps(value)}}]})
+    async def run():
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            p=ModelMemoryUnderstanding(Settings(_env_file=None,chat_provider='gemini',gemini_api_key='synthetic-not-a-key'),client)
+            history=[{'role':'user','content':message}]
+            understood=await understand(p,message,history,enabled=True,tz='Asia/Tokyo',now=NOW)
+            assert understood.status=='ready' and understood.plan.query==query
+            facts=['我参加了合成青梧社的面试。','妹妹参加了合成桔梗社的面试。'] if message.startswith('妹妹') else ['私は合成葵社の面接を受けました。','妹は合成桔梗社の面接を受けました。']
+        # The SDK owns/closes its injected client per parse; match production's fresh client per call.
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as selection_client:
+            p=ModelMemoryUnderstanding(Settings(_env_file=None,chat_provider='gemini',gemini_api_key='synthetic-not-a-key'),selection_client)
+            return await select_evidence(p,query,history,[{'id':id,'fact':fact,'event_date':None} for id,fact in zip(('own','sister'),facts)])
+    selected,status=asyncio.run(run())
+    assert status=='selected' and [m['id'] for m in selected]==['sister'] and len(requests)==2
+
+
 def test_only_recent_text_is_sent_not_tool_snapshots_or_private_extensions():
     history=[{'role':'assistant','content':'合成の短い会話','weather':{'location':'synthetic hidden place'},'private':'synthetic hidden extension'}]
     provider=SimpleNamespace(analyze=AsyncMock(return_value=plan()),select=AsyncMock(return_value={'ids':[],'confidence':.95}))
