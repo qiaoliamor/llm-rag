@@ -1,0 +1,83 @@
+"""Offline runner contracts; all model judgments here are authored, not predictions."""
+import asyncio
+import json
+import os
+import subprocess
+import sys
+import pytest
+from app.config import Settings
+from scripts import retest_memory_canon as smoke
+
+
+def setup(monkeypatch,failed=False):
+    class Analyst:
+        def __init__(self,settings):pass
+        async def analyze(self,data):
+            return {'memory_use':'allow','need_memory':True,'query':'妹 面接','target_slots':['history'],
+                'reason':'personal_history_needed','confidence':.95,'candidates':[]}
+        async def select(self,data):
+            return {'ids':[m['id'] for m in data['candidates'] if m['fact'].startswith('妹')],'confidence':.95}
+    class Judge:
+        def __init__(self,settings):pass
+        async def review(self,reply,history,evidence):
+            if failed:
+                error=RuntimeError('private-provider-detail');error.status_code=503;raise error
+            factual=reply.startswith('僕は30') or reply.startswith('妹さん')
+            return {'decision':'revise' if factual else 'accept','confidence':.95,'role_issues':[],
+                'segments':[{'text':reply,'kind':'assertion' if factual else 'nonfactual',
+                    'verdict':'contradicted' if factual else 'not_applicable','evidence_ids':[],
+                    'reason':'contradiction' if factual else 'nonfactual'}]}
+    monkeypatch.setattr(smoke,'ModelMemoryUnderstanding',Analyst)
+    monkeypatch.setattr(smoke,'FactAnalysisProvider',Judge)
+    return Settings(_env_file=None,chat_provider='mock',memory_database_url='sqlite:///must-not-open.sqlite3')
+
+
+def test_fixed_prior_failures_use_five_calls_no_generation_or_repeated_cn_selection(monkeypatch):
+    r=asyncio.run(smoke.run(setup(monkeypatch)))
+    assert r['attempted_calls']==r['max_calls']==5 and not r['unattempted_ids']
+    assert [c['stage'] for c in r['calls']]==['plan','selection','review','review','review']
+    ja,canon,zh=r['results']
+    assert ja['selected_ids']==['sister'] and ja['selection_reference_match']
+    assert ja['review_status']==canon['review_status']=='revise' and zh['review_status']=='accept'
+    assert zh['selection_status']=='prior_selection_reused'
+    assert r['assessment']=='not_assessed'
+    assert 'must-not-open.sqlite3' not in json.dumps(r)
+
+
+def test_503_is_recorded_once_and_remaining_cases_not_attempted(monkeypatch):
+    r=asyncio.run(smoke.run(setup(monkeypatch,failed=True)))
+    assert r['attempted_calls']==3 and len(r['results'])==1
+    assert r['results'][0]['review_failure']=='upstream_unavailable'
+    assert r['unattempted_ids']==['ja-canon-conflict','zh-review-503']
+    assert 'private-provider-detail' not in str(r)
+
+
+def test_focus_ledger_does_not_start_sixth_call():
+    async def run():
+        ledger=smoke.FocusLedger();seen=[]
+        async def op():seen.append(True)
+        for n in range(5):await ledger.call(str(n),'review',op)
+        with pytest.raises(ValueError):await ledger.call('sixth','review',op)
+        assert len(seen)==5
+    asyncio.run(run())
+
+
+def test_chinese_503_case_can_be_selected_without_repeating_understanding_or_selection(monkeypatch):
+    settings=setup(monkeypatch)
+    class Forbidden:
+        def __init__(self,*a):raise AssertionError('successful analysis must not be repeated')
+    monkeypatch.setattr(smoke,'ModelMemoryUnderstanding',Forbidden)
+    r=asyncio.run(smoke.run(settings,('zh-review-503',)))
+    assert r['max_calls']==r['attempted_calls']==1 and not r['unattempted_ids']
+    assert r['calls'][0]['stage']=='review' and r['results'][0]['review_status']=='accept'
+
+
+@pytest.mark.parametrize('ids',[(),('unknown',),('zh-review-503','zh-review-503')])
+def test_unbounded_or_repeated_cases_rejected_before_calls(monkeypatch,ids):
+    with pytest.raises(ValueError):asyncio.run(smoke.run(setup(monkeypatch),ids))
+
+
+def test_cli_without_live_never_reads_env_or_connects(tmp_path):
+    (tmp_path/'sitecustomize.py').write_text('import sys,os\ndef guard(e,a):\n if e=="open" and isinstance(a[0],(str,bytes)) and os.fsdecode(a[0]).endswith("/.env"):raise RuntimeError("forbidden")\n if e=="socket.connect":raise RuntimeError("forbidden")\nsys.addaudithook(guard)\n')
+    r=subprocess.run([sys.executable,'scripts/retest_memory_canon.py'],env={**os.environ,'PYTHONPATH':str(tmp_path)},capture_output=True,text=True)
+    assert r.returncode==2 and '--live required' in r.stderr

@@ -104,7 +104,7 @@ def test_selection_failure_is_not_retried_and_does_not_inject_old_memory(context
     x.analyst.select.assert_awaited_once()
 
 
-def test_empty_selection_cannot_prove_negative_player_fact_and_rewrites_once(context):
+def test_empty_selection_does_not_override_explicit_player_fact_and_rewrites_once(context):
     from app.memory_understanding import EMPTY_MEMORY_CONTEXT
     x=context
     bad='犬は飼っていなかったはずだけど……新しい家族を迎えたのかな？'
@@ -116,7 +116,7 @@ def test_empty_selection_cannot_prove_negative_player_fact_and_rewrites_once(con
          'segments':[{'text':bad,'kind':'assertion','verdict':'unsupported','evidence_ids':[],'reason':'missing_evidence'}]},
         {'decision':'accept','confidence':.95,'role_issues':[],
          'segments':[{'text':good,'kind':'nonfactual','verdict':'not_applicable','evidence_ids':[],'reason':'nonfactual'}]}]
-    r=x.c.post('/v1/chat',headers=x.h,json={'message':'飼っている犬の名前は？','locale':'ja-JP'})
+    r=x.c.post('/v1/chat',headers=x.h,json={'message':'犬を飼っている。名前を覚えてる？','locale':'ja-JP'})
     assert r.status_code==200 and r.json()['reply']==good and r.json()['guarded']
     assert r.json()['retrieved_memory_ids']==[]
     assert x.provider.generate.await_count==x.judge.review.await_count==2
