@@ -275,3 +275,24 @@ def test_rewrite_to_trusted_template_cannot_reset_guarded_or_review_call_count()
     (reply,guarded,status),g=run([bad,good],judge)
     assert reply==good and guarded and status['calls']==2
     assert g.generate.await_count==judge.review.await_count==2
+
+
+@pytest.mark.parametrize('memory_mode',['semantic','legacy'])
+def test_empty_memory_open_world_review_prompt_uses_mock_sdk_only(memory_mode):
+    from app.memory_understanding import MEMORY_REVIEW_PROMPT
+    bad='犬は飼っていなかったはずだけど……新しい家族を迎えたのかな？'
+    def handler(request):
+        body=json.loads(request.content);prompt=body['messages'][0]['content']
+        assert (MEMORY_REVIEW_PROMPT in prompt)==(memory_mode=='semantic')
+        data=json.loads(body['messages'][1]['content'])
+        result={'confidence':.95,'role_issues':[],'units':[
+            {'id':u['id'],'kind':'assertion','verdict':'unsupported','evidence_ids':[]} for u in data['units']]}
+        return httpx.Response(200,json={'id':'synthetic','object':'chat.completion','created':0,'model':'synthetic',
+            'choices':[{'index':0,'finish_reason':'stop','message':{'role':'assistant','content':json.dumps(result)}}]})
+    async def run():
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            settings=Settings(_env_file=None,chat_provider='gemini',gemini_api_key='synthetic-not-a-key',
+                dialogue_mode='companion',memory_understanding_mode=memory_mode,reply_understanding_mode='semantic')
+            history=[{'role':'user','content':'飼っている犬の名前は？'}]
+            return await review_reply(f.FactAnalysisProvider(settings,client),bad,history,evidence_bundle(history,[],None,None))
+    assert asyncio.run(run()).status=='revise'  # Authored verdict, not actual judge quality.

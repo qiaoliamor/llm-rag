@@ -94,3 +94,11 @@ reference7/8が作者想定通り、日語質問で中文猫名を候補に取�
 公開人手開発集same_language_memory_v1.jsonは日中各5例、合計26回放。`evaluate_japanese.py --same-language-memory`は隔離一時SQLite／実chat管線を観測しますが、plan・選択・生成・審査は人手脚本。基準10/10はGemini精度ではなく、故意誤選択／生成＋偽acceptの不支持8を保存。旧31回放とは別分母で、Prompt前後改善を主張しません。実意味・母語盲評とB01–B03は未受入。[履歴](TEST_HISTORY.md)へ。
 
 少数Gemini実測の許可後、猫名だけで犬名を聞く日語例はplanが対象を保持した一方、共有4秒内の選択が未完了。2呼出で停止、生成返答なし、中文主体例は未実施。選択／返答品質の受入ではなく[履歴](TEST_HISTORY.md)に原出力・遅延・失敗を保存。
+
+## 短縮Promptと段階予算v4（2026-11-17、作業ブランチ）
+
+独立same-language-memory-v4を送信し、旧V1/V2/V3全文は保存するだけで累積送信しません。Unicode文字数はplan2734→1261、選択829→387、約54%減（token／遅延改善率ではない）。主体／属性／時点・無答空集合、原文確認、日本語省略／引用／呼称と日付／手動メタデータ規則を維持。権限・証拠・取引検査はコードのまま。
+
+MemoryCallBudgetをwebと実測CLIで共有。MEMORY_UNDERSTANDING_TIMEOUT_SECONDSはplan最大6秒、MEMORY_SELECTION_TIMEOUT_SECONDSは選択最大6秒、合計deadline12秒。選択は自身capと残り時間の小さい方、本地検索も計時。SDKにも独立capを渡し、失効なら選択なし、retry／呼出追加なし、epoch検査維持。同期DB阻塞をdeadlineで強制中断はできず、戻り時点で失効なら選択を省きます。DB長時間阻塞は別途未検証。各0.1〜10秒で合計は和。旧.envに4があればplan4＋既定選択6＝10秒、実.envは変更せずテンプレートだけ更新。生成／審査は12秒に含まず、最悪待機増加とp95／費用は未受入。
+
+実測各1回で両選択は参考と一致しましたが、日語は無根拠の未飼育推定をjudgeがaccept、中文は妹の会社へ回答した後judge503。原文／構造化計画／遅延は[履歴](TEST_HISTORY.md)へ。実測後memory-open-world-v1を回答／審査へ追加：空集合は否定事実を証明せず、はず／疑問形にも前提があります。memory_reply_contextをweb／CLIで共有し、検索要求＋根拠なし時だけ追加。追加後は離線回帰のみで実漏判修復を主張せず、CLIも完全web E2Eではありません。旧timeout／横断観測・母語盲評待ち・B01–B03を保持。

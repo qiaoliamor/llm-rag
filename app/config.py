@@ -20,7 +20,8 @@ class Settings(BaseSettings):
     emotion_understanding_timeout_seconds: float = Field(default=6, ge=.1, le=10)
     api_timeout_seconds: float = Field(default=30, ge=1, le=120)
     memory_understanding_mode: str = Field(default='semantic', pattern='^(semantic|legacy)$')
-    memory_understanding_timeout_seconds: float = Field(default=4, ge=.1, le=10)
+    memory_understanding_timeout_seconds: float = Field(default=6, ge=.1, le=10, allow_inf_nan=False)
+    memory_selection_timeout_seconds: float = Field(default=6, ge=.1, le=10, allow_inf_nan=False)
     memory_router_enabled: bool = True
     reply_understanding_mode: str = Field(default='semantic', pattern='^(semantic|legacy)$')
     semantic_review_enabled: bool = True

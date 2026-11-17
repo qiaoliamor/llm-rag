@@ -159,17 +159,17 @@ def test_actual_structured_sdk_contract_uses_fixed_prompt_and_mock_transport():
     ('妹の面接先、覚えてる？','妹 面接'),
 ])
 def test_v3_plan_and_selection_prompts_use_real_sdk_with_scripted_same_language_results(message,query):
-    from app.memory_understanding import PLAN_PROMPT_V2, SELECT_PROMPT_V1, POLICY_VERSION
+    from app.memory_understanding import PLAN_PROMPT_V2, PLAN_PROMPT_V3, SELECT_PROMPT_V1, SELECT_PROMPT_V3, POLICY_VERSION
     requests=[]
     def handler(request):
         body=json.loads(request.content);requests.append(body)
         prompt=body['messages'][0]['content'];data=json.loads(body['messages'][1]['content'])
         if len(requests)==1:
-            assert prompt==PLAN_PROMPT and PLAN_PROMPT.startswith(PLAN_PROMPT_V2)
+            assert prompt==PLAN_PROMPT and PLAN_PROMPT_V3.startswith(PLAN_PROMPT_V2)
             assert data['current_message']==message
             value=plan(need=True,query=query)
         else:
-            assert prompt==SELECT_PROMPT and SELECT_PROMPT.startswith(SELECT_PROMPT_V1)
+            assert prompt==SELECT_PROMPT and SELECT_PROMPT_V3.startswith(SELECT_PROMPT_V1)
             assert data['query']==query and data['recent_dialogue'][-1]['content']==message
             assert [m['id'] for m in data['candidates']]==['own','sister']
             value={'ids':['sister'],'confidence':.95}
