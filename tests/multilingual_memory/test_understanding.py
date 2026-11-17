@@ -151,7 +151,7 @@ def test_actual_structured_sdk_contract_uses_fixed_prompt_and_mock_transport():
     assert result.status=='ready' and result.candidates[0].metadata.event_date=='2026-11-12'
     assert len(requests)==1
     assert '日本語' in PLAN_PROMPT and '中文' in PLAN_PROMPT
-    assert '没有答案' in SELECT_PROMPT
+    assert 'ids=[]' in SELECT_PROMPT
 
 
 @pytest.mark.parametrize('message,query',[
@@ -159,7 +159,7 @@ def test_actual_structured_sdk_contract_uses_fixed_prompt_and_mock_transport():
     ('妹の面接先、覚えてる？','妹 面接'),
 ])
 def test_v3_plan_and_selection_prompts_use_real_sdk_with_scripted_same_language_results(message,query):
-    from app.memory_understanding import PLAN_PROMPT_V2, PLAN_PROMPT_V3, SELECT_PROMPT_V1, SELECT_PROMPT_V3, POLICY_VERSION
+    from app.memory_understanding import PLAN_PROMPT_V2, PLAN_PROMPT_V3, SELECT_PROMPT_V1, SELECT_PROMPT_V3, PLAN_PROMPT_V5, POLICY_VERSION
     requests=[]
     def handler(request):
         body=json.loads(request.content);requests.append(body)
@@ -173,7 +173,8 @@ def test_v3_plan_and_selection_prompts_use_real_sdk_with_scripted_same_language_
             assert data['query']==query and data['recent_dialogue'][-1]['content']==message
             assert [m['id'] for m in data['candidates']]==['own','sister']
             value={'ids':['sister'],'confidence':.95}
-        assert POLICY_VERSION in prompt and body['response_format']['type']=='json_schema'
+        assert (prompt==PLAN_PROMPT_V5 if len(requests)==1 else prompt.startswith(POLICY_VERSION))
+        assert body['response_format']['type']=='json_schema'
         return httpx.Response(200,json={'id':'synthetic','object':'chat.completion','created':0,'model':'synthetic',
             'choices':[{'index':0,'finish_reason':'stop','message':{'role':'assistant','content':json.dumps(value)}}]})
     async def run():

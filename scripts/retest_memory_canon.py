@@ -11,7 +11,7 @@ import time
 sys.path.insert(0,str(Path(__file__).resolve().parent.parent))
 from app.config import ROOT, Settings
 from app.memory import MemoryStore
-from app.memory_understanding import ModelMemoryUnderstanding, MemoryMetadata, MemoryCallBudget, MemoryPlan, Understanding, understand, select_evidence
+from app.memory_understanding import ModelMemoryUnderstanding, MemoryMetadata, MemoryCallBudget, MemoryPlan, EvidenceSelection, Understanding, understand, select_evidence
 from app.fact_presentation import FactAnalysisProvider
 from app.semantic_review import evidence_bundle, review_reply
 from scripts.retest_same_language_memory import Ledger
@@ -57,7 +57,7 @@ async def run(settings, case_ids=None, *, selection_only=False):
             for case in cases:
                 started=time.monotonic();cid=case['id'];row={k:case[k] for k in ('id','locale','query','candidate','expected','origin')}
                 row.update(understanding_status='not_requested',candidate_ids=None,selected_ids=None,
-                    selection_status='not_reached',review_status='not_reached',review_failure=None)
+                    selection_status='not_reached',selection_output=None,selection_schema_status='not_reached',review_status='not_reached',review_failure=None)
                 rows.append(row);uid,_=store.identity(None);store.configure(uid,True,'Asia/Tokyo');aliases={};memories=[]
                 for label,fact in case['documents']:
                     m=store.candidate(uid,fact,'synthetic',store.settings(uid)['epoch'],manual=True,metadata=MemoryMetadata('event','event'))
@@ -67,7 +67,17 @@ async def run(settings, case_ids=None, *, selection_only=False):
                     model=ModelMemoryUnderstanding(settings)
                     class Analyst:
                         async def analyze(self,data):return await ledger.call(cid,'plan',lambda:model.analyze(data))
-                        async def select(self,data):return await ledger.call(cid,'selection',lambda:model.select(data))
+                        async def select(self,data):
+                            raw=await ledger.call(cid,'selection',lambda:model.select(data))
+                            try:
+                                parsed=EvidenceSelection.model_validate(raw.model_dump() if isinstance(raw,EvidenceSelection) else raw)
+                            except Exception:
+                                row['selection_schema_status']='invalid_structure'
+                                raise
+                            row['selection_schema_status']='validated'
+                            row['selection_output']={'ids':[aliases.get(id,'outside_candidate_set') for id in parsed.ids],
+                                'confidence':parsed.confidence}
+                            return raw
                     budget=MemoryCallBudget.start(settings)
                     if selection_only:
                         # Frozen successful synthetic plan from the v5 2026-11-17 run, not a fresh prediction.

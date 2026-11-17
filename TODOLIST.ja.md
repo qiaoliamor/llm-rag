@@ -2,7 +2,7 @@
 
 [中文](TODOLIST.md) · [日本語](TODOLIST.ja.md)
 
-更新：2026-11-17。PR #29–#43はレビュー後squashでmainへ提供。チェックは実装物の存在でモデル品質の正式受入ではありません。詳細は[計画](docs/ja/PLAN.md)と[日本語対応](docs/ja/JAPANESE_LOCALIZATION.md)。
+更新：2026-11-17。PR #29–#44はレビュー後squashでmainへ提供。チェックは実装物の存在でモデル品質の正式受入ではありません。詳細は[計画](docs/ja/PLAN.md)と[日本語対応](docs/ja/JAPANESE_LOCALIZATION.md)。
 
 ## 実装済み
 
@@ -163,3 +163,14 @@
 [共通原記録](docs/TEST_HISTORY.md#memory-subject-v5-20261117)。
 
 - [x] PR #43レビュー：v5／8＋6秒、主体・選択・実注入／単独CLIをコマンド検証後squash提供、main同期・受測ツリー照合と分岐清理。本回実API0、選択6.001秒timeout・歴史失敗／未検証・母語盲評待ちを保持。M5未受入、M6未開始。
+
+## 選択v6（2026-11-17、PR #44提供）
+
+- [x] 選択305→237文字、旧V5保存、query v5不変。選択8秒／合計16秒、retryなし、実.env未変更。
+- [x] 空集合／外来ID／低信頼／不正構造とnullの離線回帰・一時PGを確認。
+- [x] 成功合成planを再利用しGemini選択上限1／実1、1.979秒で妹のみ、構造とID検査通過。query／レビュー反復なし、原結果保存。
+- [ ] 全経路返答／安定可用性／p95／費用と母語独立盲評は未受入。今回成功を再試せず、旧timeout／失敗／未検証と封存v1/v2を保持、M5未受入、M6未開始。
+
+[設計](docs/ja/M2_MEMORY.md)／[原記録](docs/TEST_HISTORY.md#selection-v6-20261117)。
+
+- [x] PR #44レビュー：query v5不変、選択v6／旧Prompt、8＋8秒、構造／外来ID／低信頼／nullと空集合、単独選択で成功query／審査を反復しないことをCLI確認。squash後main同期／受測ツリー照合／分岐清理。本回実API0、歴史timeout／失敗／未検証／母語盲評待ちを保持、M5未受入、M6未開始。

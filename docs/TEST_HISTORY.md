@@ -2,7 +2,7 @@
 
 [中文](TEST_HISTORY.md) · [日本語](ja/TEST_HISTORY.md)
 
-更新：2026-11-17。日语主体v5经PR #43交付：全量1451通过/165跳过、临时PG374通过（重叠），真实2调用查询完成但选择超时，详见[本轮记录](#memory-subject-v5-20261117)。以下PR #42基线为历史。PR #29–#42经审阅squash交付main；中日情绪回复检查/兜底已交付。中日人物/来源/地点回复适配已交付；日语口吻v3/记忆同语言v4与盲评准备已交付，后端1445通过/162跳过、临时PG记忆365通过（重叠）；前端历史71及构建通过（本轮未重跑）；实际母语评分待评审。PR #40开发实测2调用，选择未完成、无生成回复；本轮PR #42合并审阅真实API0；M5未验收、M6未开始，旧阶段、失败与未验证项保留。
+更新：2026-11-17。选择v6经PR #44交付：1456通过/165跳过、临时PG379通过，真实选择1调用在1.979秒正确只选妹妹；整体验收仍待完成，见[当前记录](#selection-v6-20261117)。以下为已合并v5及更早历史。日语主体v5经PR #43交付：全量1451通过/165跳过、临时PG374通过（重叠），真实2调用查询完成但选择超时，详见[本轮记录](#memory-subject-v5-20261117)。以下PR #42基线为历史。PR #29–#42经审阅squash交付main；中日情绪回复检查/兜底已交付。中日人物/来源/地点回复适配已交付；日语口吻v3/记忆同语言v4与盲评准备已交付，后端1445通过/162跳过、临时PG记忆365通过（重叠）；前端历史71及构建通过（本轮未重跑）；实际母语评分待评审。PR #40开发实测2调用，选择未完成、无生成回复；本轮PR #42合并审阅真实API0；M5未验收、M6未开始，旧阶段、失败与未验证项保留。
 
 ## PR #28历史功能验证（不是本轮执行）
 
@@ -792,3 +792,130 @@ PR #42查询6.003秒、此前选择预算失败、中文503、历史15漏检/5�
 本轮未执行任何`--live`、真实模型或天气API调用，无新原回复或模型耗时；开发期原始报告、查询4.718秒/选择6.001秒超时/整例10.732秒及旧失败保留。实际日语选证/最终回答、稳定可用性/费用与独立母语盲评仍未验证；不因合并或离线通过而验收M5。封存v1/v2与旧包不改，M6未开始。
 
 交付方式：状态更新在原任务分支经检查提交，随PR #43 squash进入main；合并后快进同步本地、逐文件核对受测成果，再删除远端/本地任务分支并fetch --prune。合并SHA以GitHub PR记录及本地main为准。
+
+<a id="selection-v6-20261117"></a>
+
+## 日语选择v6：复用plan单次Gemini复测（2026-11-17，PR #44交付）
+
+基线main `6d3461a95714ca5662667d76a0eda343e0f575b9`，任务`codex/japanese-memory-selection-budget`。查询v5原样966字并保存PLAN_PROMPT_V5，选择独立v6从305→237字并保存SELECT_PROMPT_V5；字符数不是token或时延降幅。默认查询8/选择8/总16秒；原配置验证0.1–10有限值、权限/原文确认/ID白名单/epoch/事务保留，无新增正则/调用/重试。真实.env未改，本地未显式覆盖这两个timeout，故本轮使用新默认。
+
+### 离线验证
+
+| 命令 | 结果及边界 |
+| --- | --- |
+| `.venv/bin/pytest -q tests/multilingual_memory tests/japanese_evaluation tests/japanese_layers tests/multilingual_facts` | 首次3失败/287通过/73跳过（7.70秒）：旧断言要求“没有答案”字面和统一版本同时出现在未修改的query v5及选择v6；不是模型失败。改为校验空集协议与原样query v5/选择v6各自版本后，295通过/73跳过（7.21秒）。 |
+| `.venv/bin/pytest -q tests/multilingual_memory/test_canon_smoke.py tests/multilingual_memory/test_budget.py` | 中间31通过/6跳过，0.77秒；后续增加1个Prompt版本保留用例，已纳入全量。 |
+| `.venv/bin/pytest -q` | 最终1456通过/165跳过，23.59秒；旧legacy/audit与新semantic/companion/growth=true分别显式，非全数生产默认覆盖。 |
+| `.venv/bin/python scripts/test_postgres.py --semantic-memory` | 379通过，19.05秒（与全量重叠）；只用脚本随机临时库，结束删除，未操作玩家库。 |
+| `.venv/bin/python scripts/evaluate_japanese.py --same-language-memory` / `--memory-layers` | 独立10例/26回放与历史8例/31回放分别报告；脚本plan/选择/回复/裁判不是Gemini预测。同语言26回放的故障注入8条无依据回复、旧31回放5条及跨语言未命中保留，均是作者脚本负例，不是模型预测。 |
+| `.venv/bin/python scripts/evaluate_japanese.py --prepare-annotation /tmp/ja-selection-v6-empty-20261117` | 新外部12条公开编辑回复双人空包，当前来源哈希绑定；旧包不重绑，reviewer/评分均null、not_assessed，不是实际母语盲评。 |
+
+选择单阶段新增成功空集、外来ID、低置信、非法结构的单次记录；未完成selected_ids=null、成功空集=[]分开。模型返回的结构化选择以合成别名和confidence记录，外来ID不泄露原值且程序拒绝，非法结构不注入。本人/妹妹、无答案、权限隔离/CRUD/删除/撤回/持久化沿用完整受影响回归；无新UI/API/DB格式修改，不重跑前端构建。
+
+### 真实调用与原输出（仅合成，不是玩家数据）
+
+调用前宣布上限1、旧失败`妹の面接先、覚えてる？`，复用PR #43成功的query=`妹 面接`、slots=history/other、confidence=.9、不提候选的合成plan。只调用真实Gemini选择一次，不查询、不审查、不生成/重写/重试。运行`.venv/bin/python scripts/retest_memory_canon.py --live --case ja-memory-subject --selection-only`，退出0。
+
+实际SDK按当前模型与json_schema请求，temperature=0、max_retries=0；实际查询字符索引候选为sister/own。公开输出随机ID替换为合成别名；原文sister=`妹は合成桔梗社の面接を受けました。`、own=`私は合成葵社の面接を受けました。`。以下保留脱敏结构和源码指纹：
+
+```json
+{
+  "mode": "selection-only-prior-failure",
+  "model": "gemini-3.5-flash-lite",
+  "max_calls": 1,
+  "memory_budget": {
+    "plan_seconds": 8.0,
+    "selection_seconds": 8.0,
+    "total_seconds": 16.0
+  },
+  "calls": [
+    {
+      "case": "ja-memory-subject",
+      "stage": "selection",
+      "status": "returned",
+      "elapsed_seconds": 1.979
+    }
+  ],
+  "attempted_calls": 1,
+  "results": [
+    {
+      "id": "ja-memory-subject",
+      "locale": "ja-JP",
+      "query": "妹の面接先、覚えてる？",
+      "candidate": "妹さんは合成葵社を受けたんだね。",
+      "expected": "revise",
+      "origin": "memory_layers_v1:subject-sister/wrong-known-accept",
+      "understanding_status": "prior_plan_reused",
+      "candidate_ids": [
+        "sister",
+        "own"
+      ],
+      "selected_ids": [
+        "sister"
+      ],
+      "selection_status": "selected",
+      "selection_output": {
+        "ids": [
+          "sister"
+        ],
+        "confidence": 1.0
+      },
+      "selection_schema_status": "validated",
+      "review_status": "not_reached",
+      "review_failure": null,
+      "plan_source": "reused_successful_synthetic_plan_2026_11_17",
+      "plan": {
+        "memory_use": "allow",
+        "need_memory": true,
+        "query": "妹 面接",
+        "target_slots": [
+          "history",
+          "other"
+        ],
+        "reason": "personal_history_needed",
+        "confidence": 0.9,
+        "candidates": []
+      },
+      "selection_reference_match": true,
+      "injected_memories": [
+        {
+          "id": "sister",
+          "fact": "妹は合成桔梗社の面接を受けました。",
+          "event_date": null
+        }
+      ],
+      "status": "selection_completed",
+      "elapsed_seconds": 1.988
+    }
+  ],
+  "unattempted_ids": [],
+  "assessment": "not_assessed",
+  "source_sha256": {
+    "app/memory_understanding.py": "f1a57989de1572013d5d10b4d9a0b62dd6818eabd9be9d53e2295bae7b8979f2",
+    "app/fact_presentation.py": "8acb1bc06644fa1bbceddffa0469e6dbfb52536e7fa67cbe52057d98457ad902",
+    "characters/shen_yan.json": "0a5dd6d417ad2702b451e171d86eabade52ba21bbae9c44749d5d9538d561d5d",
+    "scripts/retest_memory_canon.py": "d2e6c3c475d8cd911c058cb7ce957fb398534545a716521fa0ee531e35e91758"
+  },
+  "limits": "Frozen successful synthetic plan reused; actual candidates/selection only, no new query prediction or review. Only fixed prior failures, no generation, rewrite or retry. Not full chat E2E or independent native quality."
+}
+```
+
+实际1/上限1调用，选择1.979秒、整例1.988秒；模型只选sister、confidence1.0，通过严格结构/ID校验且与该公开合成参考一致。不混入own。本轮candidate与expected为历史待审夹具，不是生成文本，review_status=not_reached；injected_memories只代表脚本待注入投影，本轮未跑真实聊天生成或审查。实际模型输出不能当人工预设，复用plan也不能当本轮模型query预测。单例作者已见参考不是独立金标准，confidence1.0不是100%准确率。
+
+旧选择6.001秒timeout（PR #43）和查询6.003秒timeout（PR #42）原文不变。本次1.979秒低于旧6秒cap，不能据此把改善归因于多2秒或短Prompt，亦不证明免费额度就是此前失败原因；没有重复采样挑成功。完整同语言RAG/最终回答、多轮主体泛化、可用率/p95/费用与独立母语盲评仍未验收。历史503、4.009/8.003秒timeout、15漏检/5误拦截/1未决、故障负例/跨语言观察及B01–B03、封存v1/v2保留，M5未整体验收、M6未开始。
+
+文档更新后离线检查：`.venv/bin/pytest -q tests/japanese_evaluation tests/japanese_layers tests/sealed tests/annotations tests/test_narrative_calibration.py tests/test_narrative_boundary.py`为208通过/27跳过（5.81秒）。本地文档链接、语法、封存/旧Prompt、外部新空包及实测源码哈希一致性检查通过；未改旧绑定材料、逐字读取文档或玩家数据。
+
+<a id="pr44-merge-review"></a>
+
+## PR #44合并审阅（2026-11-17，真实API 0）
+
+基线main `6d3461a`，开发head `7b73495`；GitHub可合并、无审阅评论，远端main未变，无需变基。审阅查询v5原样/旧全文、选择v6主体/时间/空集要求、选择cap8秒与总deadline16秒、SDK独立超时、模型结构/候选白名单/低置信及null与成功空集、单阶段固定plan与调用上限。未发现阻止合并的代码问题，权限/确认/epoch/事务及旧边界保持。
+
+- `.venv/bin/pytest -q`：1456通过/165跳过，23.99秒；合成模型/独立临时库，旧legacy/audit与新增semantic/companion/growth=true分别显式，不把总通过数等同生产默认质量。
+- `.venv/bin/python scripts/test_postgres.py --semantic-memory`：379通过，19.58秒（与全量重叠），只由脚本创建并删除临时库，覆盖记忆CRUD/正常/非法输入/权限隔离/撤回/删除不复活/失败/持久化。无新UI/API/数据迁移，不重复前端构建。
+- 之后只更新中日交付状态/计划/测试/TODO；`.venv/bin/pytest -q tests/japanese_evaluation tests/japanese_layers tests/sealed tests/annotations tests/test_narrative_calibration.py tests/test_narrative_boundary.py`为208通过/27跳过（6.14秒），文档链接/封存/来源哈希及敏感值检查通过；未改功能代码。旧完整Prompt及查询v5与原版本比较一致，受测代码指纹与开发期单次合成实测记录一致；旧评分包/封存v1/v2不改。
+
+**本轮未执行--live或真实模型/天气调用，无新增模型原回复或耗时。** 开发期1.979秒选择/1.988秒整例、confidence1.0及原结构保留，这只是公开作者已见单例的成功，不证明稳定性或Prompt/预算因果效果。此前6.001秒选择超时、6.003秒查询超时、旧503/4.009及8.003秒timeout/退出失败、15漏检/5误拦截/1未决、脚本故障负例/跨语言观察等全部保留。完整RAG最终回复/泛化/可用率/p95/费用/独立母语盲评仍未验证；M5未整体验收、M6未开始。
+
+状态文档在原任务分支经检查提交，随PR #44 squash交付；随后快进同步本地main，核对受测文件树相同才清理远端/本地任务分支，再fetch --prune。实际合并SHA以GitHub记录与本地main为准。
