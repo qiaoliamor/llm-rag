@@ -19,9 +19,11 @@ def test_plan_consuming_old_shared_budget_still_reserves_full_selection_stage():
     b=MemoryCallBudget.start(Settings(_env_file=None),clock=lambda:now[0])
     now[0]=2.558
     assert 4-now[0]==pytest.approx(1.442)  # Historical short remainder, not a fresh API call.
-    assert b.plan_seconds==b.selection_timeout()==6 and b.deadline==12
-    now[0]=10.;assert b.selection_timeout()==2
-    now[0]=13.;assert b.selection_timeout()==0
+    assert b.plan_seconds==8 and b.selection_timeout()==6 and b.deadline==14
+    now[0]=6.003
+    assert b.selection_timeout()==6  # Historical plan timeout no longer consumes the selection reservation.
+    now[0]=12.;assert b.selection_timeout()==2
+    now[0]=15.;assert b.selection_timeout()==0
 
 
 @pytest.mark.parametrize('field',['memory_understanding_timeout_seconds','memory_selection_timeout_seconds'])
@@ -90,7 +92,7 @@ def test_actual_chat_reserves_selection_time_and_injects_confirmed_memory(contex
 def test_total_budget_consumed_by_local_retrieval_does_not_start_selection(context,monkeypatch):
     x=context;original=x.store.semantic_candidates
     def delayed(*a,**kw):
-        value=original(*a,**kw);x.clock[0]=13;return value
+        value=original(*a,**kw);x.clock[0]=15;return value
     monkeypatch.setattr(x.store,'semantic_candidates',delayed)
     r=x.c.post('/v1/chat',headers=x.h,json={'message':'私の名前は？','locale':'ja-JP'})
     assert r.status_code==200 and r.json()['retrieved_memory_ids']==[]

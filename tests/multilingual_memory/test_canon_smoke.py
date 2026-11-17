@@ -62,6 +62,41 @@ def test_focus_ledger_does_not_start_sixth_call():
     asyncio.run(run())
 
 
+def test_selection_timeout_is_unavailable_not_successful_empty_selection(monkeypatch):
+    settings=setup(monkeypatch)
+    original=smoke.ModelMemoryUnderstanding
+    class TimedOutSelector(original):
+        async def select(self,data):raise TimeoutError('private-synthetic-timeout')
+    monkeypatch.setattr(smoke,'ModelMemoryUnderstanding',TimedOutSelector)
+    r=asyncio.run(smoke.run(settings,('ja-memory-subject',)))
+    row=r['results'][0]
+    assert r['attempted_calls']==2 and row['status']=='selection_failed'
+    assert row['selection_status']=='unavailable' and row['selected_ids'] is None
+    assert row['review_status']=='not_reached'
+    assert r['memory_budget']=={'plan_seconds':8,'selection_seconds':6,'total_seconds':14}
+    assert 'private-synthetic-timeout' not in str(r)
+
+
+def test_selection_only_reuses_plan_and_never_calls_successful_query_or_review(monkeypatch):
+    settings=setup(monkeypatch);original=smoke.ModelMemoryUnderstanding
+    class SelectorOnly(original):
+        async def analyze(self,*a):raise AssertionError('must not repeat successful query')
+    class NoJudge:
+        def __init__(self,*a):raise AssertionError('selection-only must not add review')
+    monkeypatch.setattr(smoke,'ModelMemoryUnderstanding',SelectorOnly)
+    monkeypatch.setattr(smoke,'FactAnalysisProvider',NoJudge)
+    r=asyncio.run(smoke.run(settings,('ja-memory-subject',),selection_only=True))
+    assert r['attempted_calls']==r['max_calls']==1
+    assert [c['stage'] for c in r['calls']]==['selection']
+    row=r['results'][0]
+    assert row['selected_ids']==['sister'] and row['selection_reference_match']
+    assert row['understanding_status']=='prior_plan_reused' and row['review_status']=='not_reached'
+
+
+def test_selection_only_cannot_be_used_for_unrelated_cases(monkeypatch):
+    with pytest.raises(ValueError):asyncio.run(smoke.run(setup(monkeypatch),('zh-review-503',),selection_only=True))
+
+
 def test_chinese_503_case_can_be_selected_without_repeating_understanding_or_selection(monkeypatch):
     settings=setup(monkeypatch)
     class Forbidden:
