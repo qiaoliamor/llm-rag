@@ -47,7 +47,7 @@ def test_real_sdk_payload_preserves_v1_and_adds_japanese_v2_without_live_calls()
             return await p.analyze({'current_message':'こんばんは','recent_dialogue':[],'today':'2026-11-13','timezone':'Asia/Tokyo','operation':'chat'})
     assert isinstance(asyncio.run(run()),MemoryPlan) and len(calls)==1
     assert JAPANESE_PROMPT.startswith(JAPANESE_PROMPT_V1) and JAPANESE_STYLE_VERSION in JAPANESE_PROMPT
-    assert POLICY_VERSION=='same-language-memory-v4'
+    assert POLICY_VERSION=='same-language-memory-v5'
 
 
 @pytest.mark.parametrize('locale,message,reply',[
