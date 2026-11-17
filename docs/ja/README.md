@@ -41,4 +41,6 @@ PR #42レビュー後squash提供、未設定雑談の自由と明記記憶／�
 
 PR #43提供：記憶v5、8＋6秒予算と主体別合成回帰、選択単独の次回用入口。過去実測の選択6.001秒timeout／母語盲評未完了を保持。本回マージ確認は実API0。[M2](M2_MEMORY.md)／[記録](../TEST_HISTORY.md#pr43-merge-review)。
 
-選択v6はタスク分岐で開発中：query不変、選択短Promptと8秒cap、実旧失敗1例は1.979秒で妹のみ選択。最終返答／安定性は未受入、旧timeout保持。[設計](M2_MEMORY.md)／[原記録](../TEST_HISTORY.md#selection-v6-20261117)。
+選択v6はPR #44で提供：query不変、選択短Promptと8秒cap、実旧失敗1例は1.979秒で妹のみ選択。最終返答／安定性は未受入、旧timeout保持。[設計](M2_MEMORY.md)／[原記録](../TEST_HISTORY.md#selection-v6-20261117)。
+
+PR #44マージ確認は離線のみ、実API0。単例成功を全経路／安定性や母語盲評の合格とせず、過去失敗を保持。[レビュー記録](../TEST_HISTORY.md#pr44-merge-review)。
