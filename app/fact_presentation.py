@@ -5,7 +5,7 @@ from .companion import REVIEW_PROMPT
 from .semantic_review import ModelAnalysisProvider, IndexedReview, INDEXED_PROMPT
 from .weather_presentation import REVIEW_PROMPT_EXTRA as WEATHER_REVIEW
 from .emotion_presentation import REVIEW_PROMPT_EXTRA as EMOTION_REVIEW
-from .memory_understanding import MEMORY_REVIEW_PROMPT
+from .memory_understanding import MEMORY_REVIEW_PROMPT, MEMORY_CANON_POLICY
 
 POLICY_VERSION = 'multilingual-fact-care-v2'
 # Reviewed whole-response templates, not a semantic keyword/substring classifier.
@@ -22,6 +22,8 @@ ANSWER_PROMPT = '''
 “打算去/行こうかな”、过去到访、助手邀请不能证明现在到店；当前本人明确到店可顺着聊，之后明确离开则用最新状态。未来邀请/询问是否到店不暗含已到店。角色资料里“访客”也不是本轮玩家在场证据。
 混合句、因果、否定、条件及引语逐命题看范围；正确的半句不能掩盖后半句捏造，语气亲近不等于既定恋人关系。真实工具事实仍须本轮工具证据，情绪不是诊断。只纠正越界处，保留自然聊天，不像客服。
 '''
+ANSWER_PROMPT_V1 = ANSWER_PROMPT
+ANSWER_PROMPT = ANSWER_PROMPT_V1 + MEMORY_CANON_POLICY
 REVIEW_PROMPT_EXTRA_V1 = '''
 【中日事实与来源审查：multilingual-fact-care-v1】
 只用本轮evidence核对units完整命题，按含义而非中文触发词。中文、日语及混合引用同一标准；reply_policy.reply_locale仅控制回复语言，不能给人物/地点/时间事实作证。主体语言错误可列role_issues，专名/引用原文不算错语言。

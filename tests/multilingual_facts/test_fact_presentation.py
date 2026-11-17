@@ -293,6 +293,30 @@ def test_empty_memory_open_world_review_prompt_uses_mock_sdk_only(memory_mode):
         async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
             settings=Settings(_env_file=None,chat_provider='gemini',gemini_api_key='synthetic-not-a-key',
                 dialogue_mode='companion',memory_understanding_mode=memory_mode,reply_understanding_mode='semantic')
-            history=[{'role':'user','content':'飼っている犬の名前は？'}]
+            history=[{'role':'user','content':'犬を飼っている。名前を覚えてる？'}]
             return await review_reply(f.FactAnalysisProvider(settings,client),bad,history,evidence_bundle(history,[],None,None))
     assert asyncio.run(run()).status=='revise'  # Authored verdict, not actual judge quality.
+
+
+@pytest.mark.parametrize('text,locale',[
+    ('犬は飼っていなかったはずだけど……新しい家族を迎えたのかな？','ja-JP'),
+    ('你之前应该没养狗吧，是刚迎来了新家人吗？','zh-CN'),
+])
+def test_unspecified_pet_chat_allowed_under_new_standard_with_authored_verdict(text,locale):
+    from app.memory_understanding import MEMORY_CANON_POLICY
+    assert MEMORY_CANON_POLICY in f.ANSWER_PROMPT
+    judge=SimpleNamespace(review=AsyncMock(return_value=judgment(text)))
+    (reply,guarded,status),_=run([text],judge,locale=locale)
+    assert reply==text and not guarded and status['calls']==1
+
+
+@pytest.mark.parametrize('bad,good,locale,memories',[
+    ('僕は30歳の医師だよ。','28歳で、古書店を営んでいるよ。','ja-JP',[]),
+    ('我是30岁的医生。','我28岁，经营旧书店。','zh-CN',[]),
+    ('犬は飼っていないんだね。','犬と暮らしているんだね。','ja-JP',[{'id':'pet','fact':'犬を飼っています。','event_date':None}]),
+    ('你没养狗。','你养着一只狗。','zh-CN',[{'id':'pet','fact':'我养着一只狗。','event_date':None}]),
+])
+def test_creative_blank_does_not_exempt_canon_or_confirmed_memory_contradiction(bad,good,locale,memories):
+    judge=SimpleNamespace(review=AsyncMock(side_effect=[judgment(bad,'contradicted'),judgment(good)]))
+    (reply,guarded,status),g=run([bad,good],judge,locale=locale,memories=memories)
+    assert reply==good and guarded and status['calls']==2
