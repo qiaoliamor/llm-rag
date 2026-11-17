@@ -14,7 +14,7 @@ from app.config import Settings
 from app.main import create_app
 from app.progression import Bond
 from app.localization import JAPANESE_PROMPT, JAPANESE_PROMPT_V1, JAPANESE_PROMPT_V2, JAPANESE_STYLE_VERSION
-from app.memory_understanding import (ModelMemoryUnderstanding, MemoryPlan, PLAN_PROMPT, PLAN_PROMPT_V1,
+from app.memory_understanding import (ModelMemoryUnderstanding, MemoryPlan, PLAN_PROMPT, PLAN_PROMPT_V1, PLAN_PROMPT_V2,
     POLICY_VERSION, understand)
 
 
@@ -37,7 +37,7 @@ def test_real_sdk_payload_preserves_v1_and_adds_japanese_v2_without_live_calls()
     calls=[]
     def handler(request):
         body=json.loads(request.content);calls.append(body)
-        assert body['messages'][0]['content']==PLAN_PROMPT and PLAN_PROMPT.startswith(PLAN_PROMPT_V1)
+        assert body['messages'][0]['content']==PLAN_PROMPT and PLAN_PROMPT_V2.startswith(PLAN_PROMPT_V1)
         result=plan()
         return httpx.Response(200,json={'id':'synthetic','object':'chat.completion','created':0,'model':'synthetic',
             'choices':[{'index':0,'finish_reason':'stop','message':{'role':'assistant','content':json.dumps(result)}}]})
@@ -47,7 +47,7 @@ def test_real_sdk_payload_preserves_v1_and_adds_japanese_v2_without_live_calls()
             return await p.analyze({'current_message':'こんばんは','recent_dialogue':[],'today':'2026-11-13','timezone':'Asia/Tokyo','operation':'chat'})
     assert isinstance(asyncio.run(run()),MemoryPlan) and len(calls)==1
     assert JAPANESE_PROMPT.startswith(JAPANESE_PROMPT_V1) and JAPANESE_STYLE_VERSION in JAPANESE_PROMPT
-    assert POLICY_VERSION=='same-language-memory-v3'
+    assert POLICY_VERSION=='same-language-memory-v4'
 
 
 @pytest.mark.parametrize('locale,message,reply',[

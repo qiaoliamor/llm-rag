@@ -13,7 +13,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from .config import ROOT, Settings
 from .memory_routing import route_memory, NO_MEMORY_CONTEXT, Route
-from .memory_understanding import understand, select_evidence, ModelMemoryUnderstanding, MemoryMetadata, ExactMemory, MEMORY_CONTEXT_RULES
+from .memory_understanding import understand, select_evidence, ModelMemoryUnderstanding, MemoryMetadata, ExactMemory, MemoryCallBudget, memory_reply_context
 from .semantic_review import ModelAnalysisProvider
 from .reply_pipeline import generate_checked
 from . import companion
@@ -260,10 +260,10 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
             understood = None
             selection_status = 'not_requested'
             if semantic_memory:
-                memory_deadline = time.monotonic() + settings.memory_understanding_timeout_seconds
+                memory_budget = MemoryCallBudget.start(settings)
                 understood = await understand(memory_understander, body.message, history,
                     enabled=snapshot['memory_enabled'] and abilities['memory'], tz=snapshot['timezone'],
-                    timeout=settings.memory_understanding_timeout_seconds)
+                    timeout=memory_budget.plan_seconds)
                 verify_epoch(session,snapshot['epoch'])
                 plan = understood.plan
                 route = Route(bool(plan and plan.need_memory), plan.query if plan else '',
@@ -272,7 +272,7 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
                 if route.need_memory:
                     candidates = store.semantic_candidates(session.user_id, route.query, target_slots=plan.target_slots)
                     evidence, selection_status = await select_evidence(memory_understander, route.query, history, candidates,
-                        timeout=memory_deadline-time.monotonic())
+                        timeout=memory_budget.selection_timeout())
                     verify_epoch(session,snapshot['epoch'])
             else:
                 route = await route_memory(body.message, history, enabled=snapshot['memory_enabled'] and abilities['memory'],
@@ -310,7 +310,7 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
                 if not route.need_memory:
                     prompt += NO_MEMORY_CONTEXT
             if reply_semantic: prompt += fact_voice.ANSWER_PROMPT
-            if semantic_memory and evidence: prompt += MEMORY_CONTEXT_RULES
+            if semantic_memory: prompt += memory_reply_context(evidence, requested=route.need_memory)
             if weather_semantic and weather_result: prompt += weather_voice.ANSWER_PROMPT
             if emotion_semantic and mood_settings['enabled']:prompt+=emotion_voice.ANSWER_PROMPT
             prompt += language_prompt(body.locale, previous=session.reply_locale)

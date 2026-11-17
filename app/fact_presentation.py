@@ -5,6 +5,7 @@ from .companion import REVIEW_PROMPT
 from .semantic_review import ModelAnalysisProvider, IndexedReview, INDEXED_PROMPT
 from .weather_presentation import REVIEW_PROMPT_EXTRA as WEATHER_REVIEW
 from .emotion_presentation import REVIEW_PROMPT_EXTRA as EMOTION_REVIEW
+from .memory_understanding import MEMORY_REVIEW_PROMPT
 
 POLICY_VERSION = 'multilingual-fact-care-v2'
 # Reviewed whole-response templates, not a semantic keyword/substring classifier.
@@ -48,7 +49,8 @@ class FactAnalysisProvider(ModelAnalysisProvider):
         self.review_prompt = (base
             + (WEATHER_REVIEW if settings.weather_understanding_mode == 'semantic' else '')
             + (EMOTION_REVIEW if settings.emotion_understanding_mode == 'semantic' else '')
-            + REVIEW_PROMPT_EXTRA)
+            + REVIEW_PROMPT_EXTRA
+            + (MEMORY_REVIEW_PROMPT if settings.memory_understanding_mode == 'semantic' else ''))
 
     async def parse(self, schema, prompt, data, timeout, tokens):
         return await super().parse(schema, self.review_prompt if schema is IndexedReview else prompt,

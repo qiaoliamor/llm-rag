@@ -44,6 +44,30 @@ def test_bounded_smoke_uses_synthetic_confirmed_memories_and_aliases_only(monkey
     assert r['assessment']=='not_assessed'
 
 
+def test_failed_ledger_redacts_provider_details_but_keeps_failure_class():
+    async def run():
+        ledger=smoke.Ledger()
+        async def limited():
+            error=RuntimeError('private-synthetic-provider-detail');error.status_code=503;raise error
+        with pytest.raises(RuntimeError):await ledger.call('one','selection',limited)
+        assert ledger.calls[0]['failure']=='upstream_unavailable'
+        assert 'private-synthetic-provider-detail' not in str(ledger.calls)
+    asyncio.run(run())
+
+
+@pytest.mark.parametrize('case',smoke.CASE_IDS)
+def test_single_fixed_case_has_four_call_cap_and_reports_stage_budgets(monkeypatch,case):
+    settings=setup(monkeypatch)
+    r=asyncio.run(smoke.run(settings,(case,)))
+    assert r['max_calls']==4 and r['max_cases']==r['attempted_cases']==1
+    assert r['attempted_calls']<=4 and r['results'][0]['case']==case
+    assert r['memory_budget']=={'plan_seconds':6,'selection_seconds':6,'total_seconds':12}
+
+
+def test_arbitrary_case_is_rejected_before_any_provider_call(monkeypatch):
+    with pytest.raises(ValueError):asyncio.run(smoke.run(setup(monkeypatch),('real-input-not-allowed',)))
+
+
 @pytest.mark.parametrize('failure',['plan','generation'])
 def test_service_failure_stops_all_later_real_attempts_and_preserves_elapsed(monkeypatch,failure):
     r=asyncio.run(smoke.run(setup(monkeypatch,failure)))
