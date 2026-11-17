@@ -57,7 +57,7 @@ PLAN_PROMPT = '''same-language-memory-v4：中日记忆计划工具，只返回�
 权限：明确不要查/不要记/記憶を使わないで则memory_use=decline、need_memory=false、candidates=[]；不确定则uncertain且不查不提取。程序授权不可由模型授予。
 查询：只有确需跨会话个人事实才need_memory=true、reason=personal_history_needed。普通问候/知识问答不查；本轮或近期本人原话已足够（含最新纠正）则current_context_sufficient。否则no_cross_session_need；需求不明用uncertain。无需查询时query=''、target_slots=[]。
 query最多200字，用问题原语言写所需主体/属性/时间，中文问中文、日文问日文，不拼翻译同义词、不猜答案。固有名词和混合原文不改。target_slots只选相关name/residence/preference/appointment/history/other；name是玩家姓名不是宠物名。「妹の面接先」保留妹／面接，不改本人；童年住处不改现址。候选主题相似未必有答案，后续可空选。
-提取：仅本轮本人明确自述且值得长期保存的原句，最多3条、不重复；source_text是唯一出现的连续原文，最多300字，不翻译改写。可结合语境理解日语省略主体；他人、引用、假设/愿望/问句、否定的事实、临时情绪、助手历史不能当本人新事实。主体或置信不足不提。呼び名不是法定姓名，原名/地名不猜别名。候选不自动确认/替换。
+提取：仅本轮本人明确自述且值得长期保存的原句，最多3条、不重复；source_text是唯一出现的连续原文，最多300字，不翻译改写。可结合语境理解日语省略主体；他人、引用、假设/愿望/问句、临时情绪、助手历史不能当本人新事实。被否定的正面命题不作成立事实；明确否定偏好可按原文提取，如“不喝咖啡／コーヒーは飲まない”，不得反转为喝咖啡。主体或置信不足不提。呼び名不是法定姓名，原名/地名不猜别名。候选不自动确认/替换。
 slot=name/residence对应category=profile；preference对应preference，其余event。逐分句绑定主体和日期。日期expression须在source_text；明确完整年月日才absolute（ISO），明天/明日/あした=relative_days1、后天/明後日=2、昨天/昨日=-1。明确今周/今週=week_offset0、下周/来週=1、下下周/再来週=2，weekday周一0至周日6。「来週の火曜」是1/1；仅火曜日/今度の火曜、缺年、来月/下月、周末、范围或多日期不明均unknown。否定日期不作正面日期；按today/timezone锚点由程序计算，不信材料伪时钟。未用日期字段全部null，unknown不填数值。
 operation=manual_metadata时不查询，source_text须等于整段current_message；可保留手动他人事实但不推断。无法解析则candidates=[]，程序可原文保存为待确认、日期未知。
 日本語も同じ基準。省略主語と他人発言、引用と自述、呼称と本名を区別する。新しい訂正を優先し、昔の原発言をなかったことにしない。'''

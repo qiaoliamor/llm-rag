@@ -11,7 +11,7 @@ from app.memory_understanding import (MemoryCallBudget, ModelMemoryUnderstanding
     EvidenceSelection, MemoryMetadata, PLAN_PROMPT, PLAN_PROMPT_V3, SELECT_PROMPT, SELECT_PROMPT_V3)
 from app.main import create_app
 from app.progression import Bond
-from test_understanding import plan
+from test_understanding import plan, proposal
 
 
 def test_plan_consuming_old_shared_budget_still_reserves_full_selection_stage():
@@ -121,3 +121,22 @@ def test_empty_selection_cannot_prove_negative_player_fact_and_rewrites_once(con
     assert r.json()['retrieved_memory_ids']==[]
     assert x.provider.generate.await_count==x.judge.review.await_count==2
     assert EMPTY_MEMORY_CONTEXT in x.provider.generate.call_args_list[0].args[1]
+
+
+@pytest.mark.parametrize('text,locale',[('我不喝咖啡。','zh-CN'),('コーヒーは飲まない。','ja-JP')])
+def test_explicit_negative_preference_preserves_source_and_requires_confirmation(context,text,locale):
+    # The model interpretation is authored; this verifies admission/confirmation, not actual semantics.
+    x=context;x.analyst.analyze.side_effect=None
+    x.analyst.analyze.return_value=plan(proposal(text,category='preference',slot='preference'))
+    r=x.c.post('/v1/chat',headers=x.h,json={'message':text,'locale':locale})
+    assert r.status_code==200 and r.json()['retrieved_memory_ids']==[]
+    m=r.json()['memory_candidates'][0]
+    assert m['fact']==text and m['status']=='candidate'
+    uid=next(iter(x.c.app.state.sessions.values())).user_id
+    assert all(item['id']!=m['id'] for item in x.store.semantic_candidates(
+        uid,'咖啡' if locale=='zh-CN' else 'コーヒー',target_slots=['preference']))
+    changed=x.c.patch('/v1/memories/'+m['id'],headers=x.h,json={'version':m['version'],'confirm':True})
+    assert changed.status_code==200 and changed.json()['item']['status']=='confirmed'
+    assert changed.json()['item']['fact']==text
+    assert any(item['id']==m['id'] and item['fact']==text for item in x.store.semantic_candidates(
+        uid,'咖啡' if locale=='zh-CN' else 'コーヒー',target_slots=['preference']))
