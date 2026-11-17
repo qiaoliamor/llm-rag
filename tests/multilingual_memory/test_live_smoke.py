@@ -61,7 +61,7 @@ def test_single_fixed_case_has_four_call_cap_and_reports_stage_budgets(monkeypat
     r=asyncio.run(smoke.run(settings,(case,)))
     assert r['max_calls']==4 and r['max_cases']==r['attempted_cases']==1
     assert r['attempted_calls']<=4 and r['results'][0]['case']==case
-    assert r['memory_budget']=={'plan_seconds':8,'selection_seconds':6,'total_seconds':14}
+    assert r['memory_budget']=={'plan_seconds':8,'selection_seconds':8,'total_seconds':16}
 
 
 def test_arbitrary_case_is_rejected_before_any_provider_call(monkeypatch):

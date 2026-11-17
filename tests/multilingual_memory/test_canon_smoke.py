@@ -73,7 +73,7 @@ def test_selection_timeout_is_unavailable_not_successful_empty_selection(monkeyp
     assert r['attempted_calls']==2 and row['status']=='selection_failed'
     assert row['selection_status']=='unavailable' and row['selected_ids'] is None
     assert row['review_status']=='not_reached'
-    assert r['memory_budget']=={'plan_seconds':8,'selection_seconds':6,'total_seconds':14}
+    assert r['memory_budget']=={'plan_seconds':8,'selection_seconds':8,'total_seconds':16}
     assert 'private-synthetic-timeout' not in str(r)
 
 
@@ -116,3 +116,26 @@ def test_cli_without_live_never_reads_env_or_connects(tmp_path):
     (tmp_path/'sitecustomize.py').write_text('import sys,os\ndef guard(e,a):\n if e=="open" and isinstance(a[0],(str,bytes)) and os.fsdecode(a[0]).endswith("/.env"):raise RuntimeError("forbidden")\n if e=="socket.connect":raise RuntimeError("forbidden")\nsys.addaudithook(guard)\n')
     r=subprocess.run([sys.executable,'scripts/retest_memory_canon.py'],env={**os.environ,'PYTHONPATH':str(tmp_path)},capture_output=True,text=True)
     assert r.returncode==2 and '--live required' in r.stderr
+
+
+@pytest.mark.parametrize('output,expected_status,expected_schema',[
+    ({'ids':[],'confidence':.95},'selection_completed','validated'),
+    ({'ids':['foreign-secret-id'],'confidence':.95},'selection_failed','validated'),
+    ({'ids':[],'confidence':.2},'selection_failed','validated'),
+    ({'ids':[],'confidence':'high'},'selection_failed','invalid_structure'),
+])
+def test_selection_only_preserves_empty_invalid_foreign_and_uncertain_results(monkeypatch,output,expected_status,expected_schema):
+    settings=setup(monkeypatch);original=smoke.ModelMemoryUnderstanding
+    class Selector(original):
+        async def analyze(self,*a):raise AssertionError('must not repeat plan')
+        async def select(self,data):return output
+    monkeypatch.setattr(smoke,'ModelMemoryUnderstanding',Selector)
+    r=asyncio.run(smoke.run(settings,('ja-memory-subject',),selection_only=True))
+    row=r['results'][0]
+    assert r['attempted_calls']==r['max_calls']==1
+    assert row['status']==expected_status and row['selection_schema_status']==expected_schema
+    assert row['review_status']=='not_reached' and row.get('injected_memories',[])==[]
+    assert row.get('selection_reference_match') is not True
+    if expected_status=='selection_failed':assert row['selected_ids'] is None
+    else:assert row['selected_ids']==[]  # Valid empty result is distinct from timeout/null.
+    assert 'foreign-secret-id' not in json.dumps(r)
