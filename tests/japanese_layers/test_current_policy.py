@@ -123,3 +123,29 @@ def test_current_cli_is_offline_with_private_env_sentinel(tmp_path):
     p=subprocess.run([sys.executable,'scripts/evaluate_japanese.py','--current-policy-matrix'],capture_output=True,text=True,env=env,timeout=120)
     assert p.returncode==0 and json.loads(p.stdout)['attempted']==50
     assert 'private-sentinel' not in p.stdout+p.stderr and not (tmp_path/'must-not-open.sqlite3').exists()
+
+
+@pytest.mark.parametrize('status',['unavailable','uncertain','mock_or_unavailable','accepted'])
+def test_single_tail_cli_rejects_http_200_when_review_incomplete(monkeypatch,capsys,status):
+    import dotenv
+    monkeypatch.setattr(dotenv,'dotenv_values',lambda *a,**k:{})
+    monkeypatch.setenv('GEMINI_API_KEY','synthetic-not-a-key')
+    monkeypatch.setattr(sys,'argv',['retest_bilingual_acceptance.py','--live','--case','ja-subject-tail'])
+    monkeypatch.setattr(live,'run',lambda *a,**k:{'unattempted_ids':[],'blocked':[],
+        'results':[{'test_id':'ja-subject-tail','http_status':200,'semantic_review':{'status':status},
+                    'observations':{'reviews':[]}}]})
+    assert live.main()==1
+    capsys.readouterr()
+
+
+def test_single_tail_cli_success_is_technical_only_not_semantic_acceptance(monkeypatch,capsys):
+    import dotenv
+    monkeypatch.setattr(dotenv,'dotenv_values',lambda *a,**k:{})
+    monkeypatch.setenv('GEMINI_API_KEY','synthetic-not-a-key')
+    monkeypatch.setattr(sys,'argv',['retest_bilingual_acceptance.py','--live','--case','ja-subject-tail'])
+    report={'unattempted_ids':[],'blocked':[],'assessment':'not_assessed',
+        'results':[{'test_id':'ja-subject-tail','http_status':200,'semantic_review':{'status':'accepted'},
+                    'observations':{'reviews':[{'decision':'accept'}]},'reply':{'assessment_basis':'unrated'}}]}
+    monkeypatch.setattr(live,'run',lambda *a,**k:report)
+    assert live.main()==0
+    assert json.loads(capsys.readouterr().out)['results'][0]['reply']['assessment_basis']=='unrated'

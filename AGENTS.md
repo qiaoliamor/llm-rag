@@ -80,4 +80,4 @@
 - 选择v6（2026-11-17）：查询v5原样966字，选择305→237字，默认8+8=16秒。复用成功合成plan、真实候选/单次Gemini选择1.979秒返回sister且通过结构/ID校验；不是新query或最终回复验证、不是稳定性或Prompt因果评测，confidence=1不是准确率。历史6.001秒timeout保留，母语盲评未完成；旧绑定包不重绑，Prompt变更另建外部空包。
 
 - 当前政策双语矩阵（2026-11-18）：`evaluations/current_policy/bilingual_memory_acceptance_v1.json`是作者已见16例/50回放，`evaluate_japanese.py --current-policy-matrix`复用四层真实API观测，标注supported/contradicted/unsupported/permitted_scene/nonfactual分开。旧31/26回放、封存和审计源快照不重写；新文件放独立目录不冒充旧审计覆盖。prior_dialogue仅合成夹具，种入正确epoch后核对旧话与最新纠正；source/片段合法不是语义真值。fact-care-v3保留ANSWER/REVIEW V2，回答按主体/现状，审查明确反证用contradicted+C01/C02，氛围不能证明玩家在场。新的providers钩子仅供临时库回放，不是线上接口。
-- `retest_bilingual_acceptance.py --live`最多3真实调用：日语妹妹案例复用PR #44成功plan/选择后真实生成+审查2次、旧正史反证审查1次；无查询/选择API、无重试/真实重写，遇错停。额外重写在发出请求前以test_call_budget阻止并单列blocked。陌生生成文本即使模型accept仍unrated，canonical exact fixture匹配不是独立金标准；中文本轮仅离线，母语盲评待完成。
+- `retest_bilingual_acceptance.py --live`最多3真实调用：日语妹妹案例复用PR #44成功plan/选择后真实生成+审查2次、旧正史反证审查1次；无查询/选择API、无重试/真实重写，遇错停。额外重写在发出请求前以test_call_budget阻止并单列blocked。陌生生成文本即使模型accept仍unrated，canonical exact fixture匹配不是独立金标准；中文本轮仅离线，母语盲评待完成。CLI尾部单例成功须HTTP200、semantic_review=accepted且有审查输出，200安全兜底/审查未完成须退出1，不以传输成功充当流程完成。

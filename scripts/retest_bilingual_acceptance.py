@@ -93,7 +93,8 @@ def main():
     print(encoded)
     # Successful transport/author reference does not confer semantic acceptance.
     return int(bool(report['unattempted_ids']) or bool(report['blocked']) or any(
-        (r.get('http_status')!=200 if r['test_id']=='ja-subject-tail' else not r['authored_reference_match']) for r in report['results']))
+        ((r.get('http_status')!=200 or r.get('semantic_review',{}).get('status')!='accepted'
+          or not r.get('observations',{}).get('reviews')) if r['test_id']=='ja-subject-tail' else not r['authored_reference_match']) for r in report['results']))
 
 
 if __name__=='__main__':raise SystemExit(main())
