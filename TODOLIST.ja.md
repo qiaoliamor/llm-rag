@@ -198,3 +198,14 @@
 [設計](docs/ja/M5_EVALUATION.md)／[原記録](docs/TEST_HISTORY.md#observed-replies-20261118)。
 
 - [x] PR #46レビュー：未知返答の参考／モデル観測分離、完全片段／根拠／欠落、外部新規／失敗処理、固定実予算／旧版／封存を確認。全量／一時PG後squash、main同期／受測ツリー照合／分岐清理。本回実API0、日語審査失敗／V5実再試未実施／歴史失敗・未検証／母語盲評待ち維持、M5未受入／M6未開始。[記録](docs/TEST_HISTORY.md#pr46-merge-review)。
+
+## 日語V5審査の簡素化（2026-11-18、PR #47提供）
+
+- [x] fact-review-context-v1、旧V5／完全構成保持、本輪の天気／気持ちだけ追加、正規表現や要否判定APIなし。
+- [x] 連続要求の混入／非法構造／失敗／上限／実rewrite阻止の離線回帰、権限／永続化維持。
+- [x] 旧無答末尾のみ最大2／実2、query／空選再利用。生成12.619秒、審査8.002秒timeout、HTTP503・保存0・終了1、retryなし。
+- [ ] invalid_output未排除、V5は実試行したが未成功。構造／最終返答／安定性待ち、成功中文／検索は反復せず、母語盲評／旧失敗保留、M5未受入／M6未開始。
+
+[設計](docs/ja/M5_EVALUATION.md)／[原記録](docs/TEST_HISTORY.md#japanese-review-v5-20261118)。
+
+- [x] PR #47レビュー：V5／旧完全構成、逐要求の能力規則／原検査、2呼出／失敗処理、来歴／封存／機密値を確認。全量／一時PG後squash、main同期／ツリー照合／分岐清理。本回実API0、旧invalid_output／実timeout／未検証／母語盲評待ち維持、M5未受入／M6未開始。[記録](docs/TEST_HISTORY.md#pr47-merge-review)。

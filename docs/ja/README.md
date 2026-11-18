@@ -52,3 +52,7 @@ PR #45マージ確認は実API0。HTTP200の審査未完了をCLI成功にする
 未知実合成返答の離線入口とfact-care-v5はPR #46提供。歴史2文の作者参考は金標準ではなく、実8呼出中中文完了／日語invalid_output保持、V5は離線改善のみ。[M5](M5_EVALUATION.md)／[原記録](../TEST_HISTORY.md#observed-replies-20261118)。
 
 PR #46マージ確認は実API0。離線／来歴確認後squash、main同期／分岐清理。日語審査失敗／V5実再試なし／母語盲評待ちを維持。[記録](../TEST_HISTORY.md#pr46-merge-review)。
+
+V5日語無答審査の簡素化はPR #47提供、V5保持・関連能力のみ、4133→1951文字。実2呼出後審査timeout／503・未公開／未保存、旧invalid_output未排除、V5未成功。[設計](M5_EVALUATION.md)／[記録](../TEST_HISTORY.md#japanese-review-v5-20261118)。
+
+PR #47マージ確認は実API0、離線／来歴確認後squash、main同期／分岐清理。旧invalid_output／実timeoutは未解決のまま保持。[記録](../TEST_HISTORY.md#pr47-merge-review)。

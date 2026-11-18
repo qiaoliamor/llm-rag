@@ -84,3 +84,6 @@
 
 - 陌生合成回复离线入口`evaluate_observed_replies.py`/`app/observed_reply_evaluation.py`：读取current_policy下Gemini转录与独立保存的开发参考，复用annotation_scoring.Claim/check_claims，不把原模型accept当参考。原文SHA/不可变Git文档、源场景/声明选证/角色证据、完整Unicode分片/来源白名单与逐片缺失校验；模型判断仅作分歧观察。声明选证与文档转录不是供应商签名或语义真值。无参考unrated；有作者参考也not_assessed，主观分数不自动填，母语盲评仍待完成。prepare与汇总只写仓库外新文件，评分原件不提交。
 - fact-care-v5使用独立短版并保留V3/V4：V4实测源码022d47c中中文持久纠正完整4阶段完成；日语无答案空选正确，但review invalid_output、HTTP200安全兜底、退出1，8/8调用后停。最终V5只离线验证空选不模拟失忆/讲述来源、unit顺序/唯一编号/三种kind等契约，不声称真实修复。`retest_memory_generalization.py`最多两类各4调用、每阶段至多一次，任错停、不真实重写；日语选择cap仍8秒。新实际模型钩子只用于临时库回放，analysis_calls可真模型/回放，须看memory_stage_source，不与旧复用plan实测混淆。
+
+- V5审查组装`fact-review-context-v1`在fact_presentation.py：V5回答/事实附加文字不变，旧完整组装保留review_prompt_v5_full；新短JSON结构引导+V5+记忆政策，weather_current或emotion_current/emotion_policy存在且相应semantic模式时才附工具政策。逐请求只读拼接不修改共享provider；权限/覆盖/证据/置信度/天气数值/epoch与调用预算不变。当前仅可信完整短句跳过，其余自由回复仍审查；这是缩减请求，不是已经实现语义按需审查，不能偷偷用中日关键词决定放行。
+- retest_japanese_review.py --live固定旧日语无答案尾部：复用PR #46成功合成plan/空选，最多生成1+审查1，不重新理解/选证、不真实重写或重试；测试诊断仅固定错误类型，不能导出SDK原始异常/input。2026-11-18实2调用生成12.619秒、审查8.002秒timeout，HTTP503且未保存草稿；V5已真实尝试但未成功验证，旧invalid_output仍未排除，不能说已修复。旧失败/封存/母语盲评待完成保留，新空包另建不重绑。

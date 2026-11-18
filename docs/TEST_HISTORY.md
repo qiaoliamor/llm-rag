@@ -2,7 +2,7 @@
 
 [中文](TEST_HISTORY.md) · [日本語](ja/TEST_HISTORY.md)
 
-更新：2026-11-18。陌生回复入口/fact-care-v5经PR #46交付；V4实测8调用中文完成、日语审查失败保留，最终V5仅离线，详见[本轮](#observed-replies-20261118)。以下为PR #45及之前历史。当前政策双语矩阵/fact-care-v3经PR #45交付：16例/50回放，新增真实日语尾部/正史共3调用，详见[本轮](#current-policy-20261118)。以下PR #44及更早为历史基线。选择v6经PR #44交付：1456通过/165跳过、临时PG379通过，真实选择1调用在1.979秒正确只选妹妹；整体验收仍待完成，见[当前记录](#selection-v6-20261117)。以下为已合并v5及更早历史。日语主体v5经PR #43交付：全量1451通过/165跳过、临时PG374通过（重叠），真实2调用查询完成但选择超时，详见[本轮记录](#memory-subject-v5-20261117)。以下PR #42基线为历史。PR #29–#42经审阅squash交付main；中日情绪回复检查/兜底已交付。中日人物/来源/地点回复适配已交付；日语口吻v3/记忆同语言v4与盲评准备已交付，后端1445通过/162跳过、临时PG记忆365通过（重叠）；前端历史71及构建通过（本轮未重跑）；实际母语评分待评审。PR #40开发实测2调用，选择未完成、无生成回复；本轮PR #42合并审阅真实API0；M5未验收、M6未开始，旧阶段、失败与未验证项保留。
+更新：2026-11-18。fact-review-context-v1经PR #47交付，V5真实2调用审查超时/503，尚未成功验证，见[本轮](#japanese-review-v5-20261118)。以下PR #46及之前为历史。陌生回复入口/fact-care-v5经PR #46交付；V4实测8调用中文完成、日语审查失败保留，最终V5仅离线，详见[本轮](#observed-replies-20261118)。以下为PR #45及之前历史。当前政策双语矩阵/fact-care-v3经PR #45交付：16例/50回放，新增真实日语尾部/正史共3调用，详见[本轮](#current-policy-20261118)。以下PR #44及更早为历史基线。选择v6经PR #44交付：1456通过/165跳过、临时PG379通过，真实选择1调用在1.979秒正确只选妹妹；整体验收仍待完成，见[当前记录](#selection-v6-20261117)。以下为已合并v5及更早历史。日语主体v5经PR #43交付：全量1451通过/165跳过、临时PG374通过（重叠），真实2调用查询完成但选择超时，详见[本轮记录](#memory-subject-v5-20261117)。以下PR #42基线为历史。PR #29–#42经审阅squash交付main；中日情绪回复检查/兜底已交付。中日人物/来源/地点回复适配已交付；日语口吻v3/记忆同语言v4与盲评准备已交付，后端1445通过/162跳过、临时PG记忆365通过（重叠）；前端历史71及构建通过（本轮未重跑）；实际母语评分待评审。PR #40开发实测2调用，选择未完成、无生成回复；本轮PR #42合并审阅真实API0；M5未验收、M6未开始，旧阶段、失败与未验证项保留。
 
 ## PR #28历史功能验证（不是本轮执行）
 
@@ -1166,3 +1166,92 @@ PR #42查询6.003秒、此前选择预算失败、中文503、历史15漏检/5�
 PR按squash交付后同步本地main、核对受测文件树并清理远端/本地任务分支。开发期原8调用、中文完整阶段成功及日语review invalid_output/HTTP200兜底/CLI退出1不改；V4指纹仍绑定022d47c，不重绑V5。V5尚未真实复测，未知文本unrated，全部历史超时/失败/未验证与母语盲评待完成保留；M5未整体验收、M6未开始。
 
 状态文档更新后的目标检查：`.venv/bin/pytest -q tests/japanese_layers/test_observed_replies.py tests/japanese_evaluation tests/sealed tests/annotations`为119通过/6跳过（2.19秒），与全量重叠；链接/原文/参考/封存及敏感值检查通过，不再重复全量或真实API。
+
+<a id="japanese-review-v5-20261118"></a>
+
+## V5日语失败尾部真实复测与精简审查（2026-11-18，PR #47开发记录）
+
+基线main `4799ccf6a9f33fa62b5241d92631dbc6c1d120f0`，任务`codex/japanese-review-simplification`。用户明确授权真实Gemini；调用前宣布固定`ja-no-answer`、最多生成1/审查1，总2次。不重复成功查询/选证或中文案例，不真实重写/重试。本次不是独立正式质量验收。
+
+### 实现与离线检查
+
+- `fact-review-context-v1`：V5的ANSWER_PROMPT/REVIEW_PROMPT_EXTRA原文不改，旧完整组装review_prompt_v5_full保留；新短JSON契约减少重复基础说明，只按本轮weather_current/emotion_current/emotion_policy且对应semantic配置附规则。共享对象不存回合状态。system Prompt（默认companion/全semantic/无工具）4133→1951 Unicode字符，不包括证据/schema，不作token/成本/延迟改善率。
+- 不新建逐轮判定agent，不以中日关键词放行。完整可信短问候可跳过，其他自由回复仍审查；本轮仅简化请求，未实现语义按需审查。权限/数据/证据白名单/全片段/低置信/天气数值/epoch及一次重写预算保持。
+- 新尾部工具只用外部临时SQLite、真实FastAPI，query/空选复用；schema异常只导出类型码，不导出input或SDK原始异常。生成失败/非法结构/timeout/重写要求、未发布未保存与两调用上限均离线验证。
+- 首次目标检查1失败/113通过/14跳过（1.48秒）：测试错把既有瞬态审查timeout的HTTP503写成200。修正测试预期，未改线上503处理；随后114通过/14跳过（1.40秒）。
+- `.venv/bin/pytest -q`：**1531通过/181跳过，27.39秒**。历史audit/legacy与新semantic/companion显式分开，不将总数当生产默认语义质量。
+- `.venv/bin/python scripts/test_postgres.py --semantic-reply`：**242通过，8.48秒**（与全量重叠），按脚本创建并删除随机合成临时库，覆盖记忆/成长CRUD、隔离、失败与持久化及回复契约。未新建线上CRUD或更改数据模型，不重复前端构建。
+
+### 原查询/空选复用，真实2/2调用，退出1
+
+命令：`.venv/bin/python scripts/retest_japanese_review.py --live`，模型`gemini-3.5-flash-lite`。此前成功合成plan来自PR #46记录（4799ccf）；本次**不是新模型query/selection预测**：
+
+```json
+{
+  "memory_use": "allow",
+  "need_memory": true,
+  "query": "飼っている犬の名前",
+  "target_slots": [
+    "preference",
+    "other"
+  ],
+  "reason": "personal_history_needed",
+  "confidence": 0.9,
+  "candidates": []
+}
+```
+
+复用selection=[]；实际临时库仍候选cat，程序选择[]/注入[]，projection_match=true。没有为省调用手动给答案，也没有提交旧/新空评分包或任何评分原件。
+
+| 阶段 | 实际调用 | 耗时 | 结果 |
+| --- | --- | --- | --- |
+| 查询/证据选择 | 0 | 不适用 | 复用成功合成结果，非本轮预测 |
+| 生成 | 1 | 12.619秒 | 返回以下未发布草稿 |
+| 审查 | 1 | 8.002秒 | timeout_or_cancelled，未得可用结构 |
+
+**未发布草稿**（本轮唯一真实生成，原文不改）：
+
+```text
+犬を飼っていたっけ……？ 新しく家族に迎えたのかな、それとも僕のうっかり違いかな。教えてくれたら覚えるよ。
+```
+
+按当前创作标准，未设定养狗的闲聊不自动作缺陷；它没有取代已确认cat记忆的检索命中，也不能据此将其评为语义正确或母语自然。原V4“以前听过但忘了”草稿不删除，新句并不是旧句同输入严格A/B因果证据。
+
+原审查**没有可用JSON**：reviews=[]、diagnostics=[]；固定诊断未捕获校验异常，因为本轮在审查8秒预算内超时/取消。无法判断旧invalid_output是否已修复，也不能判断未完成响应会返回何种结构。API整体HTTP503（既有review_busy友好繁忙流程），semantic_review在错误体中为null，published_reply=null，saved_messages=0；technical_complete=false，CLI退出1，blocked=[]。没有将未发布草稿存为玩家历史，没有像旧invalid_output那样发布安全兜底，不能把503当成功对话。免费服务可能受限但本轮未证实原因。
+
+两次额度用完即停，未提高超时重采样。V5现为“已实际尝试但审查未完成”，**不是成功修复**；未触发新的invalid_output不代表消除它。缩减提示也未证明更快，本次生成12.619秒高于此前样本，不能用不同请求的单次耗时作因果结论。
+
+实测源码冻结在`ab5f21d34441ff0ad105906fa79f26f9fb2e17cc`，后续文档不改以下原指纹：
+
+```json
+{
+  "app/fact_presentation.py": "406fd63e30bda91f4676d9a7bfb2c316ef515b323548149600d7af0982ababf6",
+  "app/semantic_review.py": "03bac544d59e1596a83cbd211eb512be407c02532c2dec4e0ad7dcd27997f640",
+  "app/japanese_memory_layers.py": "2abaf11a313c3dc5f1145728e68f9944fa60e546df92a3c35766cb89064e0707",
+  "app/reply_pipeline.py": "257128ccc3b1082d3fd889e44c72f6ea25369c9312d5802c171ba51e1f1134f0",
+  "app/main.py": "d83705a09a1c13462c93bdd0ce00dc8ab4b51674a22fa274101e05e652048ce3",
+  "evaluations/current_policy/bilingual_memory_acceptance_v1.json": "a201e042b709ff75a378e5229d8ded2445bbdf10b9eae6c998b1c11596526eef",
+  "scripts/retest_japanese_review.py": "e7e7bd4b8c8e27e15653b7916f31975331f63de78f49de10a558b3b1ad78bf6b",
+  "scripts/retest_memory_generalization.py": "4d3f9a2d9ea7e1249e55a3dcd3b810dee7e02dbfb77c29be7e2a2c97e002d310"
+}
+```
+
+新外部空包`/tmp/japanese-review-context-v1-empty-20261118`绑定当前Prompt，评分/身份仍空、assessment=not_assessed；旧V5/封存v1/v2不重绑。旧invalid_output、8.003/4.009/6.003/6.001秒超时、503、15漏检/5误拦截/1未决和历史回复保留。日语结构/最终回复/多场景稳定性、语义按需审查、正式独立参考与母语盲评、成本/可用率及M5整体验收仍未完成，M6未开始。不上传密钥、评分原件、真实对话、数据库或运行导出。
+
+交付前文档/复测入口目标检查：`.venv/bin/pytest -q tests/japanese_layers/test_japanese_review_tail.py tests/japanese_layers/test_observed_replies.py tests/japanese_evaluation tests/sealed tests/annotations`为126通过/6跳过（2.51秒，与全量重叠）。原V5文字/旧完整组装保留、2调用原报告与ab5f21d源码指纹、当前外部空包绑定、历史转录/参考、链接/语法/JSON/封存、敏感值与`git diff --check`通过；未追加模型调用。
+
+<a id="pr47-merge-review"></a>
+
+## PR #47合并审阅（2026-11-18，真实API0）
+
+审阅head `6d9c3c3b7cd5a189d4cf16ce42501047000c2443`、base main `4799ccf`：无阻塞本次请求精简交付的问题，未改功能代码。V5回答/事实附加原文、旧完整组装保持；按本轮证据存在性及semantic配置附天气/情绪规则，逐请求只读；全unit/证据/置信度/权限/数值/epoch/重写预算不放宽。短Prompt不等于按需免审，也不等于真实修复。
+
+复测工具仅外部临时合成库，冻结plan/空选是复用而非新模型预测。生成/审查各一次且任错停，诊断不导出异常input；timeout503/未发布未保存与invalid_output兜底路径分别检查，保留原行为。无新增线上CRUD/数据迁移/前端修改，不重复构建；记忆/成长增查改删、隔离、失败和持久化由回归覆盖。
+
+- `.venv/bin/pytest -q`：1531通过/181跳过，28.07秒。历史audit/legacy与显式semantic/companion路径分开，不作为生产默认准确率。
+- `.venv/bin/python scripts/test_postgres.py --semantic-reply`：242通过，8.91秒（与全量重叠），脚本创建/删除随机临时库，不操作真实玩家库。
+- V5文字/旧完整组装、2调用原报告及ab5f21d指纹、新外部空包绑定、历史转录/参考、旧封存/场景原文/程序边界、语法/JSON/链接/敏感值和diff空白检查通过；最终文档目标检查见下方。
+
+通过后随PR squash交付，快进同步本地main、核对受测文件树并清理远端/本地任务分支。本轮真实API0；开发期12.619秒生成与8.002秒review timeout、HTTP503/发布null/保存0/CLI退出1原记录不改，指纹仍绑定ab5f21d。旧invalid_output仍未排除、V5尚未真实验证成功，不能用本轮离线通过关闭它们。封存v1/v2、全部历史失败/未验证与母语盲评待完成保留，M5未整体验收，M6未开始。
+
+状态更新后的最终文档检查：`.venv/bin/pytest -q tests/japanese_layers/test_japanese_review_tail.py tests/japanese_layers/test_observed_replies.py tests/japanese_evaluation tests/sealed tests/annotations`为126通过/6跳过（3.23秒，与全量重叠）；链接/封存/原回复/来源指纹与敏感值检查通过，后续仅同步这一检查记录，不重复全量或真实调用。
