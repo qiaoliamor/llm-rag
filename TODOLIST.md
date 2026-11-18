@@ -210,3 +210,13 @@ M6未开始；历史文档整理不改功能/Prompt；当前日语基础适配�
 [矩阵](docs/M5_EVALUATION.md#current-policy-matrix)／[测试](docs/TEST_HISTORY.md#current-policy-20261118)。
 
 - [x] PR #45合并审阅：核对新矩阵来源/参考边界、旧31/26与封存不改、Prompt V2保留、真实提供方钩子仅临时库、固定3调用与未知输出unrated。修复单例HTTP200但审查未完成仍退出0的CLI缺陷并补回归；通过后随PR squash、快进同步main核对文件树并清理分支。本轮真实API0，全部历史失败/未验证及母语盲评待完成保留，M5未整体验收、M6未开始。
+
+## 陌生回复离线入口与双语验证（2026-11-18，任务分支待审）
+
+- [x] 历史Gemini合成2条转录/原文SHA/源上下文，独立保存作者开发参考，复用原Unicode片段/证据检查；无参考unrated，有参考仍not_assessed，主观评分不自动填。
+- [x] 外部空模板/汇总、拒覆盖/失败清理/非法快照或ID/逐片缺失，模型审查只列分歧，不以accept当正解。
+- [x] 精简fact-care-v4并保留V3；实测后保留V4升级V5补空选来源/失忆措辞与unit契约，未加正则，选证8秒不变。
+- [x] 经澄清授权，2类/上限8/实际8调用：中文持久纠正实际4阶段完成；日语空选正确，review invalid_output/HTTP200兜底/退出1后停，不重试。
+- [ ] 最终V5对日语失败仅离线验证，真实结构/生成泛化仍未验证；新实际生成仍unrated，不重复已成功中文链路。独立参考/母语盲评/可用率与费用/M5验收待完成，历史失败与封存保留，M6未开始。
+
+[入口](docs/M5_EVALUATION.md#observed-reply-entry)／[原回复与测试](docs/TEST_HISTORY.md#observed-replies-20261118)。

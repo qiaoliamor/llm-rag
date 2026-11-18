@@ -176,3 +176,34 @@ Prompt负责提出语义判断，程序限制引用和执行，玩家确认后�
 真实开发测试经用户澄清授权后仅3调用：通过真实FastAPI，日语妹妹案例复用成功plan/选证，再生成与审查；另对旧“30岁医生”反证审查1次。不重复中文成功审查或日语选择。成功返回不自动验收：新回复仍unrated，独立母语盲评待完成，中文本轮只有完整离线覆盖。[命令、原文/耗时、失败](TEST_HISTORY.md#current-policy-20261118)。M5未整体验收、M6未开始。
 
 PR #45审阅补充：限量实测CLI的退出0须完整技术流程成功（HTTP200、accepted且有审查输出）；安全兜底或未完成审查退出1。未知真实回复仍unrated，退出0不代表独立质量验收。此修复仅离线验证，不重复开发期成功的真实调用。
+
+<a id="observed-reply-entry"></a>
+
+## 陌生真实合成回复的离线入口（2026-11-18，任务分支待审）
+
+实现`app/observed_reply_evaluation.py`、`scripts/evaluate_observed_replies.py`，输入与作者开发参考分别为`evaluations/current_policy/gemini_observations_v1.json`、`observed_reply_reference_dev_v1.json`。转录PR #45日语妹妹回复、PR #42复用审查的中文原回复，不重复调用模型。它们来自Gemini合成实验，不是玩家对话或私人评分原件；中文样本的历史发布状态未观察，不冒称已经在网页发布。
+
+1. 原文、history、实际声明选证/完整事实和model_review_observation分开保存；provenance绑定不可变Git文档、源场景、原文SHA与上下文。文档转录/场景匹配不是供应商签名，也不独立证明选证事件或语义支持。
+2. 不再要求新句等于固定fixture。另行提交完整命题参考：start/end/text、kind、verdict、evidence_ids、proposition、rationale，调用原`annotation_scoring.Claim/check_claims`验证Unicode连续完整覆盖和来源。事实缺失/未决必须定位到claim_index，回答不完整须列answer缺失；语气/独立性缺失单列。
+3. 源上下文按原Git版本核对本人消息、合成记忆、角色/scene资料，拒绝私换事实、外来ID、旧快照重绑、重复字段或漏尾。已知ID/完整分片不等于语义真值。无参考保持unrated；有作者参考为author_reference_checked_not_independent，整体仍not_assessed。
+4. 原模型审查只作观察：对齐分片后列kind/verdict/evidence分歧，不让accept填参考或抵消缺失。旧中文“她后来情况怎么样，还顺利吗？”开发参考是询问未知结果，不将面试记忆当结果证据；旧审查的assertion/supported与之有分歧。日语「だっけ」开发参考为试探回忆，不由此给母语自然度打分。
+5. 不自动补naturalness/character_voice/care_fit或人类身份，不声称双标/κ。空模板与不含原文/理由/身份的统计只在仓库外新文件生成，拒绝覆盖并复用失败清理；`--require-acceptance`固定返回3，计算成功不等于验收。
+
+```sh
+# 没有参考时，两条真实合成新句都是unrated；零模型调用
+.venv/bin/python scripts/evaluate_observed_replies.py
+# 有公开作者开发参考，校验并汇总；仍not_assessed
+.venv/bin/python scripts/evaluate_observed_replies.py \
+  --reference evaluations/current_policy/observed_reply_reference_dev_v1.json \
+  --output /tmp/observed-summary.json
+# 生成空标注模板，不预填命题或主观分数
+.venv/bin/python scripts/evaluate_observed_replies.py --prepare /tmp/observed-empty.json
+```
+
+这补齐的是保存输出→版本/原文/证据核对→完整命题→缺失/分歧汇总的技术入口，未补齐独立语义金标准或母语人评。新样本应新建版本/来源绑定，不改旧转录或旧评分包。无线上CRUD接口；输出新建、重复拒绝、非法输入和失败处理已测，记忆删除/撤回/权限仍由原回归负责。
+
+## 短Prompt与本轮双语实测边界
+
+fact-care-v4改独立短版，保留V3全文；实测后另保留V4并升级V5：回答1488→690、审查附加Prompt2244→1107个Unicode字符（不是总请求token或延迟降幅）。语义边界仍包含主体/现状与历史、来源时间、完整专名/在场、正史、许可氛围、真实工具与非诊断。自然问题在在线unit schema是nonfactual，不用标注schema的question；每个输入ID按序且仅一次，空选不拿“忘了以前听过”解释来源。无新增语言正则，权限/证据/epoch/8秒选证不变。
+
+本轮另行授权并预先限定2类/8调用：中文持久化纠正与日语无答案，都是已有故障回放类别、真实覆盖未补齐；不重复成功中文面试审查/日语妹妹回复。V4下中文4阶段实际完成并只注入新地址；日语空选正确，但审查invalid_output，网页返回安全兜底、CLI退出1。未重试、未真实重写。V5是该失败之后的离线改进，**尚未真实复测，不保证已修复日语泛化**。细分结构失败原因未捕获，不归因为额度/网络；缺证据不等于否定养狗，未设定闲聊自由不变。[原回复/耗时/指纹/失败](TEST_HISTORY.md#observed-replies-20261118)。M5未整体验收、母语盲评待完成、M6未开始。

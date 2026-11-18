@@ -186,3 +186,13 @@
 [矩陣](docs/ja/M5_EVALUATION.md)／[原記録](docs/TEST_HISTORY.md#current-policy-20261118)。
 
 - [x] PR #45レビュー：新参考／旧31/26と封存／Prompt V2保存／一時庫のみの実提供者／3呼出上限／unrated境界を確認。単例HTTP200でも審査未完了ならCLI失敗へ修正・回帰後squash、main同期／ツリー照合／分岐清理。本回実API0、歴史失敗／未検証と母語盲評待ちを保持、M5未受入／M6未開始。
+
+## 未知返答入口と双語検証（2026-11-18、レビュー待ち）
+
+- [x] 歴史実合成2文の転記／SHA／元文脈と作者参考を分離、Unicode片段／証拠検査再利用。無参考unrated、有参考でもnot_assessed、主観採点なし。
+- [x] 外部空包／統計、上書拒否／失敗清理／非法快照・ID／欠落、モデルacceptは正解にしない。
+- [x] 短縮V4と原V3保存、実測後V4保存してV5を離線改善。選択8秒／権限不変。
+- [x] 承認後2類最大8／実8呼出：中文訂正は実4段階成功、日語は空選後invalid_output・安全fallback／終了1で停止、retryなし。
+- [ ] 最終V5の日語実修復未検証、新実返答unrated。成功中文を反復せず、独立参考／母語盲評／安定性費用／M5受入は未完了、歴史失敗／封存保持、M6未開始。
+
+[設計](docs/ja/M5_EVALUATION.md)／[原記録](docs/TEST_HISTORY.md#observed-replies-20261118)。

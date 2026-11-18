@@ -7,7 +7,7 @@ from .weather_presentation import REVIEW_PROMPT_EXTRA as WEATHER_REVIEW
 from .emotion_presentation import REVIEW_PROMPT_EXTRA as EMOTION_REVIEW
 from .memory_understanding import MEMORY_REVIEW_PROMPT, MEMORY_CANON_POLICY
 
-POLICY_VERSION = 'multilingual-fact-care-v4'
+POLICY_VERSION = 'multilingual-fact-care-v5'
 # Reviewed whole-response templates, not a semantic keyword/substring classifier.
 TRUSTED_TEMPLATES = {
     'zh-CN': frozenset({'你好', '你好。', '你好！', '嗯，我在听。'}),
@@ -73,6 +73,15 @@ REVIEW_PROMPT_EXTRA = '''
 完整专名原样或代词，不猜缩写/别名、距离或在场。仅最新本人明确状态支持到店；过去/意向/助手邀请不支持现在已到店，离开优先。
 scene_profile授权声音/暖灯/翻书等普通虚构氛围（assertion/supported+scene_profile），不是天气观测，也不支持玩家经历、共同过去或具体交易/消息/预约。混合句逐项区分，不以许可前半包庇无据后半。
 常体/简短/省略/不反问不自动是role_issues；回避自家普通氛围的客服式能力声明可列role_issues，但未知库存/外部消息/工具失败诚实留保不误判。仅修越界部分，不强加安慰或关系。原结构/完整覆盖/证据白名单保持，不输出解释或思考。
+'''
+ANSWER_PROMPT_V4 = ANSWER_PROMPT
+REVIEW_PROMPT_EXTRA_V4 = REVIEW_PROMPT_EXTRA
+ANSWER_PROMPT = ANSWER_PROMPT_V4.replace('multilingual-fact-care-v4','multilingual-fact-care-v5') + '''
+空选只表示本轮无直接答案，不用“以前听过但想不起来/教えてもらった気がするけど思い出せない”模拟检索来源或解释缺失。可自然询问名字等所需信息，不强迫复述共同过去；未设定普通闲聊的自由仍保留。不要把信息缺失变成角色失忆。
+'''
+REVIEW_PROMPT_EXTRA = REVIEW_PROMPT_EXTRA_V4.replace('multilingual-fact-care-v4','multilingual-fact-care-v5') + '''
+结构契约：只返回confidence、role_issues、units；每个输入unit.id按原顺序且仅一次，不能改id/另拆/合并/补单元。kind仅assertion/epistemic/nonfactual；纯问题在此schema用nonfactual而非question。role_issues只含输入id，无问题用[]；非事实须not_applicable且evidence_ids=[]，不输出原文、reason或自由解释。
+空证据时自然问未知名字不拦；不要把“过去听过、现在记不起”当作数据库或讲述时间证明。其是否越界按当前语境/明确事实和角色不以失忆解释空白的边界判断，不将未设定养狗状态本身当缺陷。
 '''
 REWRITE = '''\n按本轮语言只修审查指出的正史/玩家事实/来源时间/地点或口吻问题：保留许可氛围和自然关心，别写成客服。没有来源时间就不加“刚才/今天/さっき”；地名原样或代词，不猜别名；不默认玩家到店、不否认存在的历史原话。引用与否定按实际作用域处理。'''
 

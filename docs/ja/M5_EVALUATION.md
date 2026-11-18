@@ -122,3 +122,13 @@ M5は未受入、M6は未着手です。今回、日本語UI／基本対話を�
 fact-care-v3はV2全文保存、主体／訂正と履歴・反証C01/C02・混合句許可を回答／審査で明確化。正規表現追加なし、query v5／selection v6・8秒cap／権限／epochは不変。実Geminiは承認後最大3／実3呼出、妹例の成功plan／選択を再利用して実生成と審査、旧正史矛盾の審査1回。中国語は今回離線のみ、母語盲評待ち、M5未受入／M6未開始。[共通矩陣](../M5_EVALUATION.md#current-policy-matrix)／[原記録](../TEST_HISTORY.md#current-policy-20261118)。
 
 PR #45レビュー補足：実測CLIの0終了にはHTTP200／accepted／審査出力が必要。安全fallback・未完了審査は終了1。未知返答はunratedのまま、0を独立品質合格としません。修正は離線のみで旧成功実APIは反復なし。
+
+## 未知の実合成返答の離線評価（2026-11-18、レビュー待ち）
+
+`evaluate_observed_replies.py`は保存済みGemini合成2出力（PR #45日本語／PR #42中文）と別の作者開発参考を読みます。既存Claim/check_claimsでUnicode全片段・ID白名簿を検査し、proposition／rationale／claim_index付き欠落を記録。原文SHA・不変Git文書・元場面・宣言選択・人物根拠を照合、転記は署名付き実行証明ではありません。中文の旧公開状態は未観測と明示。
+
+参考なしunrated、作者参考ありでもnot_assessed。元モデルacceptは観測だけで、kind/verdict/証拠の分歧を報告し正解を自動作成しません。後続面接結果を尋ねる中文質問は結果の断言ではありません。母語自然度・主観点・人評身份／κは自動生成しません。prepare／統計は新しい外部ファイルのみ、旧包再束縛なし、--require-acceptanceは終了3。[共通設計とコマンド](../M5_EVALUATION.md#observed-reply-entry)。
+
+fact-care-v5は独立短版、V3/V4全文保存。回答1488→690・審査追加2244→1107 Unicode文字、総token／遅延の改善率ではありません。空選を忘却／過去に聞いた根拠へせず、unit順序・唯一ID・kind3種を明示、選択8秒cap／権限／epochは維持。
+
+実測V4では予告2類最大8／実8呼出、中文永続訂正はplan→選択→生成→審査完了、新住所だけ注入。日語無答は空選正しい一方review invalid_output、安全fallback、終了1。原失敗を保存しretry／追加実rewriteなし。V5は実測後の離線変更のみで修復未検証。[原記録](../TEST_HISTORY.md#observed-replies-20261118)。独立参考／母語盲評／泛化／安定性費用は未受入、M5未受入、M6未開始。

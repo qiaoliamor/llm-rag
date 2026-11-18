@@ -136,3 +136,7 @@ retest_memory_canon.py --liveは固定旧失敗だけ、日語主体plan／選�
 ## 現方針の四層確認（2026-11-18）
 
 日中16例／50回放に本人／妹・現在訂正（過去本人発言も可視）・永続訂正・無答と人物／雰囲気を統合。旧31/26回放は変更なし、query v5／selection v6／8秒cap維持。日本語尾部の実APIはPR #44成功plan／選択を再利用しsisterのみ注入後、実生成と審査を観測。新query／選択予測・泛化合格ではありません。中国語は今回離線のみ、母語盲評待ち。[矩陣](M5_EVALUATION.md)／[原記録](../TEST_HISTORY.md#current-policy-20261118)。
+
+## 双語の実段階検証（2026-11-18）
+
+test-only understanderで固定合成例のplan／選択／生成／審査を実モデルへ。中文永続訂正はnewだけ候補／注入して完了。日語無答はcat候補から空選、審査invalid_outputで安全fallback、全経路成功ではありません。query v5／selection v6／8+8秒・権限／確認／epoch不変、最終fact-care-v5は離線だけで修復未検証。B01–B03／母語盲評待ちを保持。[原記録](../TEST_HISTORY.md#observed-replies-20261118)。

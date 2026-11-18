@@ -48,3 +48,5 @@ PR #44マージ確認は離線のみ、実API0。単例成功を全経路／安�
 現方針の日中矩陣とfact-care-v3はPR #45提供：既見16例／50回放、日本語実3呼出で旧失敗尾部／反証のみ確認、独立品質未受入。[M5](M5_EVALUATION.md)／[原記録](../TEST_HISTORY.md#current-policy-20261118)。
 
 PR #45マージ確認は実API0。HTTP200の審査未完了をCLI成功にする欠陥を離線修正、開発時原出力／指紋を保持。意味品質／母語盲評は未受入。[レビュー記録](../TEST_HISTORY.md#pr45-merge-review)。
+
+未知実合成返答の離線入口とfact-care-v5を開発中。歴史2文の作者参考は金標準ではなく、実8呼出中中文完了／日語invalid_output保持、V5は離線改善のみ。[M5](M5_EVALUATION.md)／[原記録](../TEST_HISTORY.md#observed-replies-20261118)。
