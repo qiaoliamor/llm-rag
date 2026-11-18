@@ -168,8 +168,8 @@ def test_sdk_composition_and_control_policy_only_mock_transport(mode,weather_mod
         assert f.REVIEW_PROMPT_EXTRA_V3.startswith(f.REVIEW_PROMPT_EXTRA_V1)
         assert f.REVIEW_PROMPT_EXTRA.startswith("\n【"+f.POLICY_VERSION)
         assert f.POLICY_VERSION in prompt
-        assert (f.WEATHER_REVIEW in prompt)==(weather_mode=='semantic')
-        assert (f.EMOTION_REVIEW in prompt)==(emotion_mode=='semantic')
+        assert f.WEATHER_REVIEW not in prompt
+        assert f.EMOTION_REVIEW not in prompt
         assert next(x['data'] for x in data['evidence'] if x['id']=='reply_policy')['reply_locale']==locale
         result={'confidence':.95,'role_issues':[],'units':[{'id':u['id'],'kind':'nonfactual','verdict':'not_applicable','evidence_ids':[]} for u in data['units']]}
         return httpx.Response(200,json={'id':'synthetic','object':'chat.completion','created':0,'model':'synthetic','choices':[
@@ -356,3 +356,29 @@ def test_structured_japanese_review_failure_is_bounded_and_unavailable(fault):
             return await review_reply(f.FactAnalysisProvider(settings,client),text,[{'role':'user','content':'犬の名前は？'}],evidence_bundle([],[],None,None))
     result=asyncio.run(execute())
     assert result.status=='unavailable' and result.failure=='invalid_output' and len(requests)==1
+
+
+@pytest.mark.parametrize('ids',[[],['weather_current'],['emotion_policy'],['emotion_current'],['weather_current','emotion_policy']])
+def test_contextual_review_only_includes_relevant_capability_and_does_not_leak(ids):
+    settings=Settings(_env_file=None,chat_provider='mock',weather_understanding_mode='semantic',emotion_understanding_mode='semantic',memory_understanding_mode='semantic')
+    provider=f.FactAnalysisProvider(settings)
+    data={'evidence':[{'id':id} for id in ids]}
+    prompt=provider.prompt_for(data)
+    assert (f.WEATHER_REVIEW in prompt)==('weather_current' in ids)
+    assert (f.EMOTION_REVIEW in prompt)==bool(set(ids)&{'emotion_policy','emotion_current'})
+    assert f.REVIEW_PROMPT_EXTRA in prompt and f.MEMORY_REVIEW_PROMPT in prompt
+    assert len(provider.prompt_for({'evidence':[]})) < len(provider.review_prompt_v5_full)
+    assert f.WEATHER_REVIEW not in provider.prompt_for({'evidence':[]})
+    assert f.EMOTION_REVIEW not in provider.prompt_for({'evidence':[]})
+
+
+def test_contextual_review_respects_legacy_tool_modes_and_nonreview_parse(monkeypatch):
+    settings=Settings(_env_file=None,chat_provider='mock',weather_understanding_mode='legacy',emotion_understanding_mode='legacy')
+    provider=f.FactAnalysisProvider(settings)
+    prompt=provider.prompt_for({'evidence':[{'id':'weather_current'},{'id':'emotion_policy'}]})
+    assert f.WEATHER_REVIEW not in prompt and f.EMOTION_REVIEW not in prompt
+    captured=[]
+    async def parse(self,schema,prompt,data,timeout,tokens):captured.append(prompt);return 'scripted'
+    monkeypatch.setattr(f.ModelAnalysisProvider,'parse',parse)
+    assert asyncio.run(provider.parse(dict,'unchanged-router',{},1,100))=='scripted'
+    assert captured==['unchanged-router']
