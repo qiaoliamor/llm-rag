@@ -132,3 +132,11 @@ PR #45レビュー補足：実測CLIの0終了にはHTTP200／accepted／審査�
 fact-care-v5は独立短版、V3/V4全文保存。回答1488→690・審査追加2244→1107 Unicode文字、総token／遅延の改善率ではありません。空選を忘却／過去に聞いた根拠へせず、unit順序・唯一ID・kind3種を明示、選択8秒cap／権限／epochは維持。
 
 実測V4では予告2類最大8／実8呼出、中文永続訂正はplan→選択→生成→審査完了、新住所だけ注入。日語無答は空選正しい一方review invalid_output、安全fallback、終了1。原失敗を保存しretry／追加実rewriteなし。V5は実測後の離線変更のみで修復未検証。[原記録](../TEST_HISTORY.md#observed-replies-20261118)。独立参考／母語盲評／泛化／安定性費用は未受入、M5未受入、M6未開始。
+
+## V5審査の簡素化と失敗部分の実測（2026-11-18、レビュー待ち）
+
+今回は審査要求を簡素化します。信頼済みの短い挨拶以外の自由返答は引き続き審査し、日中キーワードで無条件に通しません。呼出を増やして審査要否を判断する仕組みも追加しません。会話ごとの意味的な審査省略は未実装です。
+
+`fact-review-context-v1`はV5回答／事実ルールを変更せず、重複した基本説明を短いJSON契約へ置換。旧完全構成は保存します。weather_current、emotion_current/emotion_policyが本輪にあり対応semanticの時だけ各能力ルールを追加、共有providerに状態を保存しません。既定の記憶のみではsystem部分4133→1951 Unicode文字、証拠／schema／tokenは別です。短縮は遅延／費用改善の実証ではありません。権限・根拠・全unit・数値・epoch・一度の書直し予算は維持します。
+
+固定旧無答例は成功した合成query／空選を再利用し、実生成1＋審査1の最大2呼出、query／選択APIなし、retry／実rewriteなし。生成12.619秒、審査8.002秒timeoutでHTTP503、未公開／保存0／終了1。V5は実試行しましたが審査未完了、旧invalid_output解決とは判断しません。旧失敗／母語盲評待ち／M5未受入／M6未開始を維持。[設計](../M5_EVALUATION.md#scoped-review-v5)／[原記録](../TEST_HISTORY.md#japanese-review-v5-20261118)。
