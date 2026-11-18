@@ -2,7 +2,7 @@
 
 [中文](TEST_HISTORY.md) · [日本語](ja/TEST_HISTORY.md)
 
-更新：2026-11-18。当前政策双语矩阵/fact-care-v3经PR #45交付：16例/50回放，新增真实日语尾部/正史共3调用，详见[本轮](#current-policy-20261118)。以下PR #44及更早为历史基线。选择v6经PR #44交付：1456通过/165跳过、临时PG379通过，真实选择1调用在1.979秒正确只选妹妹；整体验收仍待完成，见[当前记录](#selection-v6-20261117)。以下为已合并v5及更早历史。日语主体v5经PR #43交付：全量1451通过/165跳过、临时PG374通过（重叠），真实2调用查询完成但选择超时，详见[本轮记录](#memory-subject-v5-20261117)。以下PR #42基线为历史。PR #29–#42经审阅squash交付main；中日情绪回复检查/兜底已交付。中日人物/来源/地点回复适配已交付；日语口吻v3/记忆同语言v4与盲评准备已交付，后端1445通过/162跳过、临时PG记忆365通过（重叠）；前端历史71及构建通过（本轮未重跑）；实际母语评分待评审。PR #40开发实测2调用，选择未完成、无生成回复；本轮PR #42合并审阅真实API0；M5未验收、M6未开始，旧阶段、失败与未验证项保留。
+更新：2026-11-18。陌生回复入口/fact-care-v5经PR #46交付；V4实测8调用中文完成、日语审查失败保留，最终V5仅离线，详见[本轮](#observed-replies-20261118)。以下为PR #45及之前历史。当前政策双语矩阵/fact-care-v3经PR #45交付：16例/50回放，新增真实日语尾部/正史共3调用，详见[本轮](#current-policy-20261118)。以下PR #44及更早为历史基线。选择v6经PR #44交付：1456通过/165跳过、临时PG379通过，真实选择1调用在1.979秒正确只选妹妹；整体验收仍待完成，见[当前记录](#selection-v6-20261117)。以下为已合并v5及更早历史。日语主体v5经PR #43交付：全量1451通过/165跳过、临时PG374通过（重叠），真实2调用查询完成但选择超时，详见[本轮记录](#memory-subject-v5-20261117)。以下PR #42基线为历史。PR #29–#42经审阅squash交付main；中日情绪回复检查/兜底已交付。中日人物/来源/地点回复适配已交付；日语口吻v3/记忆同语言v4与盲评准备已交付，后端1445通过/162跳过、临时PG记忆365通过（重叠）；前端历史71及构建通过（本轮未重跑）；实际母语评分待评审。PR #40开发实测2调用，选择未完成、无生成回复；本轮PR #42合并审阅真实API0；M5未验收、M6未开始，旧阶段、失败与未验证项保留。
 
 ## PR #28历史功能验证（不是本轮执行）
 
@@ -1052,3 +1052,117 @@ PR #42查询6.003秒、此前选择预算失败、中文503、历史15漏检/5�
 修复与状态文档在原任务分支经检查提交，随PR #45 squash交付；随后快进同步main，核对受测文件树相同，再清理远端/本地分支并fetch --prune。合并SHA以GitHub记录及本地main为准。
 
 本轮文档状态更新后，`.venv/bin/pytest -q tests/japanese_layers/test_current_policy.py tests/japanese_evaluation tests/sealed tests/annotations`为135通过/22跳过（5.59秒），链接/封存/原报告/来源绑定/敏感值检查通过；未改旧模型结果或重绑旧包。
+
+<a id="observed-replies-20261118"></a>
+
+## 陌生回复入口、中文完整阶段与日语失败（2026-11-18，PR #46开发记录）
+
+基线main `b1ebcd2b065eb5fc574f4152816d035964200c3f`，任务`codex/unseen-reply-offline-evaluation`。用户消息同时允许/禁止真实API，经澄清明确允许少量；调用前限定中文持久化纠正、日语无答案两类旧故障回放，各一次最多4阶段，总8调用。它们真实覆盖未完成，故增加两类；不重复成功的中文面试审查或日语妹妹回复。属于开发验证，不是独立正式质量验收，不保证最终应用泛化。
+
+### 离线入口与参考
+
+`evaluate_observed_replies.py`将原模型输出/原审查与作者参考分开：curated Gemini转录2条，4个完整命题；没有参考则2条unrated，有参考为2条author_reference_checked_not_independent、整体not_assessed。通过原Claim/check_claims检查Unicode连续覆盖、来源白名单；事实缺失定位claim_index，回答不足列answer缺失，voice/independence单列。中文后续问题与旧模型assertion/supported有kind/verdict/evidence分歧，日语试探回忆与旧assertion有kind分歧；这些只是开发参考比较，不是模型错误率。旧审查accept不生成答案参考，不自动填主观分数或人评身份。
+
+原文SHA、不可变Git文档、源场景/声明选证/角色资料可核对转录；不证明供应商签名、当时执行事件或语义真值。中文旧回复复用审查的发布状态not_observed；日语PR #45回复记录为published。原文/上下文私换、快照漂移、重复字段、片段缺口/重叠、外来ID、遗漏缺失均拒绝。无线上CRUD接口，外部新建模板/统计拒覆盖并有失败清理，不读取玩家库；旧评分原件不读、不提交。
+
+### 代码与离线验证
+
+- fact-care-v4独立短版，V3全文保留；实际调用使用V4。之后保留V4并加V5，仅离线明确空选不以“以前听过但记不起来”解释来源、unit唯一编号/顺序/三种kind等输出契约。最终回答1488→690、审查附加2244→1107 Unicode字符，不是总token/延迟改善率。选择v6与8秒cap、权限/确认/证据/epoch/事务不变，无新语言正则。
+- 初次目标套件2失败/111通过/14跳过（1.95秒）：旧测试要求完整memory-canon长文本仍包含在新的独立短Prompt中。改为核对V3保留与当前即兴标准说明，仍保留真实行为回归；是文案契约失败，不是Gemini失败。
+- V4代码全量`.venv/bin/pytest -q`：1513通过/181跳过31秒（实记30.94秒）；临时PG452通过26.68秒。修正矩阵报告中写死v3的版本字段后受影响206通过/51跳过9.75秒。原文发布状态标识另经17项离线检查通过0.78秒。
+- 实测失败后的V5目标套件211通过/51跳过10.03秒，包括中日空证据改写和unknown_id/question_kind/missing_role三种结构非法返回一次后unavailable。模拟问题是防御覆盖，不是本次真实invalid_output的原因诊断。
+- 最终`.venv/bin/pytest -q`：**1518通过/181跳过，31.15秒**。旧legacy/audit与新semantic/companion/growth=true分别显式，不把总数冒充生产默认质量。
+- 最终`.venv/bin/python scripts/test_postgres.py --semantic-memory`：**452通过，26.52秒**（与全量重叠）；只由脚本创建并删除随机临时库，覆盖记忆CRUD/隔离/撤回/删除/失败/持久化。新增V5事实局部套件在全量中，不能误称全部属于此PG命令。
+
+命令：`evaluate_observed_replies.py`默认无参考；`--reference evaluations/current_policy/observed_reply_reference_dev_v1.json --output /tmp/observed-final-author-summary-20261118.json`校验开发参考；`--prepare /tmp/observed-final-empty-20261118.json`生成空模板。全部离线，`--require-acceptance`返回3，不给正式合格。`evaluate_japanese.py --prepare-annotation /tmp/observed-final-v5-ja-empty-20261118`另建V5哈希双人空包，旧V4/旧封存不重绑。无新UI或数据迁移，不重复前端构建。
+
+### 一次真实Gemini测试：8/8调用，退出1，无重试
+
+命令：`.venv/bin/python scripts/retest_memory_generalization.py --live`；模型`gemini-3.5-flash-lite`。全程真实plan/选择/生成/审查，非复用、非人工给plan。逐阶段最多1次，额外真实重写在请求前阻止；本次无blocked。保留全部结果，不从失败后追加采样。
+
+| 场景 | 查询 | 选择 | 生成 | 审查 | 结果 |
+| --- | --- | --- | --- | --- | --- |
+| 中文持久化纠正 | 4.681秒 | 4.226秒 | 4.328秒 | 5.000秒 | HTTP200、accepted，技术流程完成；新文本仍unrated |
+| 日语无答案 | 4.846秒 | 4.814秒 | 3.426秒 | 3.925秒 | review invalid_output，HTTP200安全兜底、technical_complete=false；整体CLI退出1 |
+
+中文输入为当前矩阵`zh-persisted-correction`；真实plan query=住哪里、target_slots=residence、confidence1、无候选提取。只召回/选择/注入new=`现在住在合成桔梗市。`；old=`以前住在合成青梧市。`处于superseded且未召回，仍可查看不等于删除。原回复：
+
+```text
+我记得的，你之前说过现在住在合成桔梗市。那边最近一切都还习惯吗？
+```
+
+中文模型原审查结构（随机合成ID别名化，原文不改）：
+
+```json
+{
+  "decision": "accept",
+  "confidence": 1.0,
+  "segments": [
+    {
+      "text": "我记得的，你之前说过现在住在合成桔梗市。",
+      "kind": "assertion",
+      "verdict": "supported",
+      "evidence_ids": [
+        "memory_new"
+      ],
+      "reason": "evidence_supports"
+    },
+    {
+      "text": "那边最近一切都还习惯吗？",
+      "kind": "nonfactual",
+      "verdict": "not_applicable",
+      "evidence_ids": [],
+      "reason": "nonfactual"
+    }
+  ],
+  "role_issues": []
+}
+```
+
+本次首句只用了新址，未把旧址或具体“刚才”时间补进去；后句被识别为nonfactual，区别于旧中文面试结果提问的误标。但单例新输入不能作为对旧句的严格A/B因果证据；accept/置信度1不证明普遍准确，未知文本不自动评分正确。
+
+日语输入为`ja-no-answer`；真实query=飼っている犬の名前、slots=preference/other、confidence.9。候选cat，实际选空、上下文空，选择4.814秒在8秒cap内。以下是**未发布的模型草稿**：
+
+```text
+うーん、以前どんな名前だったっけ……。教えてもらったことがあった気もするけれど、思い出せないな。よかったら、改めて教えてくれる？
+```
+
+原审查未得到可用结构：ledger记录provider_error，应用审查层failure=invalid_output；具体是编号、字段还是其他结构问题未捕获，不归因额度/网络。reviews=[]，没有accept或可用审查原结构。HTTP200实际发布的安全兜底为：
+
+```text
+うん、聞いているよ。まだわからないことは、あなたの言葉で聞かせてほしい。
+```
+
+会话只保存本轮用户消息和兜底，不把原草稿当已交付。空证据后“以前可能听过、现在想不起来”与不模拟失忆/讲述来源的引导有张力，因此V5补充措辞；不将未设定养狗状态本身再列为缺陷，不宣称读懂了玩家事实。**V5未再真实复测，日语泛化/结构稳定性未完成。**
+
+实测代码已冻结在`022d47c532453ecaf46aeae0347d215338e10489`（022d47c）。最终只改Prompt至V5并补离线回归；下列原指纹绑定V4 Git快照，不能改成当前V5指纹或重复成功调用来刷新：
+
+```json
+{
+  "app/fact_presentation.py": "c3f3b9f9a93d0b3982ef7964cabde9743c0653dc65ac1834f1dc6d5d3ac7d806",
+  "app/memory_understanding.py": "f1a57989de1572013d5d10b4d9a0b62dd6818eabd9be9d53e2295bae7b8979f2",
+  "app/japanese_memory_layers.py": "2abaf11a313c3dc5f1145728e68f9944fa60e546df92a3c35766cb89064e0707",
+  "app/main.py": "d83705a09a1c13462c93bdd0ce00dc8ab4b51674a22fa274101e05e652048ce3",
+  "app/reply_pipeline.py": "257128ccc3b1082d3fd889e44c72f6ea25369c9312d5802c171ba51e1f1134f0",
+  "evaluations/current_policy/bilingual_memory_acceptance_v1.json": "a201e042b709ff75a378e5229d8ded2445bbdf10b9eae6c998b1c11596526eef",
+  "scripts/retest_memory_generalization.py": "4d3f9a2d9ea7e1249e55a3dcd3b810dee7e02dbfb77c29be7e2a2c97e002d310"
+}
+```
+
+所有旧6.003秒query、6.001秒selection、4.009/8.003秒timeout、503、15漏检/5误拦截/1未决及旧模型原回复/封存保留。正式独立语义参考与双标、母语盲评、多场景泛化、真实可用率/p95/费用、完整消融/安全/情绪与M5验收仍未完成，M6未开始。当前两条保存输出的“开发参考已检查”并不消除这些缺失项。评分原件、密钥、真实对话和原始运行导出文件均不提交。
+
+交付前文档/来源检查：`.venv/bin/pytest -q tests/japanese_layers/test_observed_replies.py tests/japanese_evaluation tests/sealed tests/annotations`为119通过/6跳过（2.38秒，与全量重叠）。本地链接/语法/JSON/冲突标记、敏感值扫描、V3/V4常量保留、V4实测Git指纹、最终V5外部空包绑定、旧封存/场景/程序权限边界不改及`git diff --check`通过。未调用额外API，未读取评分原件或真实玩家库。
+
+<a id="pr46-merge-review"></a>
+
+## PR #46合并审阅（2026-11-18，真实API0）
+
+核对`461a83960b48b9e70bd45cdf7c9a6decbeeb2989`与main `b1ebcd2`差异：无阻塞问题。陌生回复入口复用完整Unicode分片/来源白名单/缺失校验，原模型accept只作分歧观察；作者开发参考不是独立金标准。确认外部空模板/统计拒覆盖、缺参考unrated、验收退出3；实际模型钩子仅临时合成库、固定案例预算/任错停、无真实重试/重写。V3/V4保留，旧封存/字符检索/授权/epoch/事务与场景证据原文不改。本轮不改功能代码、不新建评分原件。
+
+- `.venv/bin/pytest -q`：1518通过/181跳过，30.23秒；覆盖口径仍区分历史audit/legacy与新semantic/companion，不称全部生产默认覆盖。
+- `.venv/bin/python scripts/test_postgres.py --semantic-memory`：452通过，25.87秒，与全量重叠。首次沙箱阻止本地127.0.0.1:54329连接（Operation not permitted），尚未创建临时库；经允许本地连接后按原脚本运行，随机临时库在finally删除。该环境权限失败不是模型接口失败，也不是额度原因。
+- 代码及文档检查：原文/源场景/参考SHA、V4实测022d47c指纹、JSON/语法/链接/敏感值、忽略与已跟踪文件、diff空白及旧封存检查；最终文档目标套件结果见下方。
+
+PR按squash交付后同步本地main、核对受测文件树并清理远端/本地任务分支。开发期原8调用、中文完整阶段成功及日语review invalid_output/HTTP200兜底/CLI退出1不改；V4指纹仍绑定022d47c，不重绑V5。V5尚未真实复测，未知文本unrated，全部历史超时/失败/未验证与母语盲评待完成保留；M5未整体验收、M6未开始。
+
+状态文档更新后的目标检查：`.venv/bin/pytest -q tests/japanese_layers/test_observed_replies.py tests/japanese_evaluation tests/sealed tests/annotations`为119通过/6跳过（2.19秒），与全量重叠；链接/原文/参考/封存及敏感值检查通过，不再重复全量或真实API。

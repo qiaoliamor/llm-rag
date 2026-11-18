@@ -165,7 +165,8 @@ def test_sdk_composition_and_control_policy_only_mock_transport(mode,weather_mod
         body=json.loads(request.content);calls.append(body)
         prompt=body['messages'][0]['content'];data=json.loads(body['messages'][1]['content'])
         assert f.REVIEW_PROMPT_EXTRA in prompt
-        assert f.REVIEW_PROMPT_EXTRA.startswith(f.REVIEW_PROMPT_EXTRA_V1)
+        assert f.REVIEW_PROMPT_EXTRA_V3.startswith(f.REVIEW_PROMPT_EXTRA_V1)
+        assert f.REVIEW_PROMPT_EXTRA.startswith("\n【"+f.POLICY_VERSION)
         assert f.POLICY_VERSION in prompt
         assert (f.WEATHER_REVIEW in prompt)==(weather_mode=='semantic')
         assert (f.EMOTION_REVIEW in prompt)==(emotion_mode=='semantic')
@@ -304,7 +305,8 @@ def test_empty_memory_open_world_review_prompt_uses_mock_sdk_only(memory_mode):
 ])
 def test_unspecified_pet_chat_allowed_under_new_standard_with_authored_verdict(text,locale):
     from app.memory_understanding import MEMORY_CANON_POLICY
-    assert MEMORY_CANON_POLICY in f.ANSWER_PROMPT
+    assert MEMORY_CANON_POLICY in f.ANSWER_PROMPT_V3
+    assert "未设定普通闲聊允许即兴" in f.ANSWER_PROMPT
     judge=SimpleNamespace(review=AsyncMock(return_value=judgment(text)))
     (reply,guarded,status),_=run([text],judge,locale=locale)
     assert reply==text and not guarded and status['calls']==1
@@ -320,3 +322,37 @@ def test_creative_blank_does_not_exempt_canon_or_confirmed_memory_contradiction(
     judge=SimpleNamespace(review=AsyncMock(side_effect=[judgment(bad,'contradicted'),judgment(good)]))
     (reply,guarded,status),g=run([bad,good],judge,locale=locale,memories=memories)
     assert reply==good and guarded and status['calls']==2
+
+
+@pytest.mark.parametrize('bad,good,locale',[
+    ('以前どんな名前だったっけ。教えてもらった気もするけど、思い出せないな。','名前を聞かせてくれる？','ja-JP'),
+    ('你以前好像告诉过我，但我现在想不起来了。','愿意告诉我它叫什么吗？','zh-CN'),
+])
+def test_empty_evidence_does_not_require_amnesia_and_rewrites_once(bad,good,locale):
+    judge=SimpleNamespace(review=AsyncMock(side_effect=[judgment(bad,'unsupported'),judgment(good)]))
+    (reply,guarded,status),generator=run([bad,good],judge,memories=[],locale=locale)
+    assert reply==good and guarded and status['calls']==2
+    assert f.REWRITE in generator.generate.call_args.args[1]
+    assert generator.generate.call_count==2
+
+
+@pytest.mark.parametrize('fault',['unknown_id','question_kind','missing_role'])
+def test_structured_japanese_review_failure_is_bounded_and_unavailable(fault):
+    import httpx,json
+    text='以前聞いた気もするけれど思い出せないな。'
+    requests=[]
+    def handler(request):
+        body=json.loads(request.content);requests.append(body)
+        units=json.loads(body['messages'][1]['content'])['units']
+        value={'confidence':.95,'role_issues':[],'units':[{'id':u['id'],'kind':'nonfactual','verdict':'not_applicable','evidence_ids':[]} for u in units]}
+        if fault=='unknown_id':value['units'][0]['id']='unknown'
+        elif fault=='question_kind':value['units'][0]['kind']='question'
+        else:value.pop('role_issues')
+        return httpx.Response(200,json={'id':'synthetic','object':'chat.completion','created':0,'model':'synthetic',
+            'choices':[{'index':0,'finish_reason':'stop','message':{'role':'assistant','content':json.dumps(value)}}]})
+    async def execute():
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            settings=Settings(_env_file=None,chat_provider='gemini',gemini_api_key='synthetic-not-a-key',dialogue_mode='companion')
+            return await review_reply(f.FactAnalysisProvider(settings,client),text,[{'role':'user','content':'犬の名前は？'}],evidence_bundle([],[],None,None))
+    result=asyncio.run(execute())
+    assert result.status=='unavailable' and result.failure=='invalid_output' and len(requests)==1

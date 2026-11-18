@@ -145,7 +145,7 @@ def _run_probe(case,probe,url,*,providers=None):
     responses={r.id:r for r in case.responses}
     trace={'analysis_calls':0,'candidate_ids':None,'requested_ids':None,'selected_ids':None,'selection_status':'not_reached',
            'prompts':[],'generation_calls':0,'review_calls':0}
-    observations={'generated':[],'reviews':[],'published_reply':None}
+    observations={'generated':[],'reviews':[],'published_reply':None,'plans':[],'memory_understanding':None}
     def public_review(value):
         data=value.model_dump() if hasattr(value,'model_dump') else value
         data=json.loads(json.dumps(data))
@@ -156,12 +156,21 @@ def _run_probe(case,probe,url,*,providers=None):
     class Analyst:
         async def analyze(self,data):
             trace['analysis_calls']+=1
+            if providers and providers.get('understander'):
+                raw=await providers['understander'].analyze(data)
+                observations['plans'].append(raw.model_dump() if hasattr(raw,'model_dump') else raw)
+                return raw
             if providers and providers.get('frozen_plan') is not None:return providers['frozen_plan']
             need=case.need_memory or probe.retrieval=='force'
             return {'memory_use':'allow','need_memory':need,'query':case.retrieval_query if need else '',
                     'target_slots':case.target_slots if need else [],'reason':'personal_history_needed' if need else 'current_context_sufficient',
                     'confidence':.95,'candidates':[]}
         async def select(self,data):
+            if providers and providers.get('understander'):
+                raw=await providers['understander'].select(data)
+                view=raw.model_dump() if hasattr(raw,'model_dump') else raw
+                trace['requested_ids']=[alias(id) for id in view['ids']] if isinstance(view,dict) and isinstance(view.get('ids'),list) else None
+                return raw
             wanted=providers['frozen_selection'] if providers and 'frozen_selection' in providers else case.relevant
             if probe.selection=='wrong_known':wanted=[case.wrong_evidence]
             if probe.selection=='outside_id':wanted=['__outside__']
@@ -285,8 +294,9 @@ def _run_probe(case,probe,url,*,providers=None):
             'state':{'saved_messages':history_saved,'remaining_ids':remaining},'semantic_review':body.get('semantic_review')}
         if providers:
             observations['published_reply']=published
+            observations['memory_understanding']=body.get('memory_understanding')
             result['observations']=observations
-            result['memory_stage_source']='replayed_reference_not_current_prediction'
+            result['memory_stage_source']='live_model' if providers.get('understander') else 'replayed_reference_not_current_prediction'
         return result
     finally:store.engine.dispose()
 
@@ -335,7 +345,8 @@ def evaluate(path=DATASET):
             'Intentional false accepts and incorrect known IDs remain in the report; no native blind review or M5 acceptance.']}
 
     if suite.version=='bilingual-current-policy-author-dev-v1':
-        report['policy']='memory-canon-focus-v2; multilingual-fact-care-v3'
+        from .fact_presentation import POLICY_VERSION as fact_policy
+        report['policy']='memory-canon-focus-v2; '+fact_policy
         report['acceptance_matrix']=[{
             'case':case.id,'locale':case.locale,'group':case.group,'origin':case.origin,'reference_note':case.reference_note,
             'reference_responses':[{'response':response.id,'segments':[claim.model_dump() for claim in response.claims]} for response in case.responses],

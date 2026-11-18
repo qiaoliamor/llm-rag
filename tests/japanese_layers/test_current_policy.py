@@ -19,6 +19,8 @@ def report():return e.evaluate(e.CURRENT_POLICY_DATASET)
 def test_current_matrix_has_both_languages_full_layers_and_keeps_false_accepts(report):
     assert report['cases']==16 and report['attempted']==50 and report['model_calls']==0
     assert report['assessment']=='not_assessed' and report['scope']=='current_policy_bilingual'
+    from app.fact_presentation import POLICY_VERSION
+    assert report['policy']=='memory-canon-focus-v2; '+POLICY_VERSION
     assert report['reference_probes']=={'attempted':16,'reference_answer_complete':16,'candidate_misses':0}
     assert report['published_with_unsupported_claims']==14 and report['projection_mismatches']==0
     for locale in ('ja-JP','zh-CN'):
