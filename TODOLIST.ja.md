@@ -2,7 +2,7 @@
 
 [中文](TODOLIST.md) · [日本語](TODOLIST.ja.md)
 
-更新：2026-11-17。PR #29–#44はレビュー後squashでmainへ提供。チェックは実装物の存在でモデル品質の正式受入ではありません。詳細は[計画](docs/ja/PLAN.md)と[日本語対応](docs/ja/JAPANESE_LOCALIZATION.md)。
+更新：2026-11-18。PR #29–#45はレビュー後squashでmainへ提供。チェックは実装物の存在でモデル品質の正式受入ではありません。詳細は[計画](docs/ja/PLAN.md)と[日本語対応](docs/ja/JAPANESE_LOCALIZATION.md)。
 
 ## 実装済み
 
@@ -174,3 +174,15 @@
 [設計](docs/ja/M2_MEMORY.md)／[原記録](docs/TEST_HISTORY.md#selection-v6-20261117)。
 
 - [x] PR #44レビュー：query v5不変、選択v6／旧Prompt、8＋8秒、構造／外来ID／低信頼／nullと空集合、単独選択で成功query／審査を反復しないことをCLI確認。squash後main同期／受測ツリー照合／分岐清理。本回実API0、歴史timeout／失敗／未検証／母語盲評待ちを保持、M5未受入、M6未開始。
+
+## 現方針の双語矩陣（2026-11-18、PR #45提供）
+
+- [x] 作者既見16例／50回放・完全命題参考、本人／妹・現在／永続訂正・無答・正史・雰囲気／来店前提。旧データ／封存／監査は変更なし。
+- [x] fact-care-v3で主体／履歴／反証と許可をPrompt中心で改善、V2保存、選択8秒cap維持。
+- [x] CLI・合成一時SQLite／PG、非法標注／権限／CRUD／撤回／失敗確認。意図的誤accept14と過拦2を保存しモデル誤率にしない。
+- [x] 明示承認後実Gemini最大3／実3、旧妹例の生成／審査尾部と旧正史反証審査、成功plan／選択再利用、retryなし。
+- [ ] 実新返答unrated、中国語は今回離線のみ。泛化／独立参考・母語盲評／安定性費用／M5受入は未完了。歴史失敗を保持、M6未開始。
+
+[矩陣](docs/ja/M5_EVALUATION.md)／[原記録](docs/TEST_HISTORY.md#current-policy-20261118)。
+
+- [x] PR #45レビュー：新参考／旧31/26と封存／Prompt V2保存／一時庫のみの実提供者／3呼出上限／unrated境界を確認。単例HTTP200でも審査未完了ならCLI失敗へ修正・回帰後squash、main同期／ツリー照合／分岐清理。本回実API0、歴史失敗／未検証と母語盲評待ちを保持、M5未受入／M6未開始。

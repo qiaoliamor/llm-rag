@@ -110,3 +110,15 @@ M5は未受入、M6は未着手です。今回、日本語UI／基本対話を�
 2026-11-17：記憶Prompt短縮と6+6秒段階予算。上限8呼出を宣言し2例各1回、両選択完了。日語の無根拠否定の偽accept、中文審査503を保存し、SDK成功／選択一致を返答品質に置換しません。実測後の空根拠指針は離線のみ、実修復証明でなく、母語独立評審／全意味・費用とM5受入は未完了。[履歴](TEST_HISTORY.md)へ。
 
 2026-11-17方針変更：未設定の飼育雑談は欠陥扱いにせず、memory-canon-focus-v2は明示記憶／現在原話／人物設定を照合。旧判断／封存不変、標準変更を精度改善としません。旧脚本unsupported数も旧参考で保存、新金標準ではありません。創作断言を人評ラベルで扱う規約は別途校準待ち、旧12編集文／空包は新独立集の代用不可。母語盲評待ち、plan timeoutを保存し、後続の未呼出人物／中文審査は各1回でrevise／accept。細かい証拠ラベルと日語選択は未受入。[履歴](TEST_HISTORY.md)へ。
+
+## 現行方針の日中全経路マトリクス（2026-11-18、PR #45提供）
+
+`evaluations/current_policy/bilingual_memory_acceptance_v1.json`は公開作者既見16例（各言語8）／50回放。旧四層・同言語例から派生しorigin／reference_noteを保存、旧データ／封存v1/v2／監査源を変更しません。`evaluate_japanese.py --current-policy-matrix`で実候補→選択→Prompt→公開返答を観測します。
+
+本人／妹、現在の訂正（旧本人発言も可視）、永続訂正（superseded除外）、無答、正史C01/C02の矛盾、自然な音・光、雰囲気に混ぜた来店前提を日中で検証。supported／contradicted／unsupported／permitted_scene／nonfactualを区別し、反証には直接ID、雰囲気許可はscene_profileのみ。全片段とID検査は真の意味支持を保証しません。permitted_sceneは参考用で、オンラインschemaは変えません。
+
+脚本reference16完了、候補欠落0／投影不一致0。意図的誤accept14件と雰囲気誤拒否2件を保存、モデル誤率ではありません。未知返答はunrated、モデル自身のacceptで正解にしません。構造／注入／権限／CRUDは自動検査でき、人評不要。意味品質・母語自然度・独立受入は未完了です。
+
+fact-care-v3はV2全文保存、主体／訂正と履歴・反証C01/C02・混合句許可を回答／審査で明確化。正規表現追加なし、query v5／selection v6・8秒cap／権限／epochは不変。実Geminiは承認後最大3／実3呼出、妹例の成功plan／選択を再利用して実生成と審査、旧正史矛盾の審査1回。中国語は今回離線のみ、母語盲評待ち、M5未受入／M6未開始。[共通矩陣](../M5_EVALUATION.md#current-policy-matrix)／[原記録](../TEST_HISTORY.md#current-policy-20261118)。
+
+PR #45レビュー補足：実測CLIの0終了にはHTTP200／accepted／審査出力が必要。安全fallback・未完了審査は終了1。未知返答はunratedのまま、0を独立品質合格としません。修正は離線のみで旧成功実APIは反復なし。

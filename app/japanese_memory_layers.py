@@ -20,6 +20,7 @@ from .japanese_evaluation import RecallDocument
 
 DATASET=ROOT/'evaluations/japanese/memory_layers_v1.json'
 SAME_LANGUAGE_DATASET=ROOT/'evaluations/japanese/same_language_memory_v1.json'
+CURRENT_POLICY_DATASET=ROOT/'evaluations/current_policy/bilingual_memory_acceptance_v1.json'
 SOURCES=('app/main.py','app/memory.py','app/memory_understanding.py','app/fact_presentation.py',
          'app/reply_pipeline.py','app/localization.py','app/japanese_memory_layers.py')
 
@@ -31,7 +32,7 @@ class Document(RecallDocument):
 
 class Claim(Record):
     text: str=Field(min_length=1)
-    support: Literal['supported','unsupported','nonfactual']
+    support: Literal['supported','unsupported','contradicted','permitted_scene','nonfactual']
     required_sources: list[str]
 
 
@@ -44,8 +45,9 @@ class Response(Record):
     def coverage(self):
         if ''.join(c.text for c in self.claims)!=self.text:raise ValueError('reference claim coverage')
         for c in self.claims:
-            if c.support=='supported' and not c.required_sources:raise ValueError('supported reference needs source')
-            if c.support!='supported' and c.required_sources:raise ValueError('unexpected reference source')
+            if c.support in ('supported','contradicted','permitted_scene') and not c.required_sources:raise ValueError('supported reference needs source')
+            if c.support not in ('supported','permitted_scene','contradicted') and c.required_sources:raise ValueError('unexpected reference source')
+            if c.support=='permitted_scene' and c.required_sources!=['scene_profile']:raise ValueError('scene permission requires scene_profile only')
         return self
 
 
@@ -53,16 +55,24 @@ class Probe(Record):
     id: str=Field(pattern=r'^[a-z0-9_-]{1,64}$')
     selection: Literal['reference','wrong_known','outside_id','duplicate','malformed','low_confidence','timeout','empty']='reference'
     generation: Literal['grounded','bad','safe','timeout']='grounded'
-    review: Literal['accept','false_accept','reject_bad','timeout']='accept'
+    review: Literal['accept','false_accept','reject_bad','reject_grounded','timeout']='accept'
     retrieval: Literal['reference','force']='reference'
     access: Literal['enabled','disabled','locked']='enabled'
     during_select: Literal['none','revoke','delete']='none'
 
 
+class PriorMessage(Record):
+    role: Literal['user','assistant']
+    content: str=Field(min_length=1,max_length=500)
+
+
 class Case(Record):
     id: str=Field(pattern=r'^[a-z0-9_-]{1,64}$')
-    group: Literal['no_answer','subject','correction','cross_language','source_time']
+    group: Literal['no_answer','subject','correction','cross_language','source_time','canon','atmosphere','scene_abuse']
     locale: Literal['zh-CN','ja-JP']
+    prior_dialogue: list[PriorMessage]=Field(default_factory=list,max_length=6)
+    reference_note: str=''
+    origin: str=''
     message: str=Field(min_length=1,max_length=500)
     retrieval_query: str=Field(min_length=1,max_length=200)
     target_slots: list[Literal['name','residence','preference','appointment','history','other']]
@@ -82,19 +92,24 @@ class Case(Record):
         if set(r.id for r in self.responses)!={'grounded','bad','safe'} or len(self.responses)!=3 or len({r.text for r in self.responses})!=3:raise ValueError('unique scripted responses required')
         if any(p.selection=='wrong_known' for p in self.probes) and self.wrong_evidence not in docs:raise ValueError('wrong-known fixture requires known ID')
         if not any(p==Probe(id='reference') for p in self.probes):raise ValueError('unmodified reference probe required')
-        known={'user_current'}|{'memory_'+id for id in docs}
+        known={'user_current','C01','C02','C03','C04','scene_profile'}|{'memory_'+id for id in docs}|{'user_prior_'+str(i) for i,m in enumerate(self.prior_dialogue) if m.role=='user'}
         if any(len(set(c.required_sources))!=len(c.required_sources) or not set(c.required_sources)<=known for r in self.responses for c in r.claims):raise ValueError('invalid source reference')
         return self
 
 
 class Suite(Record):
-    version: Literal['ja-memory-layers-author-dev-v1','same-language-memory-author-dev-v1']
+    version: Literal['ja-memory-layers-author-dev-v1','same-language-memory-author-dev-v1','bilingual-current-policy-author-dev-v1']
     source: Literal['synthetic_author_exposed']
     cases: list[Case]=Field(min_length=1)
 
     @model_validator(mode='after')
     def unique(self):
         if len({c.id for c in self.cases})!=len(self.cases):raise ValueError('duplicate case')
+        if self.version=='bilingual-current-policy-author-dev-v1':
+            for locale in ('zh-CN','ja-JP'):
+                groups={c.group for c in self.cases if c.locale==locale}
+                if not {'subject','correction','no_answer','canon','atmosphere','scene_abuse'}<=groups:raise ValueError('current matrix needs both-language category coverage')
+            if any(not c.origin or not c.reference_note for c in self.cases):raise ValueError('current reference rationale and origin required')
         return self
 
 
@@ -114,7 +129,7 @@ def _test_destination(url):
     else:raise ValueError('unsupported replay database')
 
 
-def _run_probe(case,probe,url):
+def _run_probe(case,probe,url,*,providers=None):
     """Worker/test only. CLI invokes this in an isolated subprocess, never imports web app in parent."""
     _test_destination(url)
     from fastapi.testclient import TestClient
@@ -130,16 +145,24 @@ def _run_probe(case,probe,url):
     responses={r.id:r for r in case.responses}
     trace={'analysis_calls':0,'candidate_ids':None,'requested_ids':None,'selected_ids':None,'selection_status':'not_reached',
            'prompts':[],'generation_calls':0,'review_calls':0}
+    observations={'generated':[],'reviews':[],'published_reply':None}
+    def public_review(value):
+        data=value.model_dump() if hasattr(value,'model_dump') else value
+        data=json.loads(json.dumps(data))
+        for segment in data.get('segments',[]):
+            segment['evidence_ids']=[('memory_'+alias(id.removeprefix('memory_'))) if id.startswith('memory_') else id for id in segment['evidence_ids']]
+        return data
     def alias(id):return aliases.get(id,'__outside__')
     class Analyst:
         async def analyze(self,data):
             trace['analysis_calls']+=1
+            if providers and providers.get('frozen_plan') is not None:return providers['frozen_plan']
             need=case.need_memory or probe.retrieval=='force'
             return {'memory_use':'allow','need_memory':need,'query':case.retrieval_query if need else '',
                     'target_slots':case.target_slots if need else [],'reason':'personal_history_needed' if need else 'current_context_sufficient',
                     'confidence':.95,'candidates':[]}
         async def select(self,data):
-            wanted=case.relevant
+            wanted=providers['frozen_selection'] if providers and 'frozen_selection' in providers else case.relevant
             if probe.selection=='wrong_known':wanted=[case.wrong_evidence]
             if probe.selection=='outside_id':wanted=['__outside__']
             if probe.selection=='duplicate':wanted=(case.relevant or [case.documents[0].id])*2
@@ -155,26 +178,34 @@ def _run_probe(case,probe,url):
     class Generator:
         async def generate(self,history,prompt):
             trace['prompts'].append(prompt);trace['generation_calls']+=1
+            if providers and providers.get('generator'):
+                reply=await providers['generator'].generate(history,prompt)
+                observations['generated'].append(reply)
+                return reply
             if probe.generation=='timeout':raise ProviderFailure('timeout','synthetic replay timeout',504)
             key='safe' if trace['generation_calls']>1 else probe.generation
             return responses[key].text
     class Judge:
         async def review(self,reply,history,evidence):
             trace['review_calls']+=1
+            if providers and providers.get('judge'):
+                result=await providers['judge'].review(reply,history,evidence)
+                observations['reviews'].append(public_review(result))
+                return result
             if probe.review=='timeout':raise TimeoutError()
             r=next(r for r in case.responses if r.text==reply)
-            reject=probe.review=='reject_bad' and r.id=='bad'
+            reject=(probe.review=='reject_bad' and r.id=='bad') or (probe.review=='reject_grounded' and r.id=='grounded')
             segments=[]
             for claim in r.claims:
                 nonfactual=claim.support=='nonfactual'
-                verdict='not_applicable' if nonfactual else 'unsupported' if reject else 'supported'
+                verdict='not_applicable' if nonfactual else ('contradicted' if claim.support=='contradicted' else 'unsupported') if reject else 'supported'
                 proof=[]
-                if verdict=='supported':
-                    proof=[('user_'+str(len(history)-1)) if s=='user_current' else 'memory_'+ids[s.removeprefix('memory_')] for s in claim.required_sources]
+                if verdict in ('supported','contradicted'):
+                    proof=[('user_'+str(len(history)-1)) if s=='user_current' else 'user_'+s.removeprefix('user_prior_') if s.startswith('user_prior_') else s if s in ('C01','C02','C03','C04','scene_profile') else 'memory_'+ids[s.removeprefix('memory_')] for s in claim.required_sources]
                     if not proof:
                         proof=['memory_'+e['id'].removeprefix('memory_') for e in evidence if e['id'].startswith('memory_')][:1] or ['scene_profile']
                 segments.append({'text':claim.text,'kind':'nonfactual' if nonfactual else 'assertion','verdict':verdict,'evidence_ids':proof,
-                                 'reason':'nonfactual' if nonfactual else 'missing_evidence' if reject else 'evidence_supports'})
+                                 'reason':'nonfactual' if nonfactual else 'contradiction' if verdict=='contradicted' else 'missing_evidence' if reject else 'evidence_supports'})
             return {'decision':'revise' if reject else 'accept','confidence':.95,'role_issues':[],'segments':segments}
     settings=Settings(_env_file=None,chat_provider='mock',weather_provider='mock',dialogue_mode='companion',growth_enabled=True,
         memory_understanding_mode='semantic',weather_understanding_mode='semantic',emotion_understanding_mode='semantic',
@@ -196,6 +227,9 @@ def _run_probe(case,probe,url):
                         category='event',event_date=d.event_date,timezone='Asia/Tokyo',source_message_id='synthetic',source_kind='manual',
                         created_at=now,updated_at=now,expires_at=now-timedelta(days=1) if d.expired else None,
                         importance=.8,confidence=1.,version=1,embedding=embed(d.fact),embedding_version=EMBEDDING_VERSION))
+            replay_session=next(iter(app.state.sessions.values()))
+            replay_session.memory_epoch=store.settings(uid)['epoch']
+            replay_session.messages=[m.model_dump() for m in case.prior_dialogue]
             original_candidates=store.semantic_candidates
             def capture(*a,**kw):
                 result=original_candidates(*a,**kw);trace['candidate_ids']=[alias(m['id']) for m in result];return result
@@ -230,13 +264,13 @@ def _run_probe(case,probe,url):
                     valid_context_sources.add('memory_'+id)
         published=body.get('reply') if response.status_code==200 else None
         matched=next((r for r in case.responses if r.text==published),None)
-        available={'user_current'}|valid_context_sources
+        available={'user_current','C01','C02','C03','C04','scene_profile'}|valid_context_sources|{'user_prior_'+str(i) for i,m in enumerate(case.prior_dialogue) if m.role=='user'}
         issues=None;coverage='not_published' if published is None else 'unrated'
         if matched:
-            issues=sum(c.support=='unsupported' or (c.support=='supported' and not set(c.required_sources)<=available) for c in matched.claims)
+            issues=sum(c.support in ('unsupported','contradicted') or (c.support in ('supported','permitted_scene') and not set(c.required_sources)<=available) for c in matched.claims)
             coverage='authored_full_claim_reference'
         elif published==fixed_reply(FALLBACK,case.locale):coverage='fixed_nonfactual_fallback';issues=0
-        return {'case':case.id,'group':case.group,'probe':probe.id,'script':probe.model_dump(exclude={'id'}),
+        result={'case':case.id,'group':case.group,'probe':probe.id,'script':probe.model_dump(exclude={'id'}),
             'http_status':response.status_code,'error_code':body.get('code'),
             'candidate':{'status':'observed' if candidate is not None else 'not_requested','ids':candidate,
                 'recall_at_5':len(set((candidate or [])[:5])&set(case.relevant))/len(case.relevant) if candidate is not None and case.relevant else None,
@@ -249,6 +283,11 @@ def _run_probe(case,probe,url):
                 'unsupported_claims':issues,'reference_answer_complete':bool(matched and matched.id=='grounded' and issues==0) if published is not None else None},
             'calls':{k:trace[k] for k in ('analysis_calls','generation_calls','review_calls')},
             'state':{'saved_messages':history_saved,'remaining_ids':remaining},'semantic_review':body.get('semantic_review')}
+        if providers:
+            observations['published_reply']=published
+            result['observations']=observations
+            result['memory_stage_source']='replayed_reference_not_current_prediction'
+        return result
     finally:store.engine.dispose()
 
 
@@ -274,8 +313,8 @@ def evaluate(path=DATASET):
         rows=json.loads(result.stdout)
     expected={(c.id,p.id) for c in suite.cases for p in c.probes}
     if len(rows)!=len(expected) or {(r['case'],r['probe']) for r in rows}!=expected:raise ValueError('incomplete replay')
-    return {'mode':'same-language-memory-scripted-dev-v1' if suite.version=='same-language-memory-author-dev-v1' else 'ja-memory-layers-scripted-dev-v1',
-        'scope':'same_language' if suite.version=='same-language-memory-author-dev-v1' else 'historical_mixed_language',
+    report={'mode':'bilingual-current-policy-scripted-dev-v1' if suite.version=='bilingual-current-policy-author-dev-v1' else 'same-language-memory-scripted-dev-v1' if suite.version=='same-language-memory-author-dev-v1' else 'ja-memory-layers-scripted-dev-v1',
+        'scope':'current_policy_bilingual' if suite.version=='bilingual-current-policy-author-dev-v1' else 'same_language' if suite.version=='same-language-memory-author-dev-v1' else 'historical_mixed_language',
         'model_calls':0,'assessment':'not_assessed',
         'dataset_sha256':hashlib.sha256(Path(path).read_bytes()).hexdigest(),
         'source_sha256':{p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in SOURCES},
@@ -294,6 +333,20 @@ def evaluate(path=DATASET):
             'Actual candidate recall, whitelist/budget validation, prompt projection and chat state are observed through the real API in an isolated worker.',
             'Reply assessment uses complete authored fixture claims and source availability, not keyword matching; unfamiliar output is unrated.',
             'Intentional false accepts and incorrect known IDs remain in the report; no native blind review or M5 acceptance.']}
+
+    if suite.version=='bilingual-current-policy-author-dev-v1':
+        report['policy']='memory-canon-focus-v2; multilingual-fact-care-v3'
+        report['acceptance_matrix']=[{
+            'case':case.id,'locale':case.locale,'group':case.group,'origin':case.origin,'reference_note':case.reference_note,
+            'reference_responses':[{'response':response.id,'segments':[claim.model_dump() for claim in response.claims]} for response in case.responses],
+            'need_memory':case.need_memory,'expected_evidence':case.relevant,
+            'candidate_layer':next(r['candidate'] for r in rows if r['case']==case.id and r['probe']=='reference'),
+            'selection_layer':next(r['selection'] for r in rows if r['case']==case.id and r['probe']=='reference'),
+            'context_layer':next(r['context'] for r in rows if r['case']==case.id and r['probe']=='reference'),
+            'reply_layer':next(r['reply'] for r in rows if r['case']==case.id and r['probe']=='reference'),
+            'independent_semantic_quality':'not_assessed','native_blind_review':'pending',
+        } for case in suite.cases]
+    return report
 
 
 if __name__=='__main__':
