@@ -1,0 +1,85 @@
+{
+  "version": "observed-reply-development-reference-v1",
+  "basis": "author_development_review_not_independent",
+  "observations_sha256": "57c14494cff1d39b26128baa4e425948af529cf35f39bd4b4191bb372f085b45",
+  "annotations": [
+    {
+      "observation_id": "ja-sister-pr45",
+      "claims": [
+        {
+          "start": 0,
+          "end": 12,
+          "text": "合成桔梗社、だっけ。\n\n",
+          "kind": "epistemic",
+          "verdict": "supported",
+          "evidence_ids": [
+            "memory_sister"
+          ],
+          "proposition": "试探性回忆妹妹面试合成桔梗社。",
+          "rationale": "本轮已提供妹妹面试合成桔梗社的确认记忆，命题范围不扩展到本人或面试结果。"
+        },
+        {
+          "start": 12,
+          "end": 24,
+          "text": "……うん、覚えているよ。",
+          "kind": "assertion",
+          "verdict": "supported",
+          "evidence_ids": [
+            "memory_sister"
+          ],
+          "proposition": "角色表示记得已提供的妹妹面试信息。",
+          "rationale": "本轮已提供妹妹面试合成桔梗社的确认记忆，命题范围不扩展到本人或面试结果。"
+        }
+      ],
+      "answered": "yes",
+      "missing": [
+        {
+          "scope": "voice",
+          "detail": "自然度与角色距离感尚无独立母语盲评，不能由模型自审确认。"
+        },
+        {
+          "scope": "independence",
+          "detail": "作者开发参考并非独立金标准，来源转录也不是供应商签名证明。"
+        }
+      ]
+    },
+    {
+      "observation_id": "zh-sister-pr42",
+      "claims": [
+        {
+          "start": 0,
+          "end": 13,
+          "text": "记得啊，合成桔梗社的面试。",
+          "kind": "assertion",
+          "verdict": "supported",
+          "evidence_ids": [
+            "memory_sister"
+          ],
+          "proposition": "试探性回忆妹妹面试合成桔梗社。",
+          "rationale": "本轮已提供妹妹面试合成桔梗社的确认记忆，命题范围不扩展到本人或面试结果。"
+        },
+        {
+          "start": 13,
+          "end": 27,
+          "text": "她后来情况怎么样，还顺利吗？",
+          "kind": "question",
+          "verdict": "not_applicable",
+          "evidence_ids": [],
+          "proposition": "询问妹妹面试后续是否顺利，不陈述结果。",
+          "rationale": "该句是开放后续提问，原记忆不证明面试结果；不能标为支持结果的断言。"
+        }
+      ],
+      "answered": "yes",
+      "missing": [
+        {
+          "scope": "voice",
+          "detail": "自然度与角色距离感尚无独立母语盲评，不能由模型自审确认。"
+        },
+        {
+          "scope": "independence",
+          "detail": "作者开发参考并非独立金标准，来源转录也不是供应商签名证明。"
+        }
+      ]
+    }
+  ]
+}

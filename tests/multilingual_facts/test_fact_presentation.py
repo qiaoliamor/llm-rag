@@ -165,7 +165,8 @@ def test_sdk_composition_and_control_policy_only_mock_transport(mode,weather_mod
         body=json.loads(request.content);calls.append(body)
         prompt=body['messages'][0]['content'];data=json.loads(body['messages'][1]['content'])
         assert f.REVIEW_PROMPT_EXTRA in prompt
-        assert f.REVIEW_PROMPT_EXTRA.startswith(f.REVIEW_PROMPT_EXTRA_V1)
+        assert f.REVIEW_PROMPT_EXTRA_V3.startswith(f.REVIEW_PROMPT_EXTRA_V1)
+        assert f.REVIEW_PROMPT_EXTRA.startswith("\n【multilingual-fact-care-v4")
         assert f.POLICY_VERSION in prompt
         assert (f.WEATHER_REVIEW in prompt)==(weather_mode=='semantic')
         assert (f.EMOTION_REVIEW in prompt)==(emotion_mode=='semantic')
@@ -304,7 +305,8 @@ def test_empty_memory_open_world_review_prompt_uses_mock_sdk_only(memory_mode):
 ])
 def test_unspecified_pet_chat_allowed_under_new_standard_with_authored_verdict(text,locale):
     from app.memory_understanding import MEMORY_CANON_POLICY
-    assert MEMORY_CANON_POLICY in f.ANSWER_PROMPT
+    assert MEMORY_CANON_POLICY in f.ANSWER_PROMPT_V3
+    assert "未设定普通闲聊允许即兴" in f.ANSWER_PROMPT
     judge=SimpleNamespace(review=AsyncMock(return_value=judgment(text)))
     (reply,guarded,status),_=run([text],judge,locale=locale)
     assert reply==text and not guarded and status['calls']==1

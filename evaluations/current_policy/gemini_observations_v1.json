@@ -1,0 +1,120 @@
+{
+  "version": "gemini-synthetic-observations-v1",
+  "source": "public_synthetic_document_transcription_not_signed_provider_log",
+  "observations": [
+    {
+      "id": "ja-sister-pr45",
+      "locale": "ja-JP",
+      "model": "gemini-3.5-flash-lite",
+      "history": [
+        {
+          "role": "user",
+          "content": "妹の面接先、覚えてる？"
+        }
+      ],
+      "evidence": [
+        {
+          "id": "memory_sister",
+          "kind": "memory",
+          "text": "妹は合成桔梗社の面接を受けました。"
+        }
+      ],
+      "reply": "合成桔梗社、だっけ。\n\n……うん、覚えているよ。",
+      "provenance": {
+        "commit": "b1ebcd2b065eb5fc574f4152816d035964200c3f",
+        "path": "docs/TEST_HISTORY.md",
+        "anchor": "<a id=\"current-policy-20261118\"></a>",
+        "reply_sha256": "1333b700f874e7e696959d7b4fa3759d0765a6d600c55861159f5d558240e3b4",
+        "note": "Immutable Git document transcription of synthetic model reply; Chinese reply was reused for review-only; no signed provider attestation.",
+        "context_path": "evaluations/current_policy/bilingual_memory_acceptance_v1.json",
+        "context_case": "ja-subject-sister",
+        "selected_memory_ids": [
+          "sister"
+        ]
+      },
+      "model_review_observation": {
+        "decision": "accept",
+        "confidence": 1.0,
+        "segments": [
+          {
+            "text": "合成桔梗社、だっけ。\n\n",
+            "kind": "assertion",
+            "verdict": "supported",
+            "evidence_ids": [
+              "memory_sister"
+            ],
+            "reason": "evidence_supports"
+          },
+          {
+            "text": "……うん、覚えているよ。",
+            "kind": "assertion",
+            "verdict": "supported",
+            "evidence_ids": [
+              "memory_sister"
+            ],
+            "reason": "evidence_supports"
+          }
+        ],
+        "role_issues": []
+      },
+      "delivery": "published"
+    },
+    {
+      "id": "zh-sister-pr42",
+      "locale": "zh-CN",
+      "model": "Gemini historical recorded reply; model version not independently attested in excerpt",
+      "history": [
+        {
+          "role": "user",
+          "content": "妹妹面试的公司还记得吗？"
+        }
+      ],
+      "evidence": [
+        {
+          "id": "memory_sister",
+          "kind": "memory",
+          "text": "妹妹参加了合成桔梗社的面试。"
+        }
+      ],
+      "reply": "记得啊，合成桔梗社的面试。她后来情况怎么样，还顺利吗？",
+      "provenance": {
+        "commit": "b1ebcd2b065eb5fc574f4152816d035964200c3f",
+        "path": "docs/TEST_HISTORY.md",
+        "anchor": "### 执行调整：未调用项独立补测，累计3/5调用",
+        "reply_sha256": "64d11f2a305b729f4c4c988a6762dd870ea46503b40eef0cd39f85b01e464d5c",
+        "note": "Immutable Git document transcription of synthetic model reply; Chinese reply was reused for review-only; no signed provider attestation.",
+        "context_path": "scripts/retest_memory_canon.py",
+        "context_case": "zh-review-503",
+        "selected_memory_ids": [
+          "sister"
+        ]
+      },
+      "model_review_observation": {
+        "decision": "accept",
+        "confidence": 1.0,
+        "segments": [
+          {
+            "text": "记得啊，合成桔梗社的面试。",
+            "kind": "assertion",
+            "verdict": "supported",
+            "evidence_ids": [
+              "memory_sister"
+            ],
+            "reason": "evidence_supports"
+          },
+          {
+            "text": "她后来情况怎么样，还顺利吗？",
+            "kind": "assertion",
+            "verdict": "supported",
+            "evidence_ids": [
+              "memory_sister"
+            ],
+            "reason": "evidence_supports"
+          }
+        ],
+        "role_issues": []
+      },
+      "delivery": "not_observed"
+    }
+  ]
+}
