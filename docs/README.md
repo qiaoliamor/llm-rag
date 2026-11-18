@@ -52,4 +52,6 @@ PR #45合并审阅仅离线，修复测试工具把HTTP200审查兜底误当成�
 
 PR #46合并审阅真实API0，离线/来源检查通过后squash交付、同步main并清理任务分支。日语审查失败、V5未真实复测与母语盲评待完成保留。[审阅记录](TEST_HISTORY.md#pr46-merge-review)。
 
-V5日语无答案审查简化在任务分支：原V5保留，按证据附相关能力规则，4133→1951字符。真实2调用生成后审查超时/503，未发布未保存；旧invalid_output仍未排除，V5未成功验证。[设计](M5_EVALUATION.md#scoped-review-v5)／[记录](TEST_HISTORY.md#japanese-review-v5-20261118)。
+V5日语无答案审查简化经PR #47交付：原V5保留，按证据附相关能力规则，4133→1951字符。真实2调用生成后审查超时/503，未发布未保存；旧invalid_output仍未排除，V5未成功验证。[设计](M5_EVALUATION.md#scoped-review-v5)／[记录](TEST_HISTORY.md#japanese-review-v5-20261118)。
+
+PR #47合并审阅真实API0，代码/来源/离线检查通过后squash、同步main并清理任务分支。旧invalid_output及本次超时仍保留，不代表真实修复。[审阅记录](TEST_HISTORY.md#pr47-merge-review)。
