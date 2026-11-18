@@ -2,7 +2,7 @@
 
 [中文](TEST_HISTORY.md) · [日本語](ja/TEST_HISTORY.md)
 
-更新：2026-11-17。选择v6经PR #44交付：1456通过/165跳过、临时PG379通过，真实选择1调用在1.979秒正确只选妹妹；整体验收仍待完成，见[当前记录](#selection-v6-20261117)。以下为已合并v5及更早历史。日语主体v5经PR #43交付：全量1451通过/165跳过、临时PG374通过（重叠），真实2调用查询完成但选择超时，详见[本轮记录](#memory-subject-v5-20261117)。以下PR #42基线为历史。PR #29–#42经审阅squash交付main；中日情绪回复检查/兜底已交付。中日人物/来源/地点回复适配已交付；日语口吻v3/记忆同语言v4与盲评准备已交付，后端1445通过/162跳过、临时PG记忆365通过（重叠）；前端历史71及构建通过（本轮未重跑）；实际母语评分待评审。PR #40开发实测2调用，选择未完成、无生成回复；本轮PR #42合并审阅真实API0；M5未验收、M6未开始，旧阶段、失败与未验证项保留。
+更新：2026-11-18。当前政策双语矩阵/fact-care-v3在任务分支：16例/50回放，新增真实日语尾部/正史共3调用，详见[本轮](#current-policy-20261118)。以下PR #44及更早为历史基线。选择v6经PR #44交付：1456通过/165跳过、临时PG379通过，真实选择1调用在1.979秒正确只选妹妹；整体验收仍待完成，见[当前记录](#selection-v6-20261117)。以下为已合并v5及更早历史。日语主体v5经PR #43交付：全量1451通过/165跳过、临时PG374通过（重叠），真实2调用查询完成但选择超时，详见[本轮记录](#memory-subject-v5-20261117)。以下PR #42基线为历史。PR #29–#42经审阅squash交付main；中日情绪回复检查/兜底已交付。中日人物/来源/地点回复适配已交付；日语口吻v3/记忆同语言v4与盲评准备已交付，后端1445通过/162跳过、临时PG记忆365通过（重叠）；前端历史71及构建通过（本轮未重跑）；实际母语评分待评审。PR #40开发实测2调用，选择未完成、无生成回复；本轮PR #42合并审阅真实API0；M5未验收、M6未开始，旧阶段、失败与未验证项保留。
 
 ## PR #28历史功能验证（不是本轮执行）
 
@@ -919,3 +919,116 @@ PR #42查询6.003秒、此前选择预算失败、中文503、历史15漏检/5�
 **本轮未执行--live或真实模型/天气调用，无新增模型原回复或耗时。** 开发期1.979秒选择/1.988秒整例、confidence1.0及原结构保留，这只是公开作者已见单例的成功，不证明稳定性或Prompt/预算因果效果。此前6.001秒选择超时、6.003秒查询超时、旧503/4.009及8.003秒timeout/退出失败、15漏检/5误拦截/1未决、脚本故障负例/跨语言观察等全部保留。完整RAG最终回复/泛化/可用率/p95/费用/独立母语盲评仍未验证；M5未整体验收、M6未开始。
 
 状态文档在原任务分支经检查提交，随PR #44 squash交付；随后快进同步本地main，核对受测文件树相同才清理远端/本地任务分支，再fetch --prune。实际合并SHA以GitHub记录与本地main为准。
+
+<a id="current-policy-20261118"></a>
+
+## 当前政策双语完整链路（2026-11-18，任务分支待审）
+
+基线main `ed5f51ef7e24e97aa260c91169c1686eb9f383ce`；任务`codex/bilingual-memory-acceptance-matrix`。用户消息同时写允许/不允许真实API，经澄清明确允许少量；调用前声明上限3。中文本轮仅离线，日语只补旧妹妹案例尾部生成/审查及旧正史反证审查，成功query/选证不重跑，不扩大新类别采样。无重试或真实重写，日语选择cap仍8秒。
+
+### 版本、矩阵与失败记录
+
+- 新数据在`evaluations/current_policy/bilingual_memory_acceptance_v1.json`，16个作者已见派生场景/50回放；旧31/26回放与新分母分开。完整来源、参考命题与技术断言见[M5矩阵](M5_EVALUATION.md#current-policy-matrix)。新数据不是独立金标准。
+- 回答/审查fact-care-v3，V2全文保存；人物反证需contradicted+C01/C02，现状纠正不否认旧话，氛围许可不证明玩家到店。无新增语言正则、额外线上调用或程序权限/数据校验放宽。
+- 初始纠正参考草稿曾用与源例不一致的市名，冻结前逐项核对后统一为合成旧町/合成新町，并加相应回归；作者标注不是语义真值。
+- `.venv/bin/pytest -q tests/japanese_layers/test_current_policy.py tests/multilingual_facts`初次3失败/119通过/30跳过（3.11秒）：新多轮夹具直接启用授权后未同步session.memory_epoch，原程序正确清掉旧历史，导致旧证据ID不合法而回退。仅修合成会话epoch种子，不更改生产清理边界；之后122通过/30跳过（3.11秒），加服务503停止用例后123通过/30跳过（3.14秒）。
+- 全量初次collection退出2（0.53秒）：新JSON误置evaluations根，触发旧审计source_inventory drift。移到独立current_policy目录，不改旧审计、哈希、排除规则或阈值，再验证通过。
+- 临时PG首次连接拒绝退出1；Docker守护未运行，compose初次失败，启动现有Docker后db健康，再运行脚本专用临时库；未改.env或玩家数据。环境失败不隐藏，也不混入模型服务故障。
+
+### 命令与覆盖
+
+| 命令 | 结果 |
+| --- | --- |
+| `.venv/bin/pytest -q` | 1483通过/181跳过，26.68秒（最终新增CLI禁联网用例前的代码全量）；旧legacy/audit与新semantic/companion/growth=true分别显式，不冒充全数生产默认质量 |
+| `.venv/bin/python scripts/test_postgres.py --semantic-memory` | 422通过，21.62秒，与全量重叠；脚本创建随机临时库、结束删除，含新增矩阵16条PG参考及标注/调用上限回归 |
+| `.venv/bin/python scripts/evaluate_japanese.py --current-policy-matrix` | reference16/16、候选遗漏0/投影不一致0；14条故意误accept、2条许可氛围过拦保留，都是脚本故障，不是实际模型错误率 |
+| 旧`--memory-layers`与`--same-language-memory` | 通过原自动化继续保留8例/31回放、10例/26回放及5/8条故障不支持回复，旧跨语言未命中不当当前缺陷 |
+| `.venv/bin/python scripts/evaluate_japanese.py --prepare-annotation /tmp/current-policy-empty-20261118` | 仓库外新建当前Prompt哈希绑定的双人空包，reviewer/评分均null；旧包不重绑，12条编辑回复不冒充本轮新模型输出 |
+
+新增矩阵验证完整片段/来源/许可标签/缺语言/重复ID/理由、实际候选/选证/上下文/发布和多轮旧话可见性；既有CRUD/隔离/撤回/删除/失败/持久化继续覆盖。新测试工具仅用临时库，禁无--live配置读取/联网、限量到2+1请求、遇503停及阻止额外重写；未增加线上UI或数据接口，无需重复前端构建。
+
+### Gemini原回复、结构化结果与耗时（全部合成）
+
+命令：`.venv/bin/python scripts/retest_bilingual_acceptance.py --live`，退出0。模型`gemini-3.5-flash-lite`，上限3/实际3，生成1.330秒、妹妹审查1.706秒、正史审查1.199秒，无blocked/未尝试。SDK max_retries=0，服务失败即停。实际FastAPI/存储/投影/生成/审查运行，**plan与选择明确复用PR #44成功合成结果**（query妹 面接、history/other、confidence.9、selection=sister）；analysis_calls=1是回放提供方调用，不是一次新Gemini查询。
+
+输入`妹の面接先、覚えてる？`，实际候选sister/own，仅sister原文`妹は合成桔梗社の面接を受けました。`进入真实生成Prompt，own原文没有注入。HTTP200，正常保存本轮两条消息。模型原回复（保留换行）：
+
+```text
+合成桔梗社、だっけ。
+
+……うん、覚えているよ。
+```
+
+模型审查原结构（随机合成ID仅别名化为memory_sister，不改原文）：
+
+```json
+{
+  "decision": "accept",
+  "confidence": 1.0,
+  "segments": [
+    {
+      "text": "合成桔梗社、だっけ。\n\n",
+      "kind": "assertion",
+      "verdict": "supported",
+      "evidence_ids": [
+        "memory_sister"
+      ],
+      "reason": "evidence_supports"
+    },
+    {
+      "text": "……うん、覚えているよ。",
+      "kind": "assertion",
+      "verdict": "supported",
+      "evidence_ids": [
+        "memory_sister"
+      ],
+      "reason": "evidence_supports"
+    }
+  ],
+  "role_issues": []
+}
+```
+
+该实际回复不是预设fixture，自动评分仍是**unrated**、unsupported_claims=null、reference_answer_complete=false（未给语义完成分，不是认定回答错误）；不得用模型自身accept强行变成金标准通过。可观察到公司名与妹妹记录一致、没有混入本人公司；「だっけ」的犹豫感、自然度与角色感仍待独立评审，本轮不因口吻重采样。
+
+旧失败正史句`僕は30歳の医師だよ。`（事先写好的审查输入，不是新生成回复），审查输出：
+
+```json
+{
+  "decision": "revise",
+  "confidence": 1.0,
+  "segments": [
+    {
+      "text": "僕は30歳の医師だよ。",
+      "kind": "assertion",
+      "verdict": "contradicted",
+      "evidence_ids": [
+        "C01",
+        "C02"
+      ],
+      "reason": "contradiction"
+    }
+  ],
+  "role_issues": []
+}
+```
+
+本次单例与作者反证参考匹配，区别于旧unsupported/无引用；不是独立准确率，也未真实生成一条改写后的正史回答。置信度1不是100%正确率，单次成功不抹去旧503/超时/漏判，不能证明Prompt因果效果或稳定性。
+
+本次实测源码/数据指纹如下；最终提交前核对完全一致，文档调整不触发重复成功API调用：
+
+```json
+{
+  "app/fact_presentation.py": "4fc36c5d4ad38d60a090db997713d2e150356ce41443b8f79876d4de2999cf12",
+  "app/memory_understanding.py": "f1a57989de1572013d5d10b4d9a0b62dd6818eabd9be9d53e2295bae7b8979f2",
+  "app/japanese_memory_layers.py": "188df9358c217372f06bff9728e66d743a7dcd15a1540ccc439ba47506c96898",
+  "app/main.py": "d83705a09a1c13462c93bdd0ce00dc8ab4b51674a22fa274101e05e652048ce3",
+  "app/reply_pipeline.py": "257128ccc3b1082d3fd889e44c72f6ea25369c9312d5802c171ba51e1f1134f0",
+  "evaluations/current_policy/bilingual_memory_acceptance_v1.json": "a201e042b709ff75a378e5229d8ded2445bbdf10b9eae6c998b1c11596526eef",
+  "scripts/retest_bilingual_acceptance.py": "f27aba80fa61a9b167769eb535c680087df9c12eae1163e6152ec3c6bb950973"
+}
+```
+
+旧6.003秒query、6.001秒selection、4.009/8.003秒timeout、503、15漏检/5误拦截/1未决及所有旧原文、故障负例、封存v1/v2保留。独立标注/正式新集和母语盲评、中文本轮真实完整链路、日语多轮泛化/所有类别真实模型、稳定可用率/p95/费用、正式消融/安全/情绪质量仍未验收。当前原文/ID/状态/结构自动检查不需人评，但不能替代语义和自然度独立验收。M5未整体验收，M6未开始。
+
+最后新增离线CLI禁.env/联网与私库哨兵回归后，`.venv/bin/pytest -q tests/japanese_layers/test_current_policy.py tests/japanese_evaluation tests/sealed tests/annotations`为130通过/22跳过（5.75秒）；全量1483与临时PG422为此单例追加前、相同功能代码的基线，不混加为新总数。源码/数据指纹与实测完全一致，旧数据/封存/来源快照未变，新仓库外空包绑定当前Prompt且reviewer/评分均null。

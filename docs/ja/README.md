@@ -44,3 +44,5 @@ PR #43提供：記憶v5、8＋6秒予算と主体別合成回帰、選択単独�
 選択v6はPR #44で提供：query不変、選択短Promptと8秒cap、実旧失敗1例は1.979秒で妹のみ選択。最終返答／安定性は未受入、旧timeout保持。[設計](M2_MEMORY.md)／[原記録](../TEST_HISTORY.md#selection-v6-20261117)。
 
 PR #44マージ確認は離線のみ、実API0。単例成功を全経路／安定性や母語盲評の合格とせず、過去失敗を保持。[レビュー記録](../TEST_HISTORY.md#pr44-merge-review)。
+
+現方針の日中矩陣とfact-care-v3は開発分岐：既見16例／50回放、日本語実3呼出で旧失敗尾部／反証のみ確認、独立品質未受入。[M5](M5_EVALUATION.md)／[原記録](../TEST_HISTORY.md#current-policy-20261118)。

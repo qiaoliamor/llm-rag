@@ -132,3 +132,7 @@ retest_memory_canon.py --liveは固定旧失敗だけ、日語主体plan／選�
 成功済み合成planを明示再利用、実検索sister/ownに対しGemini単独1呼出で1.979秒、sisterのみ選択、confidence=1.0。構造／候補ID検査通過、全体1.988秒。公開IDは別名化、原文は保持。スクリプトのinjected_memoriesは注入予定投影で、実返答生成ではありません。旧candidate/expectedは事前審査fixtureで今回審査なし。旧6.001秒timeoutを保存、単例成功を因果効果／安定性／自然さとしません。[原記録](../TEST_HISTORY.md#selection-v6-20261117)。
 
 無答・外来ID・低信頼・不正構造とnull／空集合の離線回帰、既存権限／CRUD／撤回／削除／永続化検証を実施。次は独立した全経路品質・可用性の検証計画で、この成功選択を反復しません。母語盲評待ち、M5未受入、M6未開始。
+
+## 現方針の四層確認（2026-11-18）
+
+日中16例／50回放に本人／妹・現在訂正（過去本人発言も可視）・永続訂正・無答と人物／雰囲気を統合。旧31/26回放は変更なし、query v5／selection v6／8秒cap維持。日本語尾部の実APIはPR #44成功plan／選択を再利用しsisterのみ注入後、実生成と審査を観測。新query／選択予測・泛化合格ではありません。中国語は今回離線のみ、母語盲評待ち。[矩陣](M5_EVALUATION.md)／[原記録](../TEST_HISTORY.md#current-policy-20261118)。

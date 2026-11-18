@@ -12,12 +12,13 @@ def main():
     parser.add_argument('--prepare-annotation',type=Path)
     parser.add_argument('--memory-layers',action='store_true',help='Replay four memory layers with scripted models in an isolated worker')
     parser.add_argument('--same-language-memory',action='store_true',help='Replay separate Chinese/Chinese and Japanese/Japanese development cases; no APIs')
+    parser.add_argument('--current-policy-matrix',action='store_true',help='Current-policy bilingual four-layer matrix, synthetic only')
     args=parser.parse_args()
-    if sum(bool(x) for x in (args.memory_layers,args.same_language_memory,args.prepare_annotation))>1:parser.error('Layer replay and annotation preparation are separate commands')
+    if sum(bool(x) for x in (args.memory_layers,args.same_language_memory,args.current_policy_matrix,args.prepare_annotation))>1:parser.error('Layer replay and annotation preparation are separate commands')
     try:
-        if args.memory_layers or args.same_language_memory:
-            from app.japanese_memory_layers import evaluate, DATASET, SAME_LANGUAGE_DATASET
-            print(json.dumps(evaluate(SAME_LANGUAGE_DATASET if args.same_language_memory else DATASET),ensure_ascii=False,indent=2))
+        if args.memory_layers or args.same_language_memory or args.current_policy_matrix:
+            from app.japanese_memory_layers import evaluate, DATASET, SAME_LANGUAGE_DATASET, CURRENT_POLICY_DATASET
+            print(json.dumps(evaluate(CURRENT_POLICY_DATASET if args.current_policy_matrix else SAME_LANGUAGE_DATASET if args.same_language_memory else DATASET),ensure_ascii=False,indent=2))
             return 0
         report=evaluate_recall()
         report['binding']=binding()

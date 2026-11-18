@@ -43,3 +43,5 @@ PR #43交付记忆v5与8＋6秒阶段预算、主体选择合成回归和选择�
 记忆选择v6经PR #44交付：查询不变、选择短Prompt与8秒cap，真实旧失败单例本次1.979秒正确选中妹妹；非最终回复/稳定性验收，旧超时保留。[当前设计](M2_MEMORY.md#selection-v6)／[测试](TEST_HISTORY.md#selection-v6-20261117)。
 
 PR #44合并审阅仅离线检查，真实API0；单例选择成功不代替完整回复/稳定性或独立母语盲评，历史失败保留。[审阅记录](TEST_HISTORY.md#pr44-merge-review)。
+
+当前政策双语矩阵与fact-care-v3在任务分支开发：作者已见16例/50回放，真实日语3调用只补旧失败尾部/反证，不冒充独立质量验收。[M5](M5_EVALUATION.md#current-policy-matrix)／[记录](TEST_HISTORY.md#current-policy-20261118)。

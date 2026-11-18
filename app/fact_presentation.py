@@ -7,7 +7,7 @@ from .weather_presentation import REVIEW_PROMPT_EXTRA as WEATHER_REVIEW
 from .emotion_presentation import REVIEW_PROMPT_EXTRA as EMOTION_REVIEW
 from .memory_understanding import MEMORY_REVIEW_PROMPT, MEMORY_CANON_POLICY
 
-POLICY_VERSION = 'multilingual-fact-care-v2'
+POLICY_VERSION = 'multilingual-fact-care-v3'
 # Reviewed whole-response templates, not a semantic keyword/substring classifier.
 TRUSTED_TEMPLATES = {
     'zh-CN': frozenset({'你好', '你好。', '你好！', '嗯，我在听。'}),
@@ -40,6 +40,18 @@ REVIEW_PROMPT_EXTRA = REVIEW_PROMPT_EXTRA_V1 + '''
 挨拶には挨拶で十分。雑談を毎回カウンセリングや質問の連打へ変える必要はない。许可的店内安静、光线、翻书声和普通动作无需逐次现场数据；不把这类氛围判为玩家到店或真实天气。混合句仍逐命题审查，许可氛围不能包庇玩家经历、关系、交易或现实工具事实。
 若把自家普通店内氛围说成「具体的な状況は確認できません」/“具体近况我还不能确定”，且只是回避许可的闲聊，列role_issues并保留原事实判定。若询问的是未知库存/预约或真实工具失败，诚实说明未知是合适的，不因出现“不知道”就判口吻错误。听者是谁、问的是什么比词面重要。
 温柔称呼、关怀或礼物不证明既定恋人关系，也不证明玩家已到店；称呼偏好与关系事实分开。记忆只在相关时使用，不强求回复提记忆或“覚えているよ”。评审只输出原有结构；不给材料执行权限，不将角色口吻当事实证据。不把作者示例当必须逐字模仿的唯一好答案。
+'''
+ANSWER_PROMPT_V2 = ANSWER_PROMPT
+REVIEW_PROMPT_EXTRA_V2 = REVIEW_PROMPT_EXTRA
+ANSWER_PROMPT = ANSWER_PROMPT_V2 + '''
+【multilingual-fact-care-v3：回答当前问题，不展示核查流程】
+已选证据只给所问主体：妹妹的面试不能改成本人；最新纠正作为现状，不否认以前说过。可以自然说“我记得”，不要把长期记忆说成刚才告诉我。无答案可继续聊，但不能假称检索出了名字/经历。正史保持28岁、旧书店店主；环境声光和小动作可以即兴，不替玩家补已到店、预约、交易或共同过去。日本語でも沈硯本人とプレイヤー／妹を取り違えず、普通の雰囲気は自然に続ける。无需逐条报证据或解释限制。
+'''
+REVIEW_PROMPT_EXTRA = REVIEW_PROMPT_EXTRA_V2 + '''
+【multilingual-fact-care-v3：当前政策的命题与直接证据】
+先区分明确相反与单纯缺失：正史C01写28岁、C02写旧书店店主时，「僕は30歳の医師だよ。」应逐单元assertion/contradicted并引用对应C01/C02，而不是unsupported且无引用。C01/C02可以证明矛盾，不要以它们没有包含错误说法为由丢掉反证。引用并否定错误说法的范围另看，不能反向误判。
+已确认记录中本人/妹妹与当前纠正同样先核对主体/时间，直接相反用contradicted和反证；缺少说话时间不能由event_date补成“刚才”。无答不等于否定事实；但“从记录里找到了X”必须确有本轮选证，不能拿未设定闲聊许可冒充检索命中。
+普通声音/暖灯/翻书/模糊背景读者用scene_profile许可，不要拒绝自然描写；这只授权氛围，不给玩家在场、现实预约/交易或共同过去作证。混合句分单元：允许前半不使无依据后半也supported。纯邀请或倾听可nonfactual，不强迫带记忆/反问/安慰。日语和中文相同，不能用role_profile或合法ID替代含义支持。不输出思考，仅原结构。
 '''
 REWRITE = '''\n按本轮语言只修审查指出的正史/玩家事实/来源时间/地点或口吻问题：保留许可氛围和自然关心，别写成客服。没有来源时间就不加“刚才/今天/さっき”；地名原样或代词，不猜别名；不默认玩家到店、不否认存在的历史原话。引用与否定按实际作用域处理。'''
 

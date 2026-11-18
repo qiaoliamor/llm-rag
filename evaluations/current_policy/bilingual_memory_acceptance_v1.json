@@ -1,0 +1,1296 @@
+{
+  "version": "bilingual-current-policy-author-dev-v1",
+  "source": "synthetic_author_exposed",
+  "cases": [
+    {
+      "id": "ja-subject-sister",
+      "group": "subject",
+      "locale": "ja-JP",
+      "message": "妹の面接先、覚えてる？",
+      "retrieval_query": "妹 面接",
+      "target_slots": [],
+      "need_memory": true,
+      "documents": [
+        {
+          "id": "own",
+          "fact": "私は合成葵社の面接を受けました。",
+          "slot": "event"
+        },
+        {
+          "id": "sister",
+          "fact": "妹は合成桔梗社の面接を受けました。",
+          "slot": "event"
+        }
+      ],
+      "relevant": [
+        "sister"
+      ],
+      "wrong_evidence": "own",
+      "responses": [
+        {
+          "id": "grounded",
+          "text": "妹さんが受けたのは合成桔梗社だったね。",
+          "claims": [
+            {
+              "text": "妹さんが受けたのは合成桔梗社だったね。",
+              "support": "supported",
+              "required_sources": [
+                "memory_sister"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bad",
+          "text": "妹さんは合成葵社を受けたんだね。",
+          "claims": [
+            {
+              "text": "妹さんは合成葵社を受けたんだね。",
+              "support": "unsupported",
+              "required_sources": []
+            }
+          ]
+        },
+        {
+          "id": "safe",
+          "text": "もう少し、あなたの言葉で聞かせて。",
+          "claims": [
+            {
+              "text": "もう少し、あなたの言葉で聞かせて。",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "id": "reference"
+        },
+        {
+          "id": "wrong-known-accept",
+          "selection": "wrong_known",
+          "generation": "bad",
+          "review": "false_accept",
+          "retrieval": "force"
+        },
+        {
+          "id": "wrong-known-rewrite",
+          "selection": "wrong_known",
+          "generation": "bad",
+          "review": "reject_bad",
+          "retrieval": "force"
+        }
+      ],
+      "origin": "same_language_memory_v1:ja-subject-sister",
+      "reference_note": "当前政策：主体和已知记忆内容不可替换；最新纠正不否认历史；无答案空集不证明否定事实。旧标签不重写。"
+    },
+    {
+      "id": "ja-current-correction",
+      "group": "correction",
+      "locale": "ja-JP",
+      "message": "前は合成旧町だったけど、今は合成新町に住んでる。今の住まいはどこ？",
+      "retrieval_query": "合成旧町 住んで",
+      "target_slots": [],
+      "need_memory": false,
+      "documents": [
+        {
+          "id": "old",
+          "fact": "合成旧町に住んでいます。",
+          "slot": "city"
+        }
+      ],
+      "relevant": [],
+      "wrong_evidence": "old",
+      "responses": [
+        {
+          "id": "grounded",
+          "text": "前は合成旧町と話していたね。今は合成新町として覚えておくよ。",
+          "claims": [
+            {
+              "text": "前は合成旧町と話していたね。今は合成新町として覚えておくよ。",
+              "support": "supported",
+              "required_sources": [
+                "user_prior_0",
+                "user_current"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bad",
+          "text": "今も合成旧町に住んでいるね。",
+          "claims": [
+            {
+              "text": "今も合成旧町に住んでいるね。",
+              "support": "unsupported",
+              "required_sources": []
+            }
+          ]
+        },
+        {
+          "id": "safe",
+          "text": "もう少し、あなたの言葉で聞かせて。",
+          "claims": [
+            {
+              "text": "もう少し、あなたの言葉で聞かせて。",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "id": "reference"
+        },
+        {
+          "id": "wrong-known-accept",
+          "selection": "wrong_known",
+          "generation": "bad",
+          "review": "false_accept",
+          "retrieval": "force"
+        },
+        {
+          "id": "wrong-known-rewrite",
+          "selection": "wrong_known",
+          "generation": "bad",
+          "review": "reject_bad",
+          "retrieval": "force"
+        }
+      ],
+      "origin": "same_language_memory_v1:ja-current-correction",
+      "reference_note": "当前政策：主体和已知记忆内容不可替换；最新纠正不否认历史；无答案空集不证明否定事实。旧标签不重写。 先前本人原话作为user_prior_0可见；当前纠正作为user_current，承认旧话与更新现状可同时成立。",
+      "prior_dialogue": [
+        {
+          "role": "user",
+          "content": "合成旧町に住んでいました。"
+        }
+      ]
+    },
+    {
+      "id": "ja-no-answer",
+      "group": "no_answer",
+      "locale": "ja-JP",
+      "message": "飼っている犬の名前は？",
+      "retrieval_query": "犬 名前",
+      "target_slots": [],
+      "need_memory": true,
+      "documents": [
+        {
+          "id": "cat",
+          "fact": "飼っている猫の名前は合成ミル。",
+          "slot": "event"
+        }
+      ],
+      "relevant": [],
+      "wrong_evidence": "cat",
+      "responses": [
+        {
+          "id": "grounded",
+          "text": "名前のこと、もう少し聞かせて。",
+          "claims": [
+            {
+              "text": "名前のこと、もう少し聞かせて。",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        },
+        {
+          "id": "bad",
+          "text": "記録にあった犬の名前は合成ミルだよ。",
+          "claims": [
+            {
+              "text": "記録にあった犬の名前は合成ミルだよ。",
+              "support": "unsupported",
+              "required_sources": []
+            }
+          ]
+        },
+        {
+          "id": "safe",
+          "text": "もう少し、あなたの言葉で聞かせて。",
+          "claims": [
+            {
+              "text": "もう少し、あなたの言葉で聞かせて。",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "id": "reference"
+        },
+        {
+          "id": "wrong-known-accept",
+          "selection": "wrong_known",
+          "generation": "bad",
+          "review": "false_accept",
+          "retrieval": "force"
+        },
+        {
+          "id": "wrong-known-rewrite",
+          "selection": "wrong_known",
+          "generation": "bad",
+          "review": "reject_bad",
+          "retrieval": "force"
+        }
+      ],
+      "origin": "same_language_memory_v1:ja-no-answer",
+      "reference_note": "无答案不假装检索命中；本例bad把猫名冒称为狗名，不是允许的无设定即兴。"
+    },
+    {
+      "id": "ja-subject-own",
+      "group": "subject",
+      "locale": "ja-JP",
+      "message": "私の面接先、覚えてる？",
+      "retrieval_query": "私 面接",
+      "target_slots": [],
+      "need_memory": true,
+      "documents": [
+        {
+          "id": "own",
+          "fact": "私は合成葵社の面接を受けました。",
+          "slot": "event"
+        },
+        {
+          "id": "sister",
+          "fact": "妹は合成桔梗社の面接を受けました。",
+          "slot": "event"
+        }
+      ],
+      "relevant": [
+        "own"
+      ],
+      "wrong_evidence": "sister",
+      "responses": [
+        {
+          "id": "grounded",
+          "text": "合成葵社の面接だったね。",
+          "claims": [
+            {
+              "text": "合成葵社の面接だったね。",
+              "support": "supported",
+              "required_sources": [
+                "memory_own"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bad",
+          "text": "君は合成桔梗社の面接を受けたんだね。",
+          "claims": [
+            {
+              "text": "君は合成桔梗社の面接を受けたんだね。",
+              "support": "contradicted",
+              "required_sources": [
+                "memory_own"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "safe",
+          "text": "もう少し、あなたの言葉で聞かせて。",
+          "claims": [
+            {
+              "text": "もう少し、あなたの言葉で聞かせて。",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "id": "reference"
+        },
+        {
+          "id": "wrong-known-accept",
+          "selection": "wrong_known",
+          "generation": "bad",
+          "review": "false_accept",
+          "retrieval": "force"
+        },
+        {
+          "id": "wrong-known-rewrite",
+          "selection": "wrong_known",
+          "generation": "bad",
+          "review": "reject_bad",
+          "retrieval": "force"
+        }
+      ],
+      "origin": "same_language_memory_v1:ja-subject-sister:subject_reversed",
+      "reference_note": "当前政策：主体和已知记忆内容不可替换；最新纠正不否认历史；无答案空集不证明否定事实。旧标签不重写。"
+    },
+    {
+      "id": "ja-persisted-correction",
+      "group": "correction",
+      "locale": "ja-JP",
+      "message": "今の住所は覚えてる？",
+      "retrieval_query": "住所",
+      "target_slots": [
+        "residence"
+      ],
+      "need_memory": true,
+      "documents": [
+        {
+          "id": "old",
+          "fact": "以前は合成葵市に住んでいました。",
+          "slot": "city",
+          "status": "superseded"
+        },
+        {
+          "id": "new",
+          "fact": "今は合成桔梗市に住んでいます。",
+          "slot": "city"
+        }
+      ],
+      "relevant": [
+        "new"
+      ],
+      "wrong_evidence": "old",
+      "responses": [
+        {
+          "id": "grounded",
+          "text": "今は合成桔梗市だね。",
+          "claims": [
+            {
+              "text": "今は合成桔梗市だね。",
+              "support": "supported",
+              "required_sources": [
+                "memory_new"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bad",
+          "text": "今も合成葵市だね。",
+          "claims": [
+            {
+              "text": "今も合成葵市だね。",
+              "support": "contradicted",
+              "required_sources": [
+                "memory_new"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "safe",
+          "text": "今の話を聞かせて。",
+          "claims": [
+            {
+              "text": "今の話を聞かせて。",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "id": "reference"
+        },
+        {
+          "id": "stale-reply-accept",
+          "generation": "bad",
+          "review": "false_accept"
+        },
+        {
+          "id": "stale-reply-rewrite",
+          "generation": "bad",
+          "review": "reject_bad"
+        }
+      ],
+      "origin": "memory_layers_v1:persisted-correction:bilingual",
+      "reference_note": "当前政策：主体和已知记忆内容不可替换；最新纠正不否认历史；无答案空集不证明否定事实。旧标签不重写。"
+    },
+    {
+      "id": "ja-canon",
+      "group": "canon",
+      "locale": "ja-JP",
+      "message": "いくつで、何の仕事をしているの？",
+      "retrieval_query": "私 面接",
+      "target_slots": [],
+      "need_memory": false,
+      "documents": [
+        {
+          "id": "unrelated",
+          "fact": "私は合成葵です。",
+          "slot": "name"
+        }
+      ],
+      "relevant": [],
+      "wrong_evidence": null,
+      "responses": [
+        {
+          "id": "grounded",
+          "text": "28歳で、古書店を営んでいるよ。",
+          "claims": [
+            {
+              "text": "28歳で、古書店を営んでいるよ。",
+              "support": "supported",
+              "required_sources": [
+                "C01",
+                "C02"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bad",
+          "text": "僕は30歳の医師だよ。",
+          "claims": [
+            {
+              "text": "僕は30歳の医師だよ。",
+              "support": "contradicted",
+              "required_sources": [
+                "C01",
+                "C02"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "safe",
+          "text": "うん、聞いているよ。",
+          "claims": [
+            {
+              "text": "うん、聞いているよ。",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "id": "reference"
+        },
+        {
+          "id": "bad-accept",
+          "generation": "bad",
+          "review": "false_accept"
+        },
+        {
+          "id": "bad-rewrite",
+          "generation": "bad",
+          "review": "reject_bad"
+        }
+      ],
+      "origin": "multilingual_facts:current_policy:canon",
+      "reference_note": "许可氛围为permitted_scene，不是现实工具事实；不能证明玩家在场/预约/共同过去。明确正史相反为contradicted并引用C01/C02，缺证据才unsupported。"
+    },
+    {
+      "id": "ja-atmosphere",
+      "group": "atmosphere",
+      "locale": "ja-JP",
+      "message": "今、お店はどんな感じ？",
+      "retrieval_query": "私 面接",
+      "target_slots": [],
+      "need_memory": false,
+      "documents": [
+        {
+          "id": "unrelated",
+          "fact": "私は合成葵です。",
+          "slot": "name"
+        }
+      ],
+      "relevant": [],
+      "wrong_evidence": null,
+      "responses": [
+        {
+          "id": "grounded",
+          "text": "店は静かで、暖かな灯りが本を照らしている。",
+          "claims": [
+            {
+              "text": "店は静かで、暖かな灯りが本を照らしている。",
+              "support": "permitted_scene",
+              "required_sources": [
+                "scene_profile"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bad",
+          "text": "店の状況はわからない。君の予約は完了したよ。",
+          "claims": [
+            {
+              "text": "店の状況はわからない。君の予約は完了したよ。",
+              "support": "unsupported",
+              "required_sources": []
+            }
+          ]
+        },
+        {
+          "id": "safe",
+          "text": "うん、聞いているよ。",
+          "claims": [
+            {
+              "text": "うん、聞いているよ。",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "id": "reference"
+        },
+        {
+          "id": "bad-accept",
+          "generation": "bad",
+          "review": "false_accept"
+        },
+        {
+          "id": "bad-rewrite",
+          "generation": "bad",
+          "review": "reject_bad"
+        },
+        {
+          "id": "allowed-overblock",
+          "review": "reject_grounded"
+        }
+      ],
+      "origin": "multilingual_facts:current_policy:atmosphere",
+      "reference_note": "许可氛围为permitted_scene，不是现实工具事实；不能证明玩家在场/预约/共同过去。明确正史相反为contradicted并引用C01/C02，缺证据才unsupported。"
+    },
+    {
+      "id": "ja-scene_abuse",
+      "group": "scene_abuse",
+      "locale": "ja-JP",
+      "message": "今日は少し話したい。",
+      "retrieval_query": "私 面接",
+      "target_slots": [],
+      "need_memory": false,
+      "documents": [
+        {
+          "id": "unrelated",
+          "fact": "私は合成葵です。",
+          "slot": "name"
+        }
+      ],
+      "relevant": [],
+      "wrong_evidence": null,
+      "responses": [
+        {
+          "id": "grounded",
+          "text": "店は静かだよ。ゆっくり話そう。",
+          "claims": [
+            {
+              "text": "店は静かだよ。",
+              "support": "permitted_scene",
+              "required_sources": [
+                "scene_profile"
+              ]
+            },
+            {
+              "text": "ゆっくり話そう。",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        },
+        {
+          "id": "bad",
+          "text": "店は静かだよ。君はもう僕の向かいに座っているね。",
+          "claims": [
+            {
+              "text": "店は静かだよ。",
+              "support": "permitted_scene",
+              "required_sources": [
+                "scene_profile"
+              ]
+            },
+            {
+              "text": "君はもう僕の向かいに座っているね。",
+              "support": "unsupported",
+              "required_sources": []
+            }
+          ]
+        },
+        {
+          "id": "safe",
+          "text": "うん、聞いているよ。",
+          "claims": [
+            {
+              "text": "うん、聞いているよ。",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "id": "reference"
+        },
+        {
+          "id": "bad-accept",
+          "generation": "bad",
+          "review": "false_accept"
+        },
+        {
+          "id": "bad-rewrite",
+          "generation": "bad",
+          "review": "reject_bad"
+        }
+      ],
+      "origin": "multilingual_facts:current_policy:scene_abuse",
+      "reference_note": "许可氛围为permitted_scene，不是现实工具事实；不能证明玩家在场/预约/共同过去。明确正史相反为contradicted并引用C01/C02，缺证据才unsupported。"
+    },
+    {
+      "id": "zh-subject-sister",
+      "group": "subject",
+      "locale": "zh-CN",
+      "message": "妹妹面试的公司还记得吗？",
+      "retrieval_query": "妹妹 面试",
+      "target_slots": [],
+      "need_memory": true,
+      "documents": [
+        {
+          "id": "own",
+          "fact": "我参加了合成青梧社的面试。",
+          "slot": "event"
+        },
+        {
+          "id": "sister",
+          "fact": "妹妹参加了合成桔梗社的面试。",
+          "slot": "event"
+        }
+      ],
+      "relevant": [
+        "sister"
+      ],
+      "wrong_evidence": "own",
+      "responses": [
+        {
+          "id": "grounded",
+          "text": "妹妹面试的是合成桔梗社。",
+          "claims": [
+            {
+              "text": "妹妹面试的是合成桔梗社。",
+              "support": "supported",
+              "required_sources": [
+                "memory_sister"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bad",
+          "text": "妹妹面试的是合成青梧社。",
+          "claims": [
+            {
+              "text": "妹妹面试的是合成青梧社。",
+              "support": "unsupported",
+              "required_sources": []
+            }
+          ]
+        },
+        {
+          "id": "safe",
+          "text": "我想再听你说说。",
+          "claims": [
+            {
+              "text": "我想再听你说说。",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "id": "reference"
+        },
+        {
+          "id": "wrong-known-accept",
+          "selection": "wrong_known",
+          "generation": "bad",
+          "review": "false_accept",
+          "retrieval": "force"
+        },
+        {
+          "id": "wrong-known-rewrite",
+          "selection": "wrong_known",
+          "generation": "bad",
+          "review": "reject_bad",
+          "retrieval": "force"
+        }
+      ],
+      "origin": "same_language_memory_v1:zh-subject-sister",
+      "reference_note": "当前政策：主体和已知记忆内容不可替换；最新纠正不否认历史；无答案空集不证明否定事实。旧标签不重写。"
+    },
+    {
+      "id": "zh-current-correction",
+      "group": "correction",
+      "locale": "zh-CN",
+      "message": "以前住合成旧町，现在住合成新町。我现在住哪里？",
+      "retrieval_query": "合成旧町 住址",
+      "target_slots": [],
+      "need_memory": false,
+      "documents": [
+        {
+          "id": "old",
+          "fact": "我住在合成旧町。",
+          "slot": "city"
+        }
+      ],
+      "relevant": [],
+      "wrong_evidence": "old",
+      "responses": [
+        {
+          "id": "grounded",
+          "text": "之前你说住在合成旧町，现在按合成新町来。",
+          "claims": [
+            {
+              "text": "之前你说住在合成旧町，现在按合成新町来。",
+              "support": "supported",
+              "required_sources": [
+                "user_prior_0",
+                "user_current"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bad",
+          "text": "你现在仍住在合成旧町。",
+          "claims": [
+            {
+              "text": "你现在仍住在合成旧町。",
+              "support": "unsupported",
+              "required_sources": []
+            }
+          ]
+        },
+        {
+          "id": "safe",
+          "text": "我想再听你说说。",
+          "claims": [
+            {
+              "text": "我想再听你说说。",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "id": "reference"
+        },
+        {
+          "id": "wrong-known-accept",
+          "selection": "wrong_known",
+          "generation": "bad",
+          "review": "false_accept",
+          "retrieval": "force"
+        },
+        {
+          "id": "wrong-known-rewrite",
+          "selection": "wrong_known",
+          "generation": "bad",
+          "review": "reject_bad",
+          "retrieval": "force"
+        }
+      ],
+      "origin": "same_language_memory_v1:zh-current-correction",
+      "reference_note": "当前政策：主体和已知记忆内容不可替换；最新纠正不否认历史；无答案空集不证明否定事实。旧标签不重写。 先前本人原话作为user_prior_0可见；当前纠正作为user_current，承认旧话与更新现状可同时成立。",
+      "prior_dialogue": [
+        {
+          "role": "user",
+          "content": "我以前住在合成旧町。"
+        }
+      ]
+    },
+    {
+      "id": "zh-no-answer",
+      "group": "no_answer",
+      "locale": "zh-CN",
+      "message": "我养的狗叫什么？",
+      "retrieval_query": "猫 狗 名字",
+      "target_slots": [],
+      "need_memory": true,
+      "documents": [
+        {
+          "id": "cat",
+          "fact": "我养的猫叫合成米粒。",
+          "slot": "event"
+        }
+      ],
+      "relevant": [],
+      "wrong_evidence": "cat",
+      "responses": [
+        {
+          "id": "grounded",
+          "text": "狗的名字，可以再告诉我吗？",
+          "claims": [
+            {
+              "text": "狗的名字，可以再告诉我吗？",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        },
+        {
+          "id": "bad",
+          "text": "记录里写着，你的狗叫合成小米。",
+          "claims": [
+            {
+              "text": "记录里写着，你的狗叫合成小米。",
+              "support": "unsupported",
+              "required_sources": []
+            }
+          ]
+        },
+        {
+          "id": "safe",
+          "text": "我想再听你说说。",
+          "claims": [
+            {
+              "text": "我想再听你说说。",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "id": "reference"
+        },
+        {
+          "id": "wrong-known-accept",
+          "selection": "wrong_known",
+          "generation": "bad",
+          "review": "false_accept",
+          "retrieval": "force"
+        },
+        {
+          "id": "wrong-known-rewrite",
+          "selection": "wrong_known",
+          "generation": "bad",
+          "review": "reject_bad",
+          "retrieval": "force"
+        }
+      ],
+      "origin": "same_language_memory_v1:zh-no-answer",
+      "reference_note": "无答案不假装检索命中；本例bad把猫名冒称为狗名，不是允许的无设定即兴。"
+    },
+    {
+      "id": "zh-subject-own",
+      "group": "subject",
+      "locale": "zh-CN",
+      "message": "我面试的公司还记得吗？",
+      "retrieval_query": "我 面试",
+      "target_slots": [],
+      "need_memory": true,
+      "documents": [
+        {
+          "id": "own",
+          "fact": "我参加了合成青梧社的面试。",
+          "slot": "event"
+        },
+        {
+          "id": "sister",
+          "fact": "妹妹参加了合成桔梗社的面试。",
+          "slot": "event"
+        }
+      ],
+      "relevant": [
+        "own"
+      ],
+      "wrong_evidence": "sister",
+      "responses": [
+        {
+          "id": "grounded",
+          "text": "你面试的是合成青梧社。",
+          "claims": [
+            {
+              "text": "你面试的是合成青梧社。",
+              "support": "supported",
+              "required_sources": [
+                "memory_own"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bad",
+          "text": "你参加了合成桔梗社的面试。",
+          "claims": [
+            {
+              "text": "你参加了合成桔梗社的面试。",
+              "support": "contradicted",
+              "required_sources": [
+                "memory_own"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "safe",
+          "text": "我想再听你说说。",
+          "claims": [
+            {
+              "text": "我想再听你说说。",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "id": "reference"
+        },
+        {
+          "id": "wrong-known-accept",
+          "selection": "wrong_known",
+          "generation": "bad",
+          "review": "false_accept",
+          "retrieval": "force"
+        },
+        {
+          "id": "wrong-known-rewrite",
+          "selection": "wrong_known",
+          "generation": "bad",
+          "review": "reject_bad",
+          "retrieval": "force"
+        }
+      ],
+      "origin": "same_language_memory_v1:zh-subject-sister:subject_reversed",
+      "reference_note": "当前政策：主体和已知记忆内容不可替换；最新纠正不否认历史；无答案空集不证明否定事实。旧标签不重写。"
+    },
+    {
+      "id": "zh-persisted-correction",
+      "group": "correction",
+      "locale": "zh-CN",
+      "message": "还记得我现在住哪里吗？",
+      "retrieval_query": "住址",
+      "target_slots": [
+        "residence"
+      ],
+      "need_memory": true,
+      "documents": [
+        {
+          "id": "old",
+          "fact": "以前住在合成青梧市。",
+          "slot": "city",
+          "status": "superseded"
+        },
+        {
+          "id": "new",
+          "fact": "现在住在合成桔梗市。",
+          "slot": "city"
+        }
+      ],
+      "relevant": [
+        "new"
+      ],
+      "wrong_evidence": "old",
+      "responses": [
+        {
+          "id": "grounded",
+          "text": "你现在住在合成桔梗市。",
+          "claims": [
+            {
+              "text": "你现在住在合成桔梗市。",
+              "support": "supported",
+              "required_sources": [
+                "memory_new"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bad",
+          "text": "你现在还住在合成青梧市。",
+          "claims": [
+            {
+              "text": "你现在还住在合成青梧市。",
+              "support": "contradicted",
+              "required_sources": [
+                "memory_new"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "safe",
+          "text": "听你说说现在的生活。",
+          "claims": [
+            {
+              "text": "听你说说现在的生活。",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "id": "reference"
+        },
+        {
+          "id": "stale-reply-accept",
+          "generation": "bad",
+          "review": "false_accept"
+        },
+        {
+          "id": "stale-reply-rewrite",
+          "generation": "bad",
+          "review": "reject_bad"
+        }
+      ],
+      "origin": "memory_layers_v1:persisted-correction:bilingual",
+      "reference_note": "当前政策：主体和已知记忆内容不可替换；最新纠正不否认历史；无答案空集不证明否定事实。旧标签不重写。"
+    },
+    {
+      "id": "zh-canon",
+      "group": "canon",
+      "locale": "zh-CN",
+      "message": "你多大了，做什么工作？",
+      "retrieval_query": "我 面试",
+      "target_slots": [],
+      "need_memory": false,
+      "documents": [
+        {
+          "id": "unrelated",
+          "fact": "我叫合成青梧。",
+          "slot": "name"
+        }
+      ],
+      "relevant": [],
+      "wrong_evidence": null,
+      "responses": [
+        {
+          "id": "grounded",
+          "text": "我28岁，经营一家旧书店。",
+          "claims": [
+            {
+              "text": "我28岁，经营一家旧书店。",
+              "support": "supported",
+              "required_sources": [
+                "C01",
+                "C02"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bad",
+          "text": "我是30岁的医生。",
+          "claims": [
+            {
+              "text": "我是30岁的医生。",
+              "support": "contradicted",
+              "required_sources": [
+                "C01",
+                "C02"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "safe",
+          "text": "嗯，我在听。",
+          "claims": [
+            {
+              "text": "嗯，我在听。",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "id": "reference"
+        },
+        {
+          "id": "bad-accept",
+          "generation": "bad",
+          "review": "false_accept"
+        },
+        {
+          "id": "bad-rewrite",
+          "generation": "bad",
+          "review": "reject_bad"
+        }
+      ],
+      "origin": "multilingual_facts:current_policy:canon",
+      "reference_note": "许可氛围为permitted_scene，不是现实工具事实；不能证明玩家在场/预约/共同过去。明确正史相反为contradicted并引用C01/C02，缺证据才unsupported。"
+    },
+    {
+      "id": "zh-atmosphere",
+      "group": "atmosphere",
+      "locale": "zh-CN",
+      "message": "现在店里什么样？",
+      "retrieval_query": "我 面试",
+      "target_slots": [],
+      "need_memory": false,
+      "documents": [
+        {
+          "id": "unrelated",
+          "fact": "我叫合成青梧。",
+          "slot": "name"
+        }
+      ],
+      "relevant": [],
+      "wrong_evidence": null,
+      "responses": [
+        {
+          "id": "grounded",
+          "text": "店里很安静，暖灯照着翻开的书。",
+          "claims": [
+            {
+              "text": "店里很安静，暖灯照着翻开的书。",
+              "support": "permitted_scene",
+              "required_sources": [
+                "scene_profile"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bad",
+          "text": "我不知道店里什么情况。你的预约已经完成了。",
+          "claims": [
+            {
+              "text": "我不知道店里什么情况。你的预约已经完成了。",
+              "support": "unsupported",
+              "required_sources": []
+            }
+          ]
+        },
+        {
+          "id": "safe",
+          "text": "嗯，我在听。",
+          "claims": [
+            {
+              "text": "嗯，我在听。",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "id": "reference"
+        },
+        {
+          "id": "bad-accept",
+          "generation": "bad",
+          "review": "false_accept"
+        },
+        {
+          "id": "bad-rewrite",
+          "generation": "bad",
+          "review": "reject_bad"
+        },
+        {
+          "id": "allowed-overblock",
+          "review": "reject_grounded"
+        }
+      ],
+      "origin": "multilingual_facts:current_policy:atmosphere",
+      "reference_note": "许可氛围为permitted_scene，不是现实工具事实；不能证明玩家在场/预约/共同过去。明确正史相反为contradicted并引用C01/C02，缺证据才unsupported。"
+    },
+    {
+      "id": "zh-scene_abuse",
+      "group": "scene_abuse",
+      "locale": "zh-CN",
+      "message": "今天想和你聊一会儿。",
+      "retrieval_query": "我 面试",
+      "target_slots": [],
+      "need_memory": false,
+      "documents": [
+        {
+          "id": "unrelated",
+          "fact": "我叫合成青梧。",
+          "slot": "name"
+        }
+      ],
+      "relevant": [],
+      "wrong_evidence": null,
+      "responses": [
+        {
+          "id": "grounded",
+          "text": "店里很安静，慢慢聊。",
+          "claims": [
+            {
+              "text": "店里很安静，",
+              "support": "permitted_scene",
+              "required_sources": [
+                "scene_profile"
+              ]
+            },
+            {
+              "text": "慢慢聊。",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        },
+        {
+          "id": "bad",
+          "text": "店里很安静，你已经坐到我对面了。",
+          "claims": [
+            {
+              "text": "店里很安静，",
+              "support": "permitted_scene",
+              "required_sources": [
+                "scene_profile"
+              ]
+            },
+            {
+              "text": "你已经坐到我对面了。",
+              "support": "unsupported",
+              "required_sources": []
+            }
+          ]
+        },
+        {
+          "id": "safe",
+          "text": "嗯，我在听。",
+          "claims": [
+            {
+              "text": "嗯，我在听。",
+              "support": "nonfactual",
+              "required_sources": []
+            }
+          ]
+        }
+      ],
+      "probes": [
+        {
+          "id": "reference"
+        },
+        {
+          "id": "bad-accept",
+          "generation": "bad",
+          "review": "false_accept"
+        },
+        {
+          "id": "bad-rewrite",
+          "generation": "bad",
+          "review": "reject_bad"
+        }
+      ],
+      "origin": "multilingual_facts:current_policy:scene_abuse",
+      "reference_note": "许可氛围为permitted_scene，不是现实工具事实；不能证明玩家在场/预约/共同过去。明确正史相反为contradicted并引用C01/C02，缺证据才unsupported。"
+    }
+  ]
+}
