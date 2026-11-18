@@ -48,4 +48,6 @@ PR #44合并审阅仅离线检查，真实API0；单例选择成功不代替完�
 
 PR #45合并审阅仅离线，修复测试工具把HTTP200审查兜底误当成功的退出码；开发期原回复/指纹不改，实际质量与母语盲评仍未验收。[审阅记录](TEST_HISTORY.md#pr45-merge-review)。
 
-陌生真实合成回复离线入口及fact-care-v5在任务分支开发：历史2条开发参考不等于金标准；本轮8次实际模型调用中中文链路完成、日语审查invalid_output保留，V5仅离线改善。[M5](M5_EVALUATION.md#observed-reply-entry)／[记录](TEST_HISTORY.md#observed-replies-20261118)。
+陌生真实合成回复离线入口及fact-care-v5经PR #46交付：历史2条开发参考不等于金标准；开发期8次实际模型调用中中文链路完成、日语审查invalid_output保留，V5仅离线改善。[M5](M5_EVALUATION.md#observed-reply-entry)／[记录](TEST_HISTORY.md#observed-replies-20261118)。
+
+PR #46合并审阅真实API0，离线/来源检查通过后squash交付、同步main并清理任务分支。日语审查失败、V5未真实复测与母语盲评待完成保留。[审阅记录](TEST_HISTORY.md#pr46-merge-review)。

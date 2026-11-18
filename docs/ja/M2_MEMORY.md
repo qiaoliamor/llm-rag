@@ -140,3 +140,5 @@ retest_memory_canon.py --liveは固定旧失敗だけ、日語主体plan／選�
 ## 双語の実段階検証（2026-11-18）
 
 test-only understanderで固定合成例のplan／選択／生成／審査を実モデルへ。中文永続訂正はnewだけ候補／注入して完了。日語無答はcat候補から空選、審査invalid_outputで安全fallback、全経路成功ではありません。query v5／selection v6／8+8秒・権限／確認／epoch不変、最終fact-care-v5は離線だけで修復未検証。B01–B03／母語盲評待ちを保持。[原記録](../TEST_HISTORY.md#observed-replies-20261118)。
+
+本節の実装はPR #46で提供。マージ確認の実API0、日語審査失敗／V5実再試未実施を維持。

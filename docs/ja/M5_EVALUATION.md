@@ -123,7 +123,7 @@ fact-care-v3はV2全文保存、主体／訂正と履歴・反証C01/C02・混�
 
 PR #45レビュー補足：実測CLIの0終了にはHTTP200／accepted／審査出力が必要。安全fallback・未完了審査は終了1。未知返答はunratedのまま、0を独立品質合格としません。修正は離線のみで旧成功実APIは反復なし。
 
-## 未知の実合成返答の離線評価（2026-11-18、レビュー待ち）
+## 未知の実合成返答の離線評価（2026-11-18、PR #46提供）
 
 `evaluate_observed_replies.py`は保存済みGemini合成2出力（PR #45日本語／PR #42中文）と別の作者開発参考を読みます。既存Claim/check_claimsでUnicode全片段・ID白名簿を検査し、proposition／rationale／claim_index付き欠落を記録。原文SHA・不変Git文書・元場面・宣言選択・人物根拠を照合、転記は署名付き実行証明ではありません。中文の旧公開状態は未観測と明示。
 

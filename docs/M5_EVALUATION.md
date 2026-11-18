@@ -179,7 +179,7 @@ PR #45审阅补充：限量实测CLI的退出0须完整技术流程成功（HTTP
 
 <a id="observed-reply-entry"></a>
 
-## 陌生真实合成回复的离线入口（2026-11-18，任务分支待审）
+## 陌生真实合成回复的离线入口（2026-11-18，PR #46交付）
 
 实现`app/observed_reply_evaluation.py`、`scripts/evaluate_observed_replies.py`，输入与作者开发参考分别为`evaluations/current_policy/gemini_observations_v1.json`、`observed_reply_reference_dev_v1.json`。转录PR #45日语妹妹回复、PR #42复用审查的中文原回复，不重复调用模型。它们来自Gemini合成实验，不是玩家对话或私人评分原件；中文样本的历史发布状态未观察，不冒称已经在网页发布。
 
