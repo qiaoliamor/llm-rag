@@ -57,4 +57,6 @@ V5日語無答審査の簡素化はPR #47提供、V5保持・関連能力のみ�
 
 PR #47マージ確認は実API0、離線／来歴確認後squash、main同期／分岐清理。旧invalid_output／実timeoutは未解決のまま保持。[記録](../TEST_HISTORY.md#pr47-merge-review)。
 
-現在は普通の日中会話を優先。contextual既定／親密度口調は作業分岐、Gemini合成4例全200、能力許可不変。[M1](M1_CHAT.md)／[記録](../TEST_HISTORY.md#practical-companion-20261124)。正式受入は後続、本回M6未開始。
+現在は普通の日中会話を優先。contextual既定／親密度口調はPR #48提供、Gemini合成4例全200、能力許可不変。[M1](M1_CHAT.md)／[記録](../TEST_HISTORY.md#practical-companion-20261124)。正式受入は後続、本回M6未開始。
+
+PR #48確認は実API0、離線／一時PG／原文指紋確認後squash、main同期／分岐清理。歴史失敗／未検証保持、M6未開始。[記録](../TEST_HISTORY.md#pr48-merge-review)。
