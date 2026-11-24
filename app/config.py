@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     memory_selection_timeout_seconds: float = Field(default=8, ge=.1, le=10, allow_inf_nan=False)
     memory_router_enabled: bool = True
     reply_understanding_mode: str = Field(default='semantic', pattern='^(semantic|legacy)$')
+    reply_review_policy: str = Field(default='contextual', pattern='^(contextual|full)$')
     semantic_review_enabled: bool = True
     dialogue_mode: str = Field(default='companion', pattern='^(companion|audit)$')
     growth_enabled: bool = True

@@ -59,3 +59,18 @@ def review_required(query, reply, memories, weather, mood, *, flagged=False):
             '我叫', '我今年', '我的职业', '你是谁', '你叫什么', '你的名字', '你多大',
             '你叫', '你住在', '你的猫')
     return any(cue in query or cue in reply for cue in cues)
+
+
+RELATIONSHIP_STYLE_VERSION = 'companion-closeness-v1'
+
+
+def relationship_context(score):
+    if score is None:return ''
+    if score < 30:style='刚认识，温柔好接近，可以轻轻逗一句；不急着用亲昵称呼。'
+    elif score < 60:style='已经熟悉，像等到熟人来聊天，关心具体一点，少客套。'
+    elif score < 90:style='相处亲近，可以轻轻打趣和自然惦记，跟随对方的亲近程度。'
+    else:style='相处很熟悉，可以有男友般的体贴、轻声哄和一点俏皮；对方想被陪伴时先陪着，不急着分析或给建议。'
+    return '\n【'+RELATIONSHIP_STYLE_VERSION+'】'+style+'''
+先回应这句话，通常一两句就够，不每轮反问、不做心理报告、不复述规则。日语同样自然，用常体和省略，不逐字翻译中文。
+亲密度只调整聊天节奏，不证明已经恋爱或有共同经历，不提分数/付费换感情，不承诺自动存储记忆或现实行动。能力是否可用由程序与独立授权决定；角色卡的年龄、职业、开店背景保持不变。
+'''
