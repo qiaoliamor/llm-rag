@@ -233,3 +233,15 @@ M6未开始；历史文档整理不改功能/Prompt；当前日语基础适配�
 [设计](docs/M5_EVALUATION.md#scoped-review-v5)／[原记录](docs/TEST_HISTORY.md#japanese-review-v5-20261118)。
 
 - [x] PR #47合并审阅：核对V5/旧完整组装保留、逐请求能力规则/原校验、两调用预算和失败路径、来源/封存/敏感值；离线全量/临时PG通过，随PR squash、快进同步main核对树并清理分支。本轮真实API0，保留旧invalid_output、本次超时、未验证与母语盲评待完成，M5未验收、M6未开始。[记录](docs/TEST_HISTORY.md#pr47-merge-review)。
+
+## 先验证普通聊天可用（2026-11-24，PR #48交付）
+
+- [x] contextual新默认：普通companion无能力上下文生成一次，full/能力路径保留原审查；无新语言正则或判定模型。
+- [x] 亲密度档位调整温柔/熟悉/体贴语气，资格30/60/90与独立授权、低分不冷淡、钱包边界不变。
+- [x] 合成Gemini固定4类各1次，4/4 HTTP200，原文/耗时/中文夹词留档，不重试；真实能力API本轮未调用。
+- [x] 新默认/权限/撤回竞态/失败/持久化、解锁与礼物等离线回归；历史回归与分层回放显式full。
+- [ ] 先本地体验，再按真实使用问题修整并另议M6；本轮不开始M6。旧invalid_output/超时/正式研究验收与母语盲评未关闭，保留后续但不阻塞这轮普通聊天。
+
+[设计](docs/M1_CHAT.md#practical-companion)／[原回复与测试](docs/TEST_HISTORY.md#practical-companion-20261124)。
+
+- [x] PR #48合并审阅：新默认/能力审查与授权、亲密度语气、epoch/事务及固定烟测预算核对；离线全量/临时PG/来源与敏感值通过，随PR squash、快进main核对树并清理分支。本轮真实API0，保留原回复/口误、历史失败与未验证项，M6未开始。[记录](docs/TEST_HISTORY.md#pr48-merge-review)。

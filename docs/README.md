@@ -55,3 +55,7 @@ PR #46合并审阅真实API0，离线/来源检查通过后squash交付、同步
 V5日语无答案审查简化经PR #47交付：原V5保留，按证据附相关能力规则，4133→1951字符。真实2调用生成后审查超时/503，未发布未保存；旧invalid_output仍未排除，V5未成功验证。[设计](M5_EVALUATION.md#scoped-review-v5)／[记录](TEST_HISTORY.md#japanese-review-v5-20261118)。
 
 PR #47合并审阅真实API0，代码/来源/离线检查通过后squash、同步main并清理任务分支。旧invalid_output及本次超时仍保留，不代表真实修复。[审阅记录](TEST_HISTORY.md#pr47-merge-review)。
+
+当前先验证普通中日陪伴可用：新contextual默认/亲密度语气经PR #48交付，Gemini四个合成场景全200，能力授权不变。[M1](M1_CHAT.md#practical-companion)／[原记录](TEST_HISTORY.md#practical-companion-20261124)。旧正式验收待办保留，本轮不开始M6。
+
+PR #48审阅真实API0，离线全量/临时PG与原文指纹检查通过后squash、同步main并清理任务分支；历史失败/未验证项保留，本轮不开始M6。[记录](TEST_HISTORY.md#pr48-merge-review)。

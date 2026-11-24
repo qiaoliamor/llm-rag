@@ -140,3 +140,7 @@ fact-care-v5は独立短版、V3/V4全文保存。回答1488→690・審査追�
 `fact-review-context-v1`はV5回答／事実ルールを変更せず、重複した基本説明を短いJSON契約へ置換。旧完全構成は保存します。weather_current、emotion_current/emotion_policyが本輪にあり対応semanticの時だけ各能力ルールを追加、共有providerに状態を保存しません。既定の記憶のみではsystem部分4133→1951 Unicode文字、証拠／schema／tokenは別です。短縮は遅延／費用改善の実証ではありません。権限・根拠・全unit・数値・epoch・一度の書直し予算は維持します。
 
 固定旧無答例は成功した合成query／空選を再利用し、実生成1＋審査1の最大2呼出、query／選択APIなし、retry／実rewriteなし。生成12.619秒、審査8.002秒timeoutでHTTP503、未公開／保存0／終了1。V5は実試行しましたが審査未完了、旧invalid_output解決とは判断しません。旧失敗／母語盲評待ち／M5未受入／M6未開始を維持。[設計](../M5_EVALUATION.md#scoped-review-v5)／[原記録](../TEST_HISTORY.md#japanese-review-v5-20261118)。
+
+## 今回は実用体験を優先（2026-11-24）
+
+普段の応答・人物の基本設定・親密度資格と優しさを軽い開発確認にします。既定contextualは能力文脈のない自由文へ裁判を追加せず、人物紹介もPromptに依存。旧invalid_output／timeout解決を意味せず、full／歴史再現と旧基準・封存・母語盲評待ちは保存。実4例の成功は正式品質や安定性の受入ではありません。[会話設計](M1_CHAT.md)／[原記録](../TEST_HISTORY.md#practical-companion-20261124)。M6は開始しません。

@@ -27,7 +27,7 @@ try:
     connection.execute(sql.SQL('CREATE DATABASE {}').format(sql.Identifier(name)))
     child={**os.environ,'TEST_POSTGRES_URL':url.set(database=name).render_as_string(hide_password=False)}
     paths = (['tests/growth/test_progression.py'] if args.growth_only else
-             ['tests/test_memory.py','tests/growth/test_progression.py','tests/multilingual_facts'] if args.semantic_reply else
+             ['tests/test_memory.py','tests/growth/test_progression.py','tests/multilingual_facts','tests/practical'] if args.semantic_reply else
              ['tests/test_emotion.py','tests/growth/test_progression.py','tests/multilingual_emotion'] if args.semantic_emotion else
              ['tests/test_weather.py','tests/growth/test_progression.py','tests/multilingual_weather'] if args.semantic_weather else
              ['tests/test_memory.py','tests/growth/test_progression.py','tests/multilingual_memory','tests/japanese_evaluation','tests/japanese_layers'] if args.semantic_memory else

@@ -15,7 +15,7 @@ REWRITE='''\n上次输出违反证据或表达边界。重新回答：保留场�
 
 async def generate_checked(provider,history,prompt,query,memories,weather,mood,mood_settings,
                            *,judge=None,review_enabled=True,review_timeout=8,companion=False, force_review=False,
-                           locale='zh-CN', multilingual_weather=False,multilingual_emotion=False,multilingual_facts=False):
+                           locale='zh-CN', multilingual_weather=False,multilingual_emotion=False,multilingual_facts=False, review_policy='full'):
     from . import companion as natural
     from .localization import fixed_reply
     fallback = fixed_reply(natural.FALLBACK if companion else FALLBACK,locale)
@@ -44,6 +44,11 @@ async def generate_checked(provider,history,prompt,query,memories,weather,mood,m
     for attempt in range(2):
         rewrite = (natural.REWRITE if companion else REWRITE+CONVERSATION_FACT_RULES) + (weather_voice.REWRITE if weather_active else '')+(emotion_voice.REWRITE if emotion_context else '')+(fact_voice.REWRITE if multilingual_facts else '')
         reply=await provider.generate(history,prompt+(rewrite+feedback if attempt else ''))
+        if (companion and multilingual_facts and review_policy == 'contextual' and attempt == 0
+                and not (force_review or memories or weather_active or emotion_active)):
+            # Ordinary chat relies on the role prompt, not an extra judge call.
+            # No claim of per-sentence verification; capability evidence keeps review.
+            return reply,False,{'status':'prompt_only','calls':0}
         if (multilingual_facts and attempt == 0 and not (force_review or memories or weather_active or emotion_active)
                 and reply in fact_voice.TRUSTED_TEMPLATES.get(locale, ())):
             return reply,False,{'status':'trusted_template','calls':0}

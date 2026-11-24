@@ -249,7 +249,8 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
         async with session.lock:
             turn_started = growth.clock() if growth else None
             snapshot = store.settings(session.user_id)
-            abilities = growth.get(session.user_id)['character']['abilities'] if growth else {'memory':True,'emotion':True,'weather':True}
+            bond_view = growth.get(session.user_id)['character'] if growth else None
+            abilities = bond_view['abilities'] if bond_view else {'memory':True,'emotion':True,'weather':True}
             if session.memory_epoch != snapshot['epoch']:
                 session.messages.clear()
                 session.pending_weather = None
@@ -302,7 +303,7 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
             if not weather_semantic: session.pending_weather = pending
             natural = settings.dialogue_mode == 'companion'
             if natural:
-                prompt = companion.instructions() + (fact_voice.memory_context(evidence) if reply_semantic else companion.memory_context(evidence, body.message))
+                prompt = companion.instructions() + companion.relationship_context(bond_view['score'] if bond_view else None) + (fact_voice.memory_context(evidence) if reply_semantic else companion.memory_context(evidence, body.message))
                 prompt += weather_prompt(weather_result) + (semantic_emotion.emotion_prompt(mood_result,mood_settings) if emotion_semantic else emotion_prompt(mood_result, mood_settings))
             else:
                 prompt = instructions() + weather_prompt(weather_result) + (fact_voice.memory_context(evidence) if reply_semantic else memory_prompt(evidence)) + (semantic_emotion.emotion_prompt(mood_result,mood_settings) if emotion_semantic else emotion_prompt(mood_result, mood_settings))
@@ -320,7 +321,7 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
                     reply, guarded, review_status = await generate_checked(language_provider(provider,body.locale),model_history,prompt,body.message,
                         evidence,weather_result,mood_result,mood_settings,judge=judge,
                         review_enabled=settings.semantic_review_enabled,review_timeout=settings.semantic_review_timeout_seconds,companion=natural,
-                        force_review=semantic_memory and route.need_memory,locale=body.locale,multilingual_weather=weather_semantic,multilingual_emotion=emotion_semantic,multilingual_facts=reply_semantic)
+                        force_review=semantic_memory and route.need_memory,locale=body.locale,multilingual_weather=weather_semantic,multilingual_emotion=emotion_semantic,multilingual_facts=reply_semantic,review_policy=settings.reply_review_policy)
             except TimeoutError:
                 raise ProviderFailure('timeout', '模型响应超时，请稍后重试。', 504) from None
             verify_epoch(session, snapshot['epoch'])
