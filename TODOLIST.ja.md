@@ -209,3 +209,13 @@
 [設計](docs/ja/M5_EVALUATION.md)／[原記録](docs/TEST_HISTORY.md#japanese-review-v5-20261118)。
 
 - [x] PR #47レビュー：V5／旧完全構成、逐要求の能力規則／原検査、2呼出／失敗処理、来歴／封存／機密値を確認。全量／一時PG後squash、main同期／ツリー照合／分岐清理。本回実API0、旧invalid_output／実timeout／未検証／母語盲評待ち維持、M5未受入／M6未開始。[記録](docs/TEST_HISTORY.md#pr47-merge-review)。
+
+## 先に普段の会話を確認（2026-11-24、レビュー待ち）
+
+- [x] contextual既定で能力文脈なしのcompanionは生成1回。full／能力経路は審査維持、追加モデルや言語正規表現なし。
+- [x] 親密度段階で自然な気遣い、30／60／90資格・個別許可と低得点で冷たくしない方針は維持。
+- [x] 合成Gemini4類各1回、4／4 HTTP200、原文／時間／中文混入を保存、retryなし。実能力APIは未実施。
+- [x] 新既定／権限／撤回競合／失敗／永続化／ギフトを離線回帰、歴史回帰／層別再現はfull固定。
+- [ ] 次はローカル体験、実際の問題を修正して別途M6を相談。本回M6未開始、旧審査失敗／正式研究受入／母語盲評待ちは後続として保留。
+
+[設計](docs/ja/M1_CHAT.md)／[原記録](docs/TEST_HISTORY.md#practical-companion-20261124)。

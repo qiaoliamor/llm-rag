@@ -218,7 +218,7 @@ def _run_probe(case,probe,url,*,providers=None):
             return {'decision':'revise' if reject else 'accept','confidence':.95,'role_issues':[],'segments':segments}
     settings=Settings(_env_file=None,chat_provider='mock',weather_provider='mock',dialogue_mode='companion',growth_enabled=True,
         memory_understanding_mode='semantic',weather_understanding_mode='semantic',emotion_understanding_mode='semantic',
-        reply_understanding_mode='semantic',memory_database_url=url)
+        reply_understanding_mode='semantic',reply_review_policy='full',memory_database_url=url)  # Historical reviewed replay, not practical default.
     app=web.create_app(settings,Generator(),memory_understander=Analyst(),semantic_judge=Judge())
     store=app.state.memory_store
     try:
