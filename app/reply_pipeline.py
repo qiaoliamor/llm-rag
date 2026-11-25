@@ -45,7 +45,7 @@ async def generate_checked(provider,history,prompt,query,memories,weather,mood,m
         rewrite = (natural.REWRITE if companion else REWRITE+CONVERSATION_FACT_RULES) + (weather_voice.REWRITE if weather_active else '')+(emotion_voice.REWRITE if emotion_context else '')+(fact_voice.REWRITE if multilingual_facts else '')
         reply=await provider.generate(history,prompt+(rewrite+feedback if attempt else ''))
         if (companion and multilingual_facts and review_policy == 'contextual' and attempt == 0
-                and not (force_review or memories or weather_active or emotion_active)):
+                and not (force_review or memories or weather or emotion_active or (mood and mood.get('assessment')))):
             # Ordinary chat relies on the role prompt, not an extra judge call.
             # No claim of per-sentence verification; capability evidence keeps review.
             return reply,False,{'status':'prompt_only','calls':0}

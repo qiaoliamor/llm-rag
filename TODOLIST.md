@@ -245,3 +245,13 @@ M6未开始；历史文档整理不改功能/Prompt；当前日语基础适配�
 [设计](docs/M1_CHAT.md#practical-companion)／[原回复与测试](docs/TEST_HISTORY.md#practical-companion-20261124)。
 
 - [x] PR #48合并审阅：新默认/能力审查与授权、亲密度语气、epoch/事务及固定烟测预算核对；离线全量/临时PG/来源与敏感值通过，随PR squash、快进main核对树并清理分支。本轮真实API0，保留原回复/口误、历史失败与未验证项，M6未开始。[记录](docs/TEST_HISTORY.md#pr48-merge-review)。
+
+## 日语跨会话记忆（2026-11-25）
+
+- [x] 固定合成场景，确认和纠正后各在新会话完成真实召回，核对只注入对应版本。
+- [x] 实测删除后无候选，保留未发布原草稿和预算拦截记录。默认陪伴的确认无候选分支改为一次生成，补生命周期和审查边界离线回归。
+- [ ] 删除后新路径的 Gemini 发布效果待验证。保留历史失败、独立母语盲评及正式质量待办，M6 未开始。
+
+[原回复与测试](docs/TEST_HISTORY.md#ja-memory-lifecycle-20261125)
+
+- [x] PR #49 合并审阅。确认无候选、选证未决和工具审查边界通过离线回归。删除后草稿未发布，新路径的 Gemini 验证和母语盲评仍待完成。M6 未开始。[审阅记录](docs/TEST_HISTORY.md#pr49-merge-review)

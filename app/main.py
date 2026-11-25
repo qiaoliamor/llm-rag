@@ -311,7 +311,14 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
                 if not route.need_memory:
                     prompt += NO_MEMORY_CONTEXT
             if reply_semantic: prompt += fact_voice.ANSWER_PROMPT
-            if semantic_memory: prompt += memory_reply_context(evidence, requested=route.need_memory)
+            empty_memory = semantic_memory and route.need_memory and selection_status == 'empty'
+            if semantic_memory:
+                prompt += memory_reply_context(evidence, requested=route.need_memory)
+            prompt_only_empty_memory = (empty_memory and natural and reply_semantic
+                                        and settings.reply_review_policy == 'contextual')
+            if prompt_only_empty_memory:
+                prompt += ('\n本轮没有可用的记忆。就用户的问题自然回应，必要时请对方补充。'
+                           '不要断定对方以前说过或从未说过，也不要猜测具体内容。')
             if weather_semantic and weather_result: prompt += weather_voice.ANSWER_PROMPT
             if emotion_semantic and mood_settings['enabled']:prompt+=emotion_voice.ANSWER_PROMPT
             prompt += language_prompt(body.locale, previous=session.reply_locale)
@@ -321,7 +328,7 @@ def create_app(settings=None, provider=None, weather_provider=None, emotion_prov
                     reply, guarded, review_status = await generate_checked(language_provider(provider,body.locale),model_history,prompt,body.message,
                         evidence,weather_result,mood_result,mood_settings,judge=judge,
                         review_enabled=settings.semantic_review_enabled,review_timeout=settings.semantic_review_timeout_seconds,companion=natural,
-                        force_review=semantic_memory and route.need_memory,locale=body.locale,multilingual_weather=weather_semantic,multilingual_emotion=emotion_semantic,multilingual_facts=reply_semantic,review_policy=settings.reply_review_policy)
+                        force_review=semantic_memory and route.need_memory and not prompt_only_empty_memory,locale=body.locale,multilingual_weather=weather_semantic,multilingual_emotion=emotion_semantic,multilingual_facts=reply_semantic,review_policy=settings.reply_review_policy)
             except TimeoutError:
                 raise ProviderFailure('timeout', '模型响应超时，请稍后重试。', 504) from None
             verify_epoch(session, snapshot['epoch'])
