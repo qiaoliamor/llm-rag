@@ -28,7 +28,7 @@ def test_plain_chat_one_generation_even_if_judge_unavailable(locale,judge_availa
     if judge:judge.review.assert_not_awaited()
 
 
-@pytest.mark.parametrize('trigger',['memory','empty_requested','weather','emotion','full','audit'])
+@pytest.mark.parametrize('trigger',['memory','empty_requested','weather','emotion','legacy_weather','legacy_emotion','full','audit'])
 def test_capability_context_and_full_mode_still_require_review(trigger):
     generator=SimpleNamespace(generate=AsyncMock(return_value='unreviewed synthetic'))
     judge=SimpleNamespace(review=AsyncMock(side_effect=TimeoutError()))
@@ -36,11 +36,11 @@ def test_capability_context_and_full_mode_still_require_review(trigger):
     if trigger=='full':kwargs['review_policy']='full'
     if trigger=='audit':kwargs['companion']=False
     if trigger=='empty_requested':kwargs['force_review']=True
-    weather={'status':'ok','source':'mock','temperature_c':20} if trigger=='weather' else None
-    mood={'status':'analyzed','assessment':{'source':'user','labels':['sadness'],'intensity':.5,'confidence':1,'response_strategy':'listen'}} if trigger=='emotion' else {'status':'disabled','assessment':None}
+    weather={'status':'ok','source':'mock','temperature_c':20} if trigger in ('weather','legacy_weather') else None
+    mood={'status':'analyzed','assessment':{'source':'user','labels':['sadness'],'intensity':.5,'confidence':1,'response_strategy':'listen'}} if trigger in ('emotion','legacy_emotion') else {'status':'disabled','assessment':None}
     kwargs.update(multilingual_weather=trigger=='weather',multilingual_emotion=trigger=='emotion')
     result=asyncio.run(generate_checked(generator,[],'prompt','synthetic',[{'id':'m','fact':'synthetic','event_date':None}] if trigger=='memory' else [],
-        weather,mood,{'enabled':trigger=='emotion','preference':'listen'},judge=judge,**kwargs))
+        weather,mood,{'enabled':trigger in ('emotion','legacy_emotion'),'preference':'listen'},judge=judge,**kwargs))
     assert result[0]!='unreviewed synthetic' and result[2]['calls']==1
     judge.review.assert_awaited_once();generator.generate.assert_awaited_once()
 

@@ -89,5 +89,7 @@
 - retest_japanese_review.py --live固定旧日语无答案尾部：复用PR #46成功合成plan/空选，最多生成1+审查1，不重新理解/选证、不真实重写或重试；测试诊断仅固定错误类型，不能导出SDK原始异常/input。2026-11-18实2调用生成12.619秒、审查8.002秒timeout，HTTP503且未保存草稿；V5已真实尝试但未成功验证，旧invalid_output仍未排除，不能说已修复。旧失败/封存/母语盲评待完成保留，新空包另建不重绑。
 
 - 当前用户优先级（2026-11-24）：先验证普通中日陪伴可用、人设基本一致、亲密度资格与自然体贴语气，不把旧研究性细节审计作为本轮体验阻塞。旧失败/封存/独立盲评待办不删，不冒称正式质量验收；本轮M6仍不开始。
-- 默认REPLY_REVIEW_POLICY=contextual：仅companion+semantic回复、无请求记忆/选证/天气/有效情绪上下文时，普通自由回复生成一次直接返回prompt_only/calls0，角色背景问题同样靠角色Prompt，不做额外语义裁判或关键词门禁。能力上下文和full/audit仍走原审查/数据边界；不是关闭权限或宣称逐句可靠。full供明确旧审查回放；根conftest与japanese_memory_layers历史回放显式固定full，新默认测试在tests/practical。
+- 默认REPLY_REVIEW_POLICY=contextual：仅companion+semantic回复、无记忆请求或已请求但检索确认无候选，且无选证/天气/有效情绪上下文时，普通自由回复生成一次直接返回prompt_only/calls0，角色背景问题同样靠角色Prompt，不做额外语义裁判或关键词门禁。能力上下文和full/audit仍走原审查/数据边界；不是关闭权限或宣称逐句可靠。full供明确旧审查回放；根conftest与japanese_memory_layers历史回放显式固定full，新默认测试在tests/practical。
 - companion-closeness-v1只将服务器亲密度档位映射为语气控制，数字/钱包/联系方式不送模型。低分也温柔，熟悉后可更体贴/轻轻打趣，不自动确立关系或替代30/60/90资格与独立授权。smoke_companion.py --live固定4个合成普通场景，各1次生成、总4、任错停、无能力API/裁判/重试；临时库、关闭授权，原文/耗时保留，不以小样本宣称稳定性或消除幻觉。
+
+- 2026-11-25 日语生命周期验证用同一玩家的三个全新会话与独立临时 SQLite。确认和纠正后真实召回通过，删除后的生成上下文为空，旧审查触发重写并被预算拦截。contextual 仅对 selection=empty 的成功空召回放开一次生成，保留命中、未决或失败选证以及工具审查。删除后的新路径仍待实测。
