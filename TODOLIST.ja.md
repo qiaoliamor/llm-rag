@@ -229,3 +229,5 @@
 - [ ] 削除後の新経路は Gemini での公開確認待ち。過去の失敗、母語盲評、正式評価を保持。M6未着手。
 
 [原文とテスト](docs/TEST_HISTORY.md#ja-memory-lifecycle-20261125)
+
+- [x] PR #49のマージ確認。候補なし、選択未決、ツール審査の境界をオフラインで確認。削除後の元の下書きは未公開。新経路のGemini検証と母語話者によるブラインド評価は保留。M6未着手。[記録](docs/TEST_HISTORY.md#pr49-merge-review)

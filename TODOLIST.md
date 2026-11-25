@@ -253,3 +253,5 @@ M6未开始；历史文档整理不改功能/Prompt；当前日语基础适配�
 - [ ] 删除后新路径的 Gemini 发布效果待验证。保留历史失败、独立母语盲评及正式质量待办，M6 未开始。
 
 [原回复与测试](docs/TEST_HISTORY.md#ja-memory-lifecycle-20261125)
+
+- [x] PR #49 合并审阅。确认无候选、选证未决和工具审查边界通过离线回归。删除后草稿未发布，新路径的 Gemini 验证和母语盲评仍待完成。M6 未开始。[审阅记录](docs/TEST_HISTORY.md#pr49-merge-review)
